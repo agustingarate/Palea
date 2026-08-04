@@ -1,0 +1,32 @@
+{
+  "name": "@palea/http-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup ./src/index.ts --format esm,cjs --dts --watch",
+    "lint": "eslint src",
+    "test": "jest --config ../jest-config/node.cjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@palea/eslint-config": "workspace:*",
+    "@palea/typescript-config": "workspace:*",
+    "axios-mock-adapter": "^2.1.0"
+  }
+}

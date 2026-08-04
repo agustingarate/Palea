@@ -1,0 +1,33 @@
+{
+  "name": "@palea/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup ./src/index.ts --format esm,cjs --dts --watch",
+    "lint": "eslint src",
+    "test": "jest --config ../jest-config/node.cjs --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@palea/trpc": "workspace:*",
+    "@tanstack/react-query": "^5.85.3",
+    "@trpc/client": "^11.4.3",
+    "@trpc/tanstack-react-query": "^11.4.3"
+  },
+  "devDependencies": {
+    "@palea/eslint-config": "workspace:*",
+    "@palea/typescript-config": "workspace:*"
+  }
+}

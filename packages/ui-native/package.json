@@ -1,0 +1,38 @@
+{
+  "name": "@palea/ui-native",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm,cjs --dts --clean --external react --external react-native --external nativewind",
+    "dev": "tsup ./src/index.ts --format esm,cjs --dts --watch --external react --external react-native --external nativewind",
+    "lint": "eslint src",
+    "test": "pnpm build && node ./test/verify-build.cjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "nativewind": "^4.0.0",
+    "react": "^19.1.0",
+    "react-native": "^0.81.0"
+  },
+  "devDependencies": {
+    "@palea/eslint-config": "workspace:*",
+    "@palea/typescript-config": "workspace:*",
+    "@types/react": "^19.1.9",
+    "nativewind": "^4.1.23",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-worklets": "0.5.1"
+  }
+}

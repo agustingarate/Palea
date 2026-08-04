@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.next
+.expo
+.codex
+pnpm-lock.yaml
+*.snap
+expo-env.d.ts
+next-env.d.ts

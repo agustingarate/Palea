@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spec-Driven Delivery"
+  short_description: "Planifica trabajo y entrega guiada por specs"
+  default_prompt: "Use $manage-spec-driven-delivery to turn a product request into specs, ClickUp work items, branches, and validation."

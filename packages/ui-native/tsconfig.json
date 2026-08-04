@@ -1,0 +1,8 @@
+{
+  "extends": "@palea/typescript-config/react.json",
+  "compilerOptions": {
+    "jsxImportSource": "nativewind",
+    "types": ["nativewind/types"]
+  },
+  "include": ["src"]
+}

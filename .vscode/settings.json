@@ -1,0 +1,17 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "tailwindCSS.classAttributes": ["class", "className"],
+  "tailwindCSS.experimental.configFile": {
+    "apps/mobile/tailwind.config.cjs": [
+      "apps/mobile/src/**/*.ts",
+      "apps/mobile/src/**/*.tsx",
+      "packages/ui-native/src/**/*.ts",
+      "packages/ui-native/src/**/*.tsx"
+    ]
+  }
+}

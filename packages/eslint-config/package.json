@@ -1,0 +1,14 @@
+{
+  "name": "@palea/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./base.mjs",
+    "./react": "./react.mjs"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0 || ^10.0.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
