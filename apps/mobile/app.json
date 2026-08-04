@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "palea",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "platforms": ["ios", "android", "web"],
     "plugins": ["expo-router", "expo-font"],
     "experiments": {
