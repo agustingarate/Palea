@@ -17,6 +17,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @palea/design-tokens build
       - run: pnpm validate
       - run: pnpm --filter @palea/mobile exec expo-doctor
       - run: pnpm --filter @palea/mobile export:all
