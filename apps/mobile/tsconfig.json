@@ -4,7 +4,7 @@
     "allowJs": true,
     "moduleResolution": "Bundler",
     "noEmit": true,
-    "types": ["jest", "nativewind/types"],
+    "types": ["jest", "nativewind/types", "node"],
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
     "paths": { "@/*": ["src/*"] }
