@@ -4,6 +4,7 @@ import { AppText, Button, ProjectList } from '@palea/ui-native';
 import { useThemeStore, type ThemePreference } from '@/core/state/themeStore';
 import { FeedbackState } from '@/common/presentation/FeedbackState';
 import { useProjectsViewModel } from '../viewmodels/useProjectsViewModel';
+import { useLocale } from '@/core/localization/LocaleProvider';
 
 const nextTheme: Record<ThemePreference, ThemePreference> = {
   system: 'light',
@@ -13,6 +14,8 @@ const nextTheme: Record<ThemePreference, ThemePreference> = {
 
 export function ProjectsListScreen() {
   const viewModel = useProjectsViewModel();
+  const { t: projectsT } = useLocale('projects');
+  const { t: commonT } = useLocale('common');
   const preference = useThemeStore((state) => state.preference);
   const setPreference = useThemeStore((state) => state.setPreference);
 
@@ -20,8 +23,8 @@ export function ProjectsListScreen() {
     return (
       <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
         <FeedbackState
-          title="Cargando proyectos"
-          message="Estamos preparando tu espacio de trabajo."
+          title={projectsT('loading.title')}
+          message={projectsT('loading.message')}
         />
         <ActivityIndicator />
       </SafeAreaView>
@@ -31,9 +34,9 @@ export function ProjectsListScreen() {
     return (
       <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
         <FeedbackState
-          title="No pudimos cargar los proyectos"
-          message="Revisa la conexión e inténtalo nuevamente."
-          actionLabel="Reintentar"
+          title={projectsT('error.title')}
+          message={projectsT('error.message')}
+          actionLabel={projectsT('error.retry')}
           onAction={() => void viewModel.refresh()}
         />
       </SafeAreaView>
@@ -43,8 +46,8 @@ export function ProjectsListScreen() {
     return (
       <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
         <FeedbackState
-          title="Todavía no hay proyectos"
-          message="Tus búsquedas aparecerán aquí cuando agregues la primera."
+          title={projectsT('empty.title')}
+          message={projectsT('empty.message')}
         />
       </SafeAreaView>
     );
@@ -55,11 +58,11 @@ export function ProjectsListScreen() {
       <View className="flex-1 gap-6 px-4 pt-6">
         <View className="flex-row items-center justify-between gap-4">
           <View className="flex-1">
-            <AppText variant="headline">Proyectos</AppText>
-            <AppText muted>Tu búsqueda laboral, en un solo lugar.</AppText>
+            <AppText variant="headline">{projectsT('title')}</AppText>
+            <AppText muted>{projectsT('subtitle')}</AppText>
           </View>
           <Button
-            label={`Tema: ${preference}`}
+            label={commonT('theme.label', { theme: preference })}
             variant="ghost"
             onPress={() => setPreference(nextTheme[preference])}
           />

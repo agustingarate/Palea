@@ -16,12 +16,15 @@ import {
 import { useColorScheme } from 'nativewind';
 import { DependenciesProvider } from '../di/DependenciesProvider';
 import { useThemeStore } from '../state/themeStore';
+import { getLocales } from 'expo-localization';
+import { LocaleProvider } from '../localization/LocaleProvider';
 
 onlineManager.setEventListener((setOnline) =>
   NetInfo.addEventListener((state) => setOnline(Boolean(state.isConnected))),
 );
 
 export function AppProviders({ children }: PropsWithChildren) {
+  const locale = getLocales()[0]?.languageTag ?? 'es';
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -48,8 +51,12 @@ export function AppProviders({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <DependenciesProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </DependenciesProvider>
+    <LocaleProvider locale={locale}>
+      <DependenciesProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </DependenciesProvider>
+    </LocaleProvider>
   );
 }
