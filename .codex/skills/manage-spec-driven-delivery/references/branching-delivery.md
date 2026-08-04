@@ -48,6 +48,12 @@ main
 
 Create it from an explicit, updated base. Link branch and PR from ClickUp. Avoid unrelated stories in one branch.
 
+Keep incomplete work on the working branch locally when remote pushes trigger
+costly or quota-limited CI. Open the PR and push the branch once the story or
+independently reviewable work item is complete and local validation passes.
+Push earlier only when the user explicitly requests incremental remote feedback
+or an external dependency makes it necessary.
+
 Do not create a branch for an Epic. A User Story may own the implementation branch when it is small and cohesive; otherwise give each independently reviewable Feature, Bug, or other work item its own branch.
 
 ## 3. Delivery Slice integration
