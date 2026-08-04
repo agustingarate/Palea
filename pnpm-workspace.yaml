@@ -2,8 +2,6 @@ packages:
   - apps/*
   - packages/*
 
-confirmModulesPurge: false
-
 allowBuilds:
   '@nestjs/core': true
   esbuild: true
