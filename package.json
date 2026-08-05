@@ -13,6 +13,7 @@
     "format:check": "prettier --check .",
     "lint": "turbo run lint",
     "architecture:check": "depcruise --config dependency-cruiser.cjs apps packages --output-type err",
+    "tech-debt:sync": "node scripts/tech-debt-sync.mjs",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "validate": "pnpm format:check && pnpm lint && pnpm architecture:check && pnpm typecheck && pnpm test && pnpm build",

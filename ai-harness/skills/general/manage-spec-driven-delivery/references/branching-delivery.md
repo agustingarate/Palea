@@ -37,16 +37,19 @@ Use lowercase kebab-case for the slug, avoid spaces/accents, and append the Clic
 
 Keep scopes controlled and stable, for example: `mobile`, `web`, `api`, `db`, `auth`, `onboarding`, `applications`, `metrics`, `shared`, `infra`, `ci`, `specs`, and `e2e`.
 
-## 2. Default branch model
+## 2. Explicit branch model
 
-Prefer a short-lived branch per User Story or independently reviewable work item:
+Require an explicit base branch and PR target for every short-lived branch per
+User Story or independently reviewable work item. Never infer `main`,
+`development`, or another branch when the task/spec/context does not state it:
 
 ```text
 main
 └── feat/applications/change-stage-CU-42
 ```
 
-Create it from an explicit, updated base. Link branch and PR from ClickUp. Avoid unrelated stories in one branch.
+Create it from the explicit, updated base. Link branch and PR from ClickUp. Avoid
+unrelated stories in one branch.
 
 Keep incomplete work on the working branch locally when remote pushes trigger
 costly or quota-limited CI. Open the PR and push the branch once the story or

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync Technical Debt"
+  short_description: "Sincroniza deuda técnica con ClickUp"
+  default_prompt: "Use $tech-debt-clickup-sync to create ClickUp backlog tasks for new technical debt entries."
