@@ -16,5 +16,5 @@
 - Types are consistent: no any or loose types where contracts or shared types exist.
 - New exports or public interfaces are intentional and documented if non-obvious.
 - Assumptions (missing types, unclear requirements, implicit rules) are stated explicitly, not silently assumed.
- - Uncertainty is flagged instead of guessed (e.g. “If X is required, then …” or “Clarify whether …”).
- - No speculative or “might be useful” code without explicit request.
+- Uncertainty is flagged instead of guessed (e.g. “If X is required, then …” or “Clarify whether …”).
+- No speculative or “might be useful” code without explicit request.

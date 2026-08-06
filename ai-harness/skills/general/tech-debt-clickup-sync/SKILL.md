@@ -48,12 +48,14 @@ Use a description containing:
 
 ```markdown
 ## Technical debt
+
 - ID: <ID>
 - Item: <Item>
 - Trigger: <Trigger>
 - Tracker: docs/exec-plans/tech-debt-tracker.md
 
 ## Definition of Done
+
 - [ ] The debt item is resolved or explicitly reclassified.
 - [ ] The triggering condition and affected scope are validated.
 - [ ] Evidence and the resolving PR are linked.

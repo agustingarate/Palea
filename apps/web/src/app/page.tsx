@@ -7,10 +7,7 @@ export default function HomePage() {
   const principles = [
     [t('principle.clarity.title'), t('principle.clarity.description')],
     [t('principle.calm.title'), t('principle.calm.description')],
-    [
-      t('principle.progress.title'),
-      t('principle.progress.description'),
-    ],
+    [t('principle.progress.title'), t('principle.progress.description')],
   ] as const;
   return (
     <main>
@@ -40,9 +37,7 @@ export default function HomePage() {
           </a>
         </div>
         <div className="rounded-[20px] border border-border bg-surface p-6 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-          <p className="text-sm font-medium text-muted">
-            {t('card.label')}
-          </p>
+          <p className="text-sm font-medium text-muted">{t('card.label')}</p>
           <div className="mt-5 grid gap-3">
             {principles.map(([title, text]) => (
               <article

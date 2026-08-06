@@ -63,23 +63,23 @@ Assign stable IDs:
 
 Terminology:
 
-| Token | Meaning | Purpose |
-|---|---|---|
-| `SDD` | Spec-Driven Development | Drive planning, implementation, and validation from an approved specification. |
-| `SPEC` | Specification | Identify the canonical behavior/contract document. |
-| `BR` | Business Rule | Express an invariant or domain rule that must always hold. |
-| `FR` | Functional Requirement | Express behavior the system must provide. |
-| `AC` | Acceptance Criterion | Define an observable scenario proving an outcome is accepted. |
-| `NFR` | Non-Functional Requirement | Define quality attributes or constraints such as performance, accessibility, security, or reliability. |
-| `ADR` | Architecture Decision Record | Preserve a durable architectural decision and its rationale. |
-| `HU` | Historia de Usuario / User Story | Identify the functional outcome that gives requirements product context. |
-| `CU` | ClickUp | Prefix a ClickUp task identifier in branch, commit, or PR references. |
-| `PR` | Pull Request | Review and integrate a bounded change. |
-| `API` | Application Programming Interface | Define a system interaction contract. |
-| `E2E` | End-to-End | Validate a complete user/system flow. |
-| `CI/CD` | Continuous Integration / Continuous Delivery or Deployment | Automate integration, validation, delivery, and deployment. |
-| `DoR` | Definition of Ready | Define when work is sufficiently specified to enter execution. |
-| `DoD` | Definition of Done | Define when work or an outcome is complete and accepted. |
+| Token   | Meaning                                                    | Purpose                                                                                                |
+| ------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `SDD`   | Spec-Driven Development                                    | Drive planning, implementation, and validation from an approved specification.                         |
+| `SPEC`  | Specification                                              | Identify the canonical behavior/contract document.                                                     |
+| `BR`    | Business Rule                                              | Express an invariant or domain rule that must always hold.                                             |
+| `FR`    | Functional Requirement                                     | Express behavior the system must provide.                                                              |
+| `AC`    | Acceptance Criterion                                       | Define an observable scenario proving an outcome is accepted.                                          |
+| `NFR`   | Non-Functional Requirement                                 | Define quality attributes or constraints such as performance, accessibility, security, or reliability. |
+| `ADR`   | Architecture Decision Record                               | Preserve a durable architectural decision and its rationale.                                           |
+| `HU`    | Historia de Usuario / User Story                           | Identify the functional outcome that gives requirements product context.                               |
+| `CU`    | ClickUp                                                    | Prefix a ClickUp task identifier in branch, commit, or PR references.                                  |
+| `PR`    | Pull Request                                               | Review and integrate a bounded change.                                                                 |
+| `API`   | Application Programming Interface                          | Define a system interaction contract.                                                                  |
+| `E2E`   | End-to-End                                                 | Validate a complete user/system flow.                                                                  |
+| `CI/CD` | Continuous Integration / Continuous Delivery or Deployment | Automate integration, validation, delivery, and deployment.                                            |
+| `DoR`   | Definition of Ready                                        | Define when work is sufficiently specified to enter execution.                                         |
+| `DoD`   | Definition of Done                                         | Define when work or an outcome is complete and accepted.                                               |
 
 Include purpose, non-goals, actors/authorization, visible behavior, state transitions, invariants, contracts, failure/retry/concurrency/idempotency, migration/compatibility, telemetry, and test mapping. Avoid incidental implementation detail unless contractual or architecturally approved.
 

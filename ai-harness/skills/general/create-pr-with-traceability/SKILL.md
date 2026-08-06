@@ -115,23 +115,29 @@ The body contains:
 
 ```markdown
 ## Context
+
 <business reason and user value>
 
 ## What changed
+
 <functional and technical summary>
 
 ## Acceptance criteria
+
 - [ ] <requirement or acceptance ID and evidence>
 
 ## Traceability
+
 - ClickUp: <task URL and ID>
 - Spec: <canonical path and revision/status>
 - Requirements: <IDs>
 
 ## Validation
+
 - <command or manual evidence>
 
 ## Risks and follow-up
+
 - <risk, migration, rollout/rollback, or deferred work>
 ```
 
