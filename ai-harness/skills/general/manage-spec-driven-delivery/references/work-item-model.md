@@ -37,17 +37,17 @@ Use subtasks when work belongs exclusively to one parent and shares its lifecycl
 
 ## 2. Type decisions
 
-| Type | Output | Use when | Do not use when |
-|---|---|---|---|
-| Epic | Product capability | Several outcomes share a strategic goal | Grouping only one story |
-| Delivery Slice | Integrated/releasable set | Stories must be coordinated for validation or release | General product taxonomy |
-| User Story | Verifiable user outcome | A user or actor receives value | Describing an implementation layer |
-| Feature | New behavior/capability | Implementing part or all of a story | Merely fixing specified behavior |
-| Improvement | Better existing behavior | Current behavior works but should measurably improve | Current behavior violates the spec |
-| Bug | Repaired divergence | Observed behavior violates requirement/invariant | Desired behavior was never specified |
-| Spike | Decision/evidence | Significant uncertainty blocks planning | Production code is the primary output |
-| Test | Validation evidence | Testing needs independent planning/ownership | Normal tests fit inside implementation work |
-| Chore | Maintenance result | Necessary non-user-facing work | Hiding an unarticulated feature |
+| Type           | Output                    | Use when                                              | Do not use when                             |
+| -------------- | ------------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| Epic           | Product capability        | Several outcomes share a strategic goal               | Grouping only one story                     |
+| Delivery Slice | Integrated/releasable set | Stories must be coordinated for validation or release | General product taxonomy                    |
+| User Story     | Verifiable user outcome   | A user or actor receives value                        | Describing an implementation layer          |
+| Feature        | New behavior/capability   | Implementing part or all of a story                   | Merely fixing specified behavior            |
+| Improvement    | Better existing behavior  | Current behavior works but should measurably improve  | Current behavior violates the spec          |
+| Bug            | Repaired divergence       | Observed behavior violates requirement/invariant      | Desired behavior was never specified        |
+| Spike          | Decision/evidence         | Significant uncertainty blocks planning               | Production code is the primary output       |
+| Test           | Validation evidence       | Testing needs independent planning/ownership          | Normal tests fit inside implementation work |
+| Chore          | Maintenance result        | Necessary non-user-facing work                        | Hiding an unarticulated feature             |
 
 Purpose by type:
 

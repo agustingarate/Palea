@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create PR with Traceability"
+  short_description: "Crea PRs con commits y trazabilidad ClickUp"
+  default_prompt: "Use $create-pr-with-traceability to prepare a traceable Conventional Commit and pull request for a completed ClickUp work item."

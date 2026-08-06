@@ -7,6 +7,19 @@
 5. Run the narrowest tests during implementation, then `pnpm validate`.
 6. Report evidence, deferred work, and any spec divergence.
 
+## Efficient execution
+
+- Prefer source code, repository context, specifications, and established domain
+  knowledge before running commands or performing expensive operations.
+- Defer dependency installation/reconstruction, builds, full validation, and
+  other costly commands until they are necessary to answer a question, verify a
+  relevant change, or complete the task.
+- Do not repeat an expensive command without a concrete reason; reuse its prior
+  result when the inputs and relevant files have not changed.
+- During implementation, inspect and test the narrowest affected scope first;
+  reserve full validation for the final verification or for cases where the
+  narrower evidence is insufficient.
+
 ## Delivery and CI budget
 
 - Keep implementation commits local on the working branch while the change is

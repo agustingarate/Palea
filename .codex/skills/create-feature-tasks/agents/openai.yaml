@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Feature Tasks"
+  short_description: "Convierte features en specs y tareas trazables"
+  default_prompt: "Use $create-feature-tasks to plan a feature from its product intent through a canonical spec and ClickUp work items."

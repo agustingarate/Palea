@@ -6,3 +6,26 @@
 | TD-002 | Configure auth and secure credential storage | Authentication story is approved             |
 | TD-003 | Add EAS ownership and native identifiers     | First distributable build is planned         |
 | TD-004 | Execute Maestro in hosted emulator CI        | Stable mobile flow and runner budget exist   |
+
+## Sincronización con ClickUp
+
+Para detectar las entradas nuevas agregadas en el diff actual de Git, ejecutar:
+
+```bash
+pnpm tech-debt:sync
+```
+
+El comando valida las filas y muestra las tareas candidatas, pero no modifica
+ClickUp automáticamente. Luego invocar `$tech-debt-clickup-sync` para buscar
+duplicados, verificar la lista `Palea Backlog`, mostrar el preview y solicitar
+confirmación antes de crear las tareas.
+
+Para obtener todas las entradas en formato JSON:
+
+```bash
+node scripts/tech-debt-sync.mjs --all --json
+```
+
+La sincronización usa el ID `TD-xxx` como clave de idempotencia y crea tareas
+con el formato `[CHORE] TD-xxx <Item>`. El tracker Markdown permanece como
+fuente de verdad.

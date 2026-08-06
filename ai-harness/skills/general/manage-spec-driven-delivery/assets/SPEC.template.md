@@ -55,11 +55,10 @@ supersedes: null
 ## Test mapping
 
 | Requirement | Test/evidence |
-|---|---|
-| BR-01 | |
-| AC-01 | |
+| ----------- | ------------- |
+| BR-01       |               |
+| AC-01       |               |
 
 ## Related decisions
 
 ## Open questions
-

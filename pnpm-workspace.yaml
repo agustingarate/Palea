@@ -2,12 +2,18 @@ packages:
   - apps/*
   - packages/*
 
-confirmModulesPurge: false
-
 allowBuilds:
   '@nestjs/core': true
   esbuild: true
   sharp: true
+
+packageExtensions:
+  'react-native-css-interop@*':
+    dependencies:
+      connect: 3.7.0
+  'react-native-worklets@0.5.1':
+    dependencies:
+      '@babel/traverse': 7.29.7
 
 overrides:
   '@types/react-dom': 19.2.4

@@ -22,31 +22,34 @@ Never encode `human`, `ai`, `agent`, `codex`, a person's name, or the creator ty
 
 Use lowercase kebab-case for the slug, avoid spaces/accents, and append the ClickUp task ID.
 
-| Work | Branch |
-|---|---|
-| Feature | `feat/<scope>/<slug>-CU-<id>` |
-| Bug | `fix/<scope>/<slug>-CU-<id>` |
-| Functional improvement | `feat/<scope>/<slug>-CU-<id>` |
-| Performance improvement | `perf/<scope>/<slug>-CU-<id>` |
-| Refactor | `refactor/<scope>/<slug>-CU-<id>` |
-| Test | `test/<scope>/<slug>-CU-<id>` |
-| Chore | `chore/<scope>/<slug>-CU-<id>` |
-| Spec/docs | `docs/specs/<slug>-CU-<id>` |
-| Spike | `spike/<scope>/<slug>-CU-<id>` |
-| Integration | `integration/<scope>/<version>-CU-<id>` |
+| Work                    | Branch                                  |
+| ----------------------- | --------------------------------------- |
+| Feature                 | `feat/<scope>/<slug>-CU-<id>`           |
+| Bug                     | `fix/<scope>/<slug>-CU-<id>`            |
+| Functional improvement  | `feat/<scope>/<slug>-CU-<id>`           |
+| Performance improvement | `perf/<scope>/<slug>-CU-<id>`           |
+| Refactor                | `refactor/<scope>/<slug>-CU-<id>`       |
+| Test                    | `test/<scope>/<slug>-CU-<id>`           |
+| Chore                   | `chore/<scope>/<slug>-CU-<id>`          |
+| Spec/docs               | `docs/specs/<slug>-CU-<id>`             |
+| Spike                   | `spike/<scope>/<slug>-CU-<id>`          |
+| Integration             | `integration/<scope>/<version>-CU-<id>` |
 
 Keep scopes controlled and stable, for example: `mobile`, `web`, `api`, `db`, `auth`, `onboarding`, `applications`, `metrics`, `shared`, `infra`, `ci`, `specs`, and `e2e`.
 
-## 2. Default branch model
+## 2. Explicit branch model
 
-Prefer a short-lived branch per User Story or independently reviewable work item:
+Require an explicit base branch and PR target for every short-lived branch per
+User Story or independently reviewable work item. Never infer `main`,
+`development`, or another branch when the task/spec/context does not state it:
 
 ```text
 main
 └── feat/applications/change-stage-CU-42
 ```
 
-Create it from an explicit, updated base. Link branch and PR from ClickUp. Avoid unrelated stories in one branch.
+Create it from the explicit, updated base. Link branch and PR from ClickUp. Avoid
+unrelated stories in one branch.
 
 Keep incomplete work on the working branch locally when remote pushes trigger
 costly or quota-limited CI. Open the PR and push the branch once the story or
@@ -106,18 +109,18 @@ Use Conventional Commit / Commitizen-compatible messages:
 <type>(<scope>): <description>
 ```
 
-| Change | Commit type |
-|---|---|
-| New behavior or visible functional improvement | `feat` |
-| Bug correction | `fix` |
-| Performance improvement | `perf` |
-| Internal behavior-preserving restructuring | `refactor` |
-| Tests | `test` |
-| Specs or documentation | `docs` |
-| Maintenance | `chore` |
-| Build system | `build` |
-| CI/CD | `ci` |
-| Reversion | `revert` |
+| Change                                         | Commit type |
+| ---------------------------------------------- | ----------- |
+| New behavior or visible functional improvement | `feat`      |
+| Bug correction                                 | `fix`       |
+| Performance improvement                        | `perf`      |
+| Internal behavior-preserving restructuring     | `refactor`  |
+| Tests                                          | `test`      |
+| Specs or documentation                         | `docs`      |
+| Maintenance                                    | `chore`     |
+| Build system                                   | `build`     |
+| CI/CD                                          | `ci`        |
+| Reversion                                      | `revert`    |
 
 Do not use `style` for a visual product improvement; in Conventional Commits it normally means formatting-only changes. Map an Improvement to `feat`, `perf`, `refactor`, `test`, `docs`, or `ci` according to the actual change.
 
