@@ -11,7 +11,10 @@ manual.
 3. Parse untrusted data with Zod at system boundaries.
 4. Never place secrets, provider keys, or privileged business logic in clients.
 5. Update tests and documentation with every contract or architecture change.
-6. Run `pnpm validate` before declaring work complete.
+6. Validate in proportion to the change. Run `pnpm validate` before declaring
+   source code, configuration, dependency, contract, or architecture enforcement
+   changes complete. For Markdown-only documentation changes, check formatting,
+   local links, and `git diff --check`; do not run application builds or tests.
 
 ## Rules
 
