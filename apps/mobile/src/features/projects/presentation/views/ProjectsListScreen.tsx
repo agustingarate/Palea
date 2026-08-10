@@ -1,8 +1,13 @@
-import { ActivityIndicator, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppText, Button, ProjectList } from '@palea/ui-native';
+import { FlatList, View } from 'react-native';
+import { useRouter, type Href } from 'expo-router';
+import {
+  ApplicationCard,
+  AppText,
+  Button,
+  CollectionFeedback,
+  Screen,
+} from '@palea/ui-native';
 import { useThemeStore, type ThemePreference } from '@/core/state/themeStore';
-import { FeedbackState } from '@/common/presentation/FeedbackState';
 import { useProjectsViewModel } from '../viewmodels/useProjectsViewModel';
 import { useLocale } from '@/core/localization/LocaleProvider';
 
@@ -18,61 +23,68 @@ export function ProjectsListScreen() {
   const { t: commonT } = useLocale('common');
   const preference = useThemeStore((state) => state.preference);
   const setPreference = useThemeStore((state) => state.setPreference);
-
-  if (viewModel.isLoading) {
-    return (
-      <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
-        <FeedbackState
-          title={projectsT('loading.title')}
-          message={projectsT('loading.message')}
-        />
-        <ActivityIndicator />
-      </SafeAreaView>
-    );
-  }
-  if (viewModel.error) {
-    return (
-      <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
-        <FeedbackState
-          title={projectsT('error.title')}
-          message={projectsT('error.message')}
-          actionLabel={projectsT('error.retry')}
-          onAction={() => void viewModel.refresh()}
-        />
-      </SafeAreaView>
-    );
-  }
-  if (viewModel.projects.length === 0) {
-    return (
-      <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
-        <FeedbackState
-          title={projectsT('empty.title')}
-          message={projectsT('empty.message')}
-        />
-      </SafeAreaView>
-    );
-  }
+  const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-background dark:bg-dark-background">
+    <Screen>
       <View className="flex-1 gap-6 px-4 pt-6">
-        <View className="flex-row items-center justify-between gap-4">
-          <View className="flex-1">
-            <AppText variant="headline">{projectsT('title')}</AppText>
-            <AppText muted>{projectsT('subtitle')}</AppText>
+        <View className="gap-3">
+          <View>
+            <AppText variant="screenTitle">{projectsT('title')}</AppText>
+            <AppText tone="muted">{projectsT('subtitle')}</AppText>
           </View>
-          <Button
-            label={commonT('theme.label', { theme: preference })}
-            variant="ghost"
-            onPress={() => setPreference(nextTheme[preference])}
-          />
+          <View className="flex-row flex-wrap gap-2">
+            <Button
+              label={commonT('theme.label', { theme: preference })}
+              variant="ghost"
+              onPress={() => setPreference(nextTheme[preference])}
+            />
+            {__DEV__ ? (
+              <Button
+                label="UI kit"
+                variant="secondary"
+                onPress={() => router.push('/design-system' as Href)}
+              />
+            ) : null}
+          </View>
         </View>
-        <ProjectList
-          projects={viewModel.projects}
-          refreshing={viewModel.isRefreshing}
-          onRefresh={() => void viewModel.refresh()}
-        />
+        {viewModel.isLoading ? (
+          <CollectionFeedback status="loading" />
+        ) : viewModel.error ? (
+          <CollectionFeedback
+            status="error"
+            title={projectsT('error.title')}
+            message={projectsT('error.message')}
+            actionLabel={projectsT('error.retry')}
+            onAction={() => void viewModel.refresh()}
+          />
+        ) : viewModel.projects.length === 0 ? (
+          <CollectionFeedback
+            status="empty"
+            title={projectsT('empty.title')}
+            message={projectsT('empty.message')}
+          />
+        ) : (
+          <FlatList
+            contentContainerClassName="gap-3 pb-8"
+            data={[...viewModel.projects]}
+            keyExtractor={(item) => item.id}
+            onRefresh={() => void viewModel.refresh()}
+            refreshing={viewModel.isRefreshing}
+            renderItem={({ item }) => (
+              <ApplicationCard
+                title={item.name}
+                company={item.company}
+                status={item.status === 'active' ? 'Active' : 'Archived'}
+                statusTone={
+                  item.status === 'active' ? 'interaction' : 'neutral'
+                }
+                variant="list"
+              />
+            )}
+          />
+        )}
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

@@ -1,12 +1,18 @@
-const { primitives, themes } = require('@palea/design-tokens');
+const {
+  primitives,
+  themes,
+  toNativeWindTheme,
+} = require('@palea/design-tokens');
 
-const toTailwindColorNames = (theme) =>
-  Object.fromEntries(
-    Object.entries(theme).map(([name, value]) => [
-      name.replace(/[A-Z]/g, (character) => `-${character.toLowerCase()}`),
-      value,
-    ]),
-  );
+const light = toNativeWindTheme(themes.light);
+const dark = toNativeWindTheme(themes.dark);
+
+const sizes = Object.fromEntries(
+  Object.entries(primitives.size).map(([name, value]) => [
+    name.replace(/[A-Z]/g, (character) => `-${character.toLowerCase()}`),
+    value,
+  ]),
+);
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -19,17 +25,16 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
-      colors: {
-        ...toTailwindColorNames(themes.light),
-        dark: toTailwindColorNames(themes.dark),
+      colors: { ...light.colors, dark: dark.colors },
+      spacing: { ...light.spacing, ...sizes },
+      borderRadius: light.borderRadius,
+      fontFamily: light.fontFamily,
+      fontSize: light.fontSize,
+      boxShadow: light.boxShadow,
+      opacity: {
+        disabled: primitives.opacity.disabled,
+        muted: primitives.opacity.muted,
       },
-      spacing: primitives.spacing,
-      borderRadius: {
-        sm: primitives.radius.sm,
-        md: primitives.radius.md,
-        lg: primitives.radius.lg,
-      },
-      fontFamily: { sans: ['Inter'] },
     },
   },
 };

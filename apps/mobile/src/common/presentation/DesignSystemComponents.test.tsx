@@ -1,0 +1,139 @@
+import { fireEvent, render } from '@testing-library/react-native';
+import type { ReactNode } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {
+  Button,
+  BottomNavigation,
+  Checkbox,
+  CollectionFeedback,
+  SegmentedControl,
+  TextField,
+} from '@palea/ui-native';
+import { DesignSystemCatalogScreen } from './DesignSystemCatalogScreen';
+
+function renderWithSafeArea(node: ReactNode) {
+  return render(
+    <SafeAreaProvider
+      initialMetrics={{
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: 44, left: 0, right: 0, bottom: 34 },
+      }}
+    >
+      {node}
+    </SafeAreaProvider>,
+  );
+}
+
+describe('mobile design system', () => {
+  it('blocks disabled and loading button callbacks', () => {
+    const onPress = jest.fn();
+    const view = render(
+      <>
+        <Button label="Disabled" disabled onPress={onPress} />
+        <Button label="Loading" loading onPress={onPress} />
+      </>,
+    );
+    const disabledButton = view.getByRole('button', { name: 'Disabled' });
+    const loadingButton = view.getByRole('button', { name: 'Loading' });
+
+    expect(disabledButton.props.accessibilityState).toMatchObject({
+      disabled: true,
+    });
+    expect(loadingButton.props.accessibilityState).toMatchObject({
+      busy: true,
+      disabled: true,
+    });
+    expect(disabledButton.props.onPress).toBeUndefined();
+    expect(loadingButton.props.onPress).toBeUndefined();
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('renders visible field errors and blocks disabled editing', () => {
+    const onChangeText = jest.fn();
+    const view = render(
+      <TextField
+        disabled
+        error="This value is invalid"
+        label="Company"
+        onChangeText={onChangeText}
+        value="Palea"
+      />,
+    );
+    expect(view.getByText('This value is invalid')).toBeTruthy();
+    expect(view.getByLabelText('Company').props.editable).toBe(false);
+  });
+
+  it('reports controlled checkbox and segmented changes', () => {
+    const onChecked = jest.fn();
+    const onSegment = jest.fn();
+    const view = render(
+      <>
+        <Checkbox checked={false} label="Reminder" onChange={onChecked} />
+        <SegmentedControl
+          items={[
+            { value: 'remote', label: 'Remote' },
+            { value: 'hybrid', label: 'Hybrid' },
+          ]}
+          label="Work mode"
+          onValueChange={onSegment}
+          value="remote"
+        />
+      </>,
+    );
+    fireEvent.press(view.getByRole('checkbox', { name: 'Reminder' }));
+    fireEvent.press(view.getByRole('radio', { name: 'Hybrid' }));
+    expect(onChecked).toHaveBeenCalledWith(true);
+    expect(onSegment).toHaveBeenCalledWith('hybrid');
+  });
+
+  it('renders loading, empty, and error collection states', () => {
+    const view = render(
+      <>
+        <CollectionFeedback status="loading" rows={1} />
+        <CollectionFeedback
+          status="empty"
+          title="Nothing here"
+          message="Add the first item."
+        />
+        <CollectionFeedback
+          status="error"
+          title="Unable to load"
+          message="Try again."
+        />
+      </>,
+    );
+    expect(view.getByLabelText('Loading content')).toBeTruthy();
+    expect(view.getByText('Nothing here')).toBeTruthy();
+    expect(view.getByText('Unable to load')).toBeTruthy();
+  });
+
+  it('announces unread navigation counts through their destination item', () => {
+    const view = render(
+      <BottomNavigation
+        items={[
+          { value: 'home', label: 'Home', icon: 'home' },
+          {
+            value: 'notifications',
+            label: 'Notifications',
+            icon: 'bell',
+            unreadCount: '2',
+          },
+        ]}
+        value="home"
+        onValueChange={jest.fn()}
+        variant="horizontal"
+      />,
+    );
+
+    expect(
+      view.getByLabelText('Notifications, 2 unread notifications'),
+    ).toBeTruthy();
+  });
+
+  it('smoke-renders the complete development catalog', () => {
+    const view = renderWithSafeArea(<DesignSystemCatalogScreen />);
+    expect(view.getByText('Palea design system')).toBeTruthy();
+    expect(view.getByText('Application and CV cards')).toBeTruthy();
+    expect(view.getByText('Collection states')).toBeTruthy();
+  });
+});
