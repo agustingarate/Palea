@@ -1,31 +1,55 @@
 import type { PropsWithChildren } from 'react';
 import { Text, type TextProps } from 'react-native';
 
-type TextVariant = 'headline' | 'title' | 'body' | 'caption';
+export type TextVariant =
+  'display' | 'screenTitle' | 'sectionTitle' | 'body' | 'bodySmall' | 'label';
+
+export type TextTone =
+  | 'default'
+  | 'muted'
+  | 'inverse'
+  | 'interaction'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info';
 
 const variants: Record<TextVariant, string> = {
-  headline: 'font-bold text-2xl leading-8',
-  title: 'font-semibold text-xl leading-7',
-  body: 'text-base leading-6',
-  caption: 'text-xs font-medium leading-4',
+  display: 'font-bold text-display',
+  screenTitle: 'font-bold text-screen-title',
+  sectionTitle: 'font-semibold text-section-title',
+  body: 'font-sans text-body',
+  bodySmall: 'font-sans text-body-small',
+  label: 'font-medium text-label',
+};
+
+const tones: Record<TextTone, string> = {
+  default: 'text-text dark:text-dark-text',
+  muted: 'text-text-muted dark:text-dark-text-muted',
+  inverse: 'text-text-inverse dark:text-dark-text-inverse',
+  interaction: 'text-interaction dark:text-dark-interaction',
+  success: 'text-success dark:text-dark-success',
+  warning: 'text-warning dark:text-dark-warning',
+  danger: 'text-danger dark:text-dark-danger',
+  info: 'text-info dark:text-dark-info',
 };
 
 export interface AppTextProps extends TextProps {
   variant?: TextVariant;
-  muted?: boolean;
+  tone?: TextTone;
   className?: string;
 }
 
 export function AppText({
   children,
   variant = 'body',
-  muted = false,
+  tone = 'default',
   className = '',
   ...props
 }: PropsWithChildren<AppTextProps>) {
   return (
     <Text
-      className={`${variants[variant]} ${muted ? 'text-text-muted dark:text-dark-text-muted' : 'text-text dark:text-dark-text'} ${className}`}
+      className={`${variants[variant]} ${tones[tone]} ${className}`}
       {...props}
     >
       {children}

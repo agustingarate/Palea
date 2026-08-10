@@ -4,15 +4,37 @@ export type SemanticColorName =
   | 'background'
   | 'surface'
   | 'surfaceSubtle'
+  | 'surfaceElevated'
   | 'text'
   | 'textMuted'
+  | 'textInverse'
   | 'border'
+  | 'borderStrong'
   | 'primary'
   | 'onPrimary'
+  | 'primaryPressed'
   | 'primarySubtle'
+  | 'interaction'
+  | 'interactionPressed'
+  | 'interactionSubtle'
+  | 'focusRing'
+  | 'disabledSurface'
+  | 'disabledContent'
   | 'success'
+  | 'onSuccess'
+  | 'successSubtle'
+  | 'warning'
+  | 'onWarning'
+  | 'warningSubtle'
   | 'danger'
-  | 'warning';
+  | 'onDanger'
+  | 'dangerSubtle'
+  | 'info'
+  | 'onInfo'
+  | 'infoSubtle'
+  | 'skeleton'
+  | 'skeletonHighlight'
+  | 'overlay';
 
 export type SemanticColorReferences = Record<SemanticColorName, ColorPrimitive>;
 
@@ -21,28 +43,72 @@ export const semanticColorReferences = {
     background: 'warmBackground',
     surface: 'white',
     surfaceSubtle: 'gray100',
+    surfaceElevated: 'white',
     text: 'black',
     textMuted: 'gray700',
+    textInverse: 'white',
     border: 'gray300',
+    borderStrong: 'gray500',
     primary: 'ink',
     onPrimary: 'white',
-    primarySubtle: 'accentSubtle',
+    primaryPressed: 'gray900',
+    primarySubtle: 'inkSubtle',
+    interaction: 'indigo',
+    interactionPressed: 'indigoPressed',
+    interactionSubtle: 'indigoSubtle',
+    focusRing: 'indigo',
+    disabledSurface: 'gray100',
+    disabledContent: 'gray500',
     success: 'success',
-    danger: 'danger',
+    onSuccess: 'white',
+    successSubtle: 'successSubtle',
     warning: 'warning',
+    onWarning: 'white',
+    warningSubtle: 'warningSubtle',
+    danger: 'danger',
+    onDanger: 'white',
+    dangerSubtle: 'dangerSubtle',
+    info: 'info',
+    onInfo: 'white',
+    infoSubtle: 'infoSubtle',
+    skeleton: 'gray200',
+    skeletonHighlight: 'gray50',
+    overlay: 'black',
   },
   dark: {
     background: 'darkBackground',
     surface: 'darkSurface',
-    surfaceSubtle: 'gray900',
+    surfaceSubtle: 'darkSurfaceSubtle',
+    surfaceElevated: 'darkSurfaceElevated',
     text: 'gray100',
     textMuted: 'gray300',
+    textInverse: 'ink',
     border: 'darkBorder',
-    primary: 'darkAccent',
+    borderStrong: 'gray500',
+    primary: 'gray100',
     onPrimary: 'ink',
-    primarySubtle: 'gray700',
-    success: 'success',
-    danger: 'danger',
-    warning: 'warning',
+    primaryPressed: 'white',
+    primarySubtle: 'gray800',
+    interaction: 'indigoLight',
+    interactionPressed: 'indigo',
+    interactionSubtle: 'indigoDark',
+    focusRing: 'indigoLight',
+    disabledSurface: 'darkSurfaceSubtle',
+    disabledContent: 'gray500',
+    success: 'successDark',
+    onSuccess: 'ink',
+    successSubtle: 'gray800',
+    warning: 'warningDark',
+    onWarning: 'ink',
+    warningSubtle: 'gray800',
+    danger: 'dangerDark',
+    onDanger: 'ink',
+    dangerSubtle: 'gray800',
+    info: 'infoDark',
+    onInfo: 'ink',
+    infoSubtle: 'gray800',
+    skeleton: 'gray800',
+    skeletonHighlight: 'gray700',
+    overlay: 'black',
   },
 } as const satisfies Record<'light' | 'dark', SemanticColorReferences>;
