@@ -6,3 +6,4 @@
 - [ADR-004: Design tokens](ADR-004-design-tokens.md)
 - [ADR-005: tRPC in Nest](ADR-005-trpc-in-nest.md)
 - [ADR-006: Service access](ADR-006-service-access.md)
+- [ADR-007: Managed platform stack and environment topology](ADR-007-managed-platform-stack.md)
