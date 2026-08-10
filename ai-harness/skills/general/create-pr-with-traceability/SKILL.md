@@ -46,6 +46,8 @@ instead of guessing.
 ### 1. Inspect
 
 - Run `git status` and inspect the current branch and diff.
+- Inspect the relevant `git log` and, when needed, file history to distinguish
+  the current work's separate intents and their dependency order.
 - Verify that changed files belong to the ClickUp task and canonical spec.
 - Read the relevant spec, ADRs, and acceptance criteria.
 - Read the ClickUp task and its relationships/comments when available.
@@ -105,8 +107,22 @@ Use the actual change, not the ClickUp classification, to choose the type:
 - `chore`: maintenance.
 - `build` or `ci`: build and delivery infrastructure.
 
-Group files by responsibility, not one commit per file. Do not create empty
-commits or force artificial groups.
+Create the smallest logical commits that can be independently reviewed,
+validated, reverted, and understood in history. Group changes by responsibility
+and intent, not by file. Keep production behavior with the tests, contracts,
+and documentation that are necessary to make that one behavior correct; do not
+split those merely to produce more commits.
+
+Before staging, map the diff into commit-sized change groups using the current
+diff together with the relevant repository and file history. A single file may
+contribute hunks to multiple commits when those hunks implement distinct
+changes. Stage those hunks deliberately (for example, with patch staging),
+inspect the staged diff before every commit, and leave unrelated hunks unstaged
+until their own group is ready.
+
+Order commits so that prerequisites precede their consumers. Do not create
+empty commits, force artificial groups, or put unrelated work in one commit
+because it touches the same file.
 
 ## Pull request contract
 

@@ -136,6 +136,19 @@ Requirements: BR-01, BR-02, AC-01
 
 PRs must identify the ClickUp task/story, canonical spec/revision, requirements implemented, tests run, migrations, rollout/rollback, flags, risks, and deferred work. Review behavior against the spec, not only code style. Make spec changes explicit.
 
+### Atomic commit construction
+
+Construct commits from logical change groups, not from the list of files
+changed. Inspect the current diff and relevant Git/file history before staging
+to identify each change's intent and dependencies. When independent changes
+share a file, split their hunks into their respective commits with deliberate
+patch staging; do not combine them simply because they are in the same file.
+
+Each commit must remain independently reviewable, understandable, and
+revertible. Include the tests, contracts, and documentation required for the
+behavior in that commit, and order prerequisite changes before the commits that
+consume them. Inspect the staged diff immediately before committing.
+
 ## 7. Recovery and cleanup
 
 - Update from the base according to team policy; do not silently change the PR target.
