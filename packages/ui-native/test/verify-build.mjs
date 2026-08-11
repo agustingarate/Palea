@@ -1,6 +1,6 @@
-const assert = require('node:assert/strict');
-const { readFileSync } = require('node:fs');
-const { resolve } = require('node:path');
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 for (const fileName of ['index.js', 'index.cjs']) {
   const output = readFileSync(resolve('dist', fileName), 'utf8');

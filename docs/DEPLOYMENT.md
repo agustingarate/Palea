@@ -5,6 +5,9 @@ This document operationalizes
 persistent remote environments: staging and production. Local development is not
 a shared environment and uses local or explicitly disposable resources.
 
+The variable contract, mobile variants, provider setup and local runbook live in
+[Environment configuration](ENVIRONMENTS.md).
+
 ## Promotion model
 
 | Environment | Source branch | Purpose                                           | Deployment                                  |

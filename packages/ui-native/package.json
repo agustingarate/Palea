@@ -17,7 +17,7 @@
     "build": "tsup ./src/index.ts --format esm,cjs --dts --clean --external react --external react-native --external nativewind --external react-native-reanimated --external react-native-safe-area-context --external react-native-svg --external lucide-react-native",
     "dev": "tsup ./src/index.ts --format esm,cjs --dts --watch --external react --external react-native --external nativewind --external react-native-reanimated --external react-native-safe-area-context --external react-native-svg --external lucide-react-native",
     "lint": "eslint src",
-    "test": "pnpm build && node ./test/verify-build.cjs",
+    "test": "pnpm build && node ./test/verify-build.mjs",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

@@ -1,20 +1,38 @@
 import { z } from 'zod';
 
-const environmentSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    process.loadEnvFile('.env.local');
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes('ENOENT')) {
+      throw error;
+    }
+  }
+}
+
+export const environmentSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']),
+  PALEA_ENV: z.enum(['development', 'staging', 'production']),
+  PORT: z.coerce.number().int().min(1).max(65535),
   CORS_ORIGINS: z
     .string()
-    .default('http://localhost:3000,http://localhost:8081'),
+    .transform((origins) =>
+      origins
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean),
+    )
+    .pipe(z.array(z.url()).min(1)),
 });
 
-const parsed = environmentSchema.parse(process.env);
-export const environment = {
-  nodeEnv: parsed.NODE_ENV,
-  port: parsed.PORT,
-  corsOrigins: parsed.CORS_ORIGINS.split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean),
-};
+export function parseEnvironment(input: Record<string, string | undefined>) {
+  const parsed = environmentSchema.parse(input);
+  return {
+    nodeEnv: parsed.NODE_ENV,
+    paleaEnvironment: parsed.PALEA_ENV,
+    port: parsed.PORT,
+    corsOrigins: parsed.CORS_ORIGINS,
+  };
+}
+
+export const environment = parseEnvironment(process.env);

@@ -1,8 +1,11 @@
-const path = require('node:path');
-const { getDefaultConfig } = require('expo/metro-config');
-const { withNativeWind } = require('nativewind/metro');
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 
-const projectRoot = __dirname;
+const loadCommonJs = createRequire(import.meta.url);
+const { getDefaultConfig } = loadCommonJs('expo/metro-config');
+const { withNativeWind } = loadCommonJs('nativewind/metro');
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(projectRoot, '../..');
 const developmentSourceEntries = {
   '@palea/ui-native': path.join(
@@ -25,7 +28,7 @@ if (process.env.NODE_ENV !== 'production') {
   };
 }
 
-module.exports = withNativeWind(config, {
-  input: path.join(__dirname, 'src/global.css'),
-  configPath: path.join(__dirname, 'tailwind.config.cjs'),
+export default withNativeWind(config, {
+  input: path.join(projectRoot, 'src/global.css'),
+  configPath: path.join(projectRoot, 'tailwind.config.mjs'),
 });

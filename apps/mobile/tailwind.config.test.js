@@ -1,5 +1,5 @@
-const { themes } = require('@palea/design-tokens');
-const config = require('./tailwind.config.cjs');
+import { themes } from '@palea/design-tokens';
+import config from './tailwind.config.mjs';
 
 describe('mobile Tailwind semantic colors', () => {
   const colors = config.theme.extend.colors;
