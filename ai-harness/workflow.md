@@ -4,8 +4,10 @@
 2. Read the architecture map and relevant ADRs.
 3. Record assumptions in an execution plan for non-trivial work.
 4. Change behavior, tests, contracts, and documentation together.
-5. Run the narrowest tests during implementation, then `pnpm validate`.
-6. Report evidence, deferred work, and any spec divergence.
+5. For environment changes, update the variable catalog, examples, provider
+   runbook and cache inputs with the boundary schema.
+6. Run the narrowest tests during implementation, then `pnpm validate`.
+7. Report evidence, deferred work, and any spec divergence.
 
 ## Efficient execution
 

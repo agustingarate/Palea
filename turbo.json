@@ -1,5 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "EXPO_PUBLIC_PALEA_ENV",
+    "EXPO_PUBLIC_API_URL",
+    "EXPO_PUBLIC_PROJECTS_SOURCE",
+    "NEXT_PUBLIC_PALEA_ENV",
+    "NEXT_PUBLIC_API_URL",
+    "PALEA_ENV",
+    "PORT",
+    "CORS_ORIGINS"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

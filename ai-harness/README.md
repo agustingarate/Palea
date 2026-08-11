@@ -15,6 +15,9 @@ directories such as `.codex` and `.chatgpt` only adapt these rules to their host
 
 Current general skills include:
 
+- `manage-environment-configuration`: environment-variable, variant and target
+  governance.
+
 - `create-feature-tasks`: product intent to canonical spec and ClickUp work.
 - `create-pr-with-traceability`: approved delivery work to traceable PR.
 - `tech-debt-clickup-sync`: technical-debt tracker entries to ClickUp chores.

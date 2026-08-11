@@ -5,6 +5,7 @@ import {
   createPaleaQueryOptions,
   type PaleaApiClient,
 } from '@palea/api-client';
+import { environment } from '../config/environment';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   createContext,
@@ -24,7 +25,7 @@ export function ApiProvider({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => new QueryClient());
   const [client] = useState(() =>
     createPaleaApiClient({
-      url: `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/trpc`,
+      url: `${environment.apiUrl}/trpc`,
     }),
   );
   const [trpc] = useState(() => createPaleaQueryOptions(client, queryClient));

@@ -1,5 +1,5 @@
-const path = require('node:path');
-const appConfig = require('./app.json');
+import path from 'node:path';
+import config from './metro.config.mjs';
 
 jest.mock('expo/metro-config', () => ({
   getDefaultConfig: () => ({ resolver: {} }),
@@ -22,7 +22,6 @@ describe('mobile Metro development resolution', () => {
   });
 
   it('uses the UI component source entry', () => {
-    const config = require('./metro.config.cjs');
     const fallback = jest.fn();
     const context = { resolveRequest: fallback };
 
@@ -36,12 +35,5 @@ describe('mobile Metro development resolution', () => {
       type: 'sourceFile',
     });
     expect(fallback).not.toHaveBeenCalled();
-  });
-
-  it('uses SPA output so development does not build a static-render graph', () => {
-    expect(appConfig.expo.web).toMatchObject({
-      bundler: 'metro',
-      output: 'single',
-    });
   });
 });

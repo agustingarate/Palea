@@ -5,6 +5,9 @@
 - No transport/framework dependencies in a mobile feature domain layer.
 - No data-layer imports from presentation.
 - Validate environment variables, HTTP payloads, and tRPC inputs with Zod.
+- Keep mobile variants separate from deployment targets; never use `NODE_ENV`
+  to choose staging or production.
+- Treat `EXPO_PUBLIC_*` and `NEXT_PUBLIC_*` as public, never as secret stores.
 - Do not log authorization values, tokens, credentials, or sensitive payloads.
 - Treat generated artifacts as disposable; edit their source instead.
 - Do not create pull requests or push incomplete work when the remote workflow
