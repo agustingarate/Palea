@@ -1,0 +1,60 @@
+-- Copy this file to staging.sql, replace every <PLACEHOLDER>, review it, and
+-- execute it against the staging Supabase project. Do not execute this template
+-- unchanged. Do not commit the filled staging.sql file.
+
+begin;
+
+with pro as (
+  select id from public.subscription_plans where code = 'pro'
+), product as (
+  insert into public.billing_products (
+    plan_id,
+    provider,
+    environment,
+    external_product_id
+  )
+  select
+    pro.id,
+    'paddle',
+    'sandbox',
+    '<PADDLE_SANDBOX_PRODUCT_ID>'
+  from pro
+  on conflict (provider, environment, external_product_id)
+  do update set
+    is_active = true,
+    updated_at = now()
+  returning id, plan_id
+)
+insert into public.billing_product_price_refs (
+  billing_product_id,
+  provider,
+  environment,
+  external_price_id
+)
+select
+  product.id,
+  'paddle',
+  'sandbox',
+  '<PADDLE_SANDBOX_PRICE_ID>'
+from product
+on conflict (provider, environment, external_price_id) do nothing;
+
+insert into public.provider_entitlement_refs (
+  entitlement_id,
+  authority_provider,
+  environment,
+  external_entitlement_id
+)
+select
+  entitlement.id,
+  'revenuecat',
+  'sandbox',
+  '<REVENUECAT_PRO_ENTITLEMENT_ID>'
+from public.subscription_entitlements entitlement
+where entitlement.code = 'pro'
+on conflict (authority_provider, environment, external_entitlement_id)
+do update set
+  is_active = true,
+  updated_at = now();
+
+commit;
