@@ -137,6 +137,15 @@ Before promotion to production, verify:
 6. Rollback identifies the previous application revision and the database recovery
    procedure; a destructive schema change cannot rely only on application rollback.
 
+Billing releases additionally require the staging checks and Argentine accounting
+launch gate in [Billing and subscriptions operations](BILLING.md). Production and
+staging must never share Paddle credentials, RevenueCat environment configuration,
+webhook secrets, or provider catalog IDs.
+
+Paddle is the web financial provider. Future native releases use App Store and
+Play Store billing, with environment-specific products mapped through RevenueCat.
+The stores never reuse Paddle product IDs or financial evidence.
+
 ## Provider references
 
 - [Supabase organization billing and project quotas](https://supabase.com/docs/guides/platform/billing-on-supabase)
