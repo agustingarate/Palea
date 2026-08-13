@@ -1,7 +1,6 @@
 import { parseEnvironment } from './environment';
 
 describe('web environment', () => {
-
   it('parses an explicit production configuration', () => {
     const environment = parseEnvironment({
       NEXT_PUBLIC_PALEA_ENV: 'production',
