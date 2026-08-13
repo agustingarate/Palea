@@ -14,3 +14,7 @@ web-build/
 .DS_Store
 android/
 ios/
+/supabase/
+apps/backend/supabase/.branches/
+apps/backend/supabase/.temp/
+apps/backend/supabase/catalog/staging.sql

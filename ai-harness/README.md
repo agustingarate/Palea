@@ -7,6 +7,8 @@ directories such as `.codex` and `.chatgpt` only adapt these rules to their host
 - `workflow.md`: specification-driven execution loop.
 - `guardrails.md`: mechanically enforced boundaries.
 - `definition-of-done.md`: completion evidence.
+- Billing changes are additionally governed by `docs/BILLING.md`, the approved
+  subscription specification, and ADR-009.
 - `skills/`: reusable, AI-neutral skill definitions and their references,
   organized by scope:
   - `general/`: skills shared across applications and layers.

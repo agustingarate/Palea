@@ -1,7 +1,6 @@
 import { parseEnvironment } from './environment';
 
 describe('mobile environment', () => {
-
   it('parses an explicit staging configuration', () => {
     const environment = parseEnvironment({
       EXPO_PUBLIC_PALEA_ENV: 'staging',
