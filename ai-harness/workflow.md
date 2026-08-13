@@ -9,6 +9,12 @@
 6. Run the narrowest tests during implementation, then `pnpm validate`.
 7. Report evidence, deferred work, and any spec divergence.
 
+For billing work, read `docs/product-specs/web-subscriptions.md`,
+`docs/design-docs/ADR-009-revenuecat-paddle-subscriptions.md`, and
+`docs/BILLING.md` before changing schema or behavior. Validate migrations and
+RLS locally, then in staging with real sandbox provider identifiers, before any
+production promotion. Never use a seed to invent provider products or prices.
+
 ## Efficient execution
 
 - Prefer source code, repository context, specifications, and established domain

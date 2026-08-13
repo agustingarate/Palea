@@ -1,7 +1,6 @@
 import { parseEnvironment } from './environment';
 
 describe('backend environment', () => {
-
   it('parses an explicit staging configuration', () => {
     const environment = parseEnvironment({
       NODE_ENV: 'production',

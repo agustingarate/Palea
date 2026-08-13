@@ -1,5 +1,30 @@
 # Guardrails
 
+## Billing
+
+- Paddle is authoritative for web money; App Store and Play Store will be
+  authoritative for their native channels. RevenueCat is the initial authority
+  for entitlements across channels. A financial subscription state never grants
+  access by itself.
+- Billing clients do not access base tables. Reads and writes use a privileged
+  backend boundary with capability-specific responses. Future support, admin,
+  and finance roles never imply unrestricted database access.
+- Never store card numbers, CVV, expiry, payment tokens, bank details, or
+  unnecessary billing addresses. Keep provider and webhook secrets server-side.
+- Provider event envelopes, processing attempts, entitlement observations,
+  financial operations, adjustments, subscription history, and administrative
+  actions are append-only. Payload expiry may remove only the raw payload while
+  preserving its envelope and hash.
+- Access is recomputed from the latest authoritative entitlement observations
+  and unrevoked manual grants. Cancellation, grace, refund, and revocation follow
+  RevenueCat for access and the financial provider for money.
+- The authenticated Supabase UUID is the RevenueCat App User ID. A restore must
+  never transfer a purchase between different Palea accounts.
+- Supabase billing data is an operational projection, not a tax ledger or general
+  ledger. Preserve provider statements and statutory evidence outside it.
+
+## General
+
 - No client secrets or direct calls from clients to privileged AI providers.
 - No imports from one application into another.
 - No transport/framework dependencies in a mobile feature domain layer.
