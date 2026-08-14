@@ -15,5 +15,6 @@ export function WorkOnboardingScreen() {
     <form.Field name="isCurrent">{(field) => <Checkbox label="Actualmente trabajo aquí" checked={field.state.value} onChange={field.handleChange} />}</form.Field>
     <form.Field name="endedOn">{(field) => <TextField label="Fin" placeholder="AAAA-MM-DD" value={field.state.value ?? ''} onChangeText={(value) => field.handleChange(value || null)} onBlur={field.handleBlur} error={field.state.meta.errors.map(String).join(' ')} />}</form.Field>
     {error ? <AppText tone="danger">{error}</AppText> : null}<form.Subscribe selector={(state) => state.canSubmit}>{(canSubmit) => <Button label="Continuar" fullWidth disabled={!canSubmit} onPress={() => form.handleSubmit()} />}</form.Subscribe>
+    <Button label="Omitir este paso" variant="ghost" fullWidth onPress={() => router.push('/onboarding/skills')} />
   </AuthFormLayout>;
 }

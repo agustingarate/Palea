@@ -29,5 +29,6 @@ export function SkillsOnboardingScreen() {
     <FileTrigger label="CV (opcional)" placeholder={fileName ?? 'Elegí un PDF de hasta 10 MiB'} value={fileName} onPress={() => void upload()} disabled={loading} />
     {error ? <AppText tone="danger">{error}</AppText> : null}
     <Button label="Finalizar" fullWidth loading={loading} onPress={() => void finish()} />
+    <Button label="Omitir este paso" variant="ghost" fullWidth disabled={loading} onPress={() => void vm.finish(false)} />
   </AuthFormLayout>;
 }
