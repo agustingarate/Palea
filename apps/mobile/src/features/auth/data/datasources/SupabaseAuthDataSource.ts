@@ -1,13 +1,25 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
 import type { AuthDataSource } from './AuthDataSource';
+import { supabaseSessionStorage } from '../platform/SupabaseSessionStorage';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export class SupabaseAuthDataSource implements AuthDataSource {
   private readonly client;
 
   constructor(url: string, publishableKey: string) {
     this.client = createClient(url, publishableKey, {
-      auth: { persistSession: true, autoRefreshToken: true, flowType: 'pkce' },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        flowType: 'pkce',
+        storage: supabaseSessionStorage,
+        detectSessionInUrl: Platform.OS === 'web',
+      },
     });
   }
 
@@ -34,8 +46,20 @@ export class SupabaseAuthDataSource implements AuthDataSource {
     if (error) throw error;
   }
   async signInWithSocial(provider: 'google' | 'linkedin_oidc') {
-    const { error } = await this.client.auth.signInWithOAuth({ provider, options: { redirectTo: location.href } });
+    const redirectTo = Linking.createURL('auth/callback');
+    const { data, error } = await this.client.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo, skipBrowserRedirect: Platform.OS !== 'web' },
+    });
     if (error) throw error;
+    if (Platform.OS === 'web') return;
+    if (!data.url) throw new Error('OAuth did not return an authorization URL.');
+
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+    if (result.type !== 'success') return;
+    const code = new URL(result.url).searchParams.get('code');
+    if (!code) throw new Error('OAuth callback did not include an authorization code.');
+    await this.exchangeOAuthCode(code);
   }
   async exchangeOAuthCode(code: string) { const { error } = await this.client.auth.exchangeCodeForSession(code); if (error) throw error; }
   async signOut() { const { error } = await this.client.auth.signOut({ scope: 'local' }); if (error) throw error; }
