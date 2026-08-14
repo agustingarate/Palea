@@ -19,8 +19,8 @@ it('creates Auth before completing the personal profile', async () => {
     nationality: 'AR',
   });
 
-  expect(signUp.mock.invocationCallOrder[0]).toBeLessThan(
-    completeRegistration.mock.invocationCallOrder[0],
+  expect(signUp.mock.invocationCallOrder[0]!).toBeLessThan(
+    completeRegistration.mock.invocationCallOrder[0]!,
   );
   expect(completeRegistration).toHaveBeenCalledWith({
     fullName: 'Ada Lovelace',
