@@ -23,7 +23,7 @@ export function LocaleProvider({
       supportedLngs: [...supportedLocales],
       load: 'languageOnly',
       resources,
-      ns: ['common', 'projects', 'web'],
+      ns: ['common', 'projects', 'web', 'auth'],
       defaultNS: 'common',
       interpolation: { escapeValue: false },
       react: { useSuspense: false },
