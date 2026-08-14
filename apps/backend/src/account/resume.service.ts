@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
 import { TRPCError } from '@trpc/server';
 import type { ReserveResumeUploadInput } from '@palea/contracts';
@@ -9,7 +9,7 @@ import { PrismaService } from '../database/prisma.service';
 const BUCKET = 'resumes';
 
 @Injectable()
-export class ResumeService {
+export class ResumeService implements OnModuleInit, OnModuleDestroy {
   private readonly storage = createClient(
     environment.supabaseUrl,
     environment.supabaseServiceRoleKey,
@@ -19,6 +19,18 @@ export class ResumeService {
   );
 
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  private cleanupTimer: NodeJS.Timeout | undefined;
+
+  onModuleInit() {
+    // Cleanup is deliberately independent of new uploads: abandoned signed URLs
+    // cannot leave rows or Storage objects behind indefinitely.
+    this.cleanupTimer = setInterval(() => void this.cleanupExpired(), 60_000);
+    this.cleanupTimer.unref();
+  }
+
+  onModuleDestroy() {
+    if (this.cleanupTimer) clearInterval(this.cleanupTimer);
+  }
 
   async reserve(subject: string, input: ReserveResumeUploadInput) {
     await this.cleanupExpired(subject);
@@ -130,10 +142,10 @@ export class ResumeService {
     throw new TRPCError({ code: 'BAD_REQUEST', message });
   }
 
-  private async cleanupExpired(subject: string) {
+  private async cleanupExpired(subject?: string) {
     const expired = await this.prisma.resume.findMany({
       where: {
-        profileId: subject,
+        ...(subject ? { profileId: subject } : {}),
         uploadStatus: 'pending',
         uploadExpiresAt: { lt: new Date() },
       },
