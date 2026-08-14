@@ -1,7 +1,7 @@
 ---
 id: SPEC-AUTH-001
 title: Registro, autenticación y onboarding
-status: review
+status: approved
 version: 1.1
 story: CU-86ajvbvcd
 related_tasks: [CU-86ajvbvdm, CU-86ajvbvdw, CU-86ajvbve4, CU-86ak0kyxg]
@@ -78,6 +78,6 @@ Una reserva de CV crea una fila `pending` con expiración y path bajo el UUID au
 | BR-08–BR-09, AC-08–AC-09 | Sesión, i18n, visual y responsive |
 | NFR-01–NFR-06, AC-10 | Tests de capas, lint de arquitectura y CI |
 
-## Estado de revisión
+## Estado de aprobación
 
-Esta revisión sustituye la implementación previa como base de decisión. No se autoriza código de comportamiento hasta aprobar explícitamente esta versión y la revisión vinculada de `SPEC-DATA-001`.
+Esta versión sustituye la implementación previa como base de decisión. Fue aprobada para CU-86ajvbvcd el 2026-08-14 y requiere que `SPEC-DATA-001` mantenga las reglas de nacionalidad, catálogos y cargas de CV aquí referenciadas.
