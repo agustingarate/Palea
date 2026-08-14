@@ -1,6 +1,7 @@
 module.exports = {
   preset: 'jest-expo',
   clearMocks: true,
+  setupFiles: ['<rootDir>/test/environment.setup.cjs'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^lucide-react-native$': '<rootDir>/test/lucide-react-native.cjs',
