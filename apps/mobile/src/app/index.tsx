@@ -1,2 +1,1 @@
-import { ProjectsListScreen } from '@/features/projects/presentation/views/ProjectsListScreen';
-export default ProjectsListScreen;
+export { AuthenticatedHomeScreen as default } from '@/features/auth/presentation/views/AuthenticatedHomeScreen';
