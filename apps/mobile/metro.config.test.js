@@ -1,39 +1,25 @@
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import config from './metro.config.mjs';
+import { pathToFileURL } from 'node:url';
 
-jest.mock('expo/metro-config', () => ({
-  getDefaultConfig: () => ({ resolver: {} }),
-}));
-
-jest.mock('nativewind/metro', () => ({
-  withNativeWind: (config) => config,
-}));
+function resolveUiNative() {
+  const url = pathToFileURL(path.resolve(__dirname, 'metro.config.mjs')).href;
+  const script = `process.env.NODE_ENV = 'development'; const { default: config } = await import(${JSON.stringify(url)}); const result = config.resolver.resolveRequest({ resolveRequest: () => null }, '@palea/ui-native', 'web'); console.log(JSON.stringify(result));`;
+  return JSON.parse(
+    execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
+      encoding: 'utf8',
+    }),
+  );
+}
 
 describe('mobile Metro development resolution', () => {
-  const originalNodeEnv = process.env.NODE_ENV;
-
-  beforeEach(() => {
-    jest.resetModules();
-    process.env.NODE_ENV = 'development';
-  });
-
-  afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv;
-  });
-
   it('uses the UI component source entry', () => {
-    const fallback = jest.fn();
-    const context = { resolveRequest: fallback };
-
-    expect(
-      config.resolver.resolveRequest(context, '@palea/ui-native', 'web'),
-    ).toEqual({
+    expect(resolveUiNative()).toEqual({
       filePath: path.resolve(
         __dirname,
         '../../packages/ui-native/src/index.ts',
       ),
       type: 'sourceFile',
     });
-    expect(fallback).not.toHaveBeenCalled();
   });
 });
