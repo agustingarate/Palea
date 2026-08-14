@@ -1,5 +1,7 @@
 # Product specifications
 
+- [Authentication and onboarding](auth-onboarding.md) — approved registration, session and optional onboarding contract.
+
 - [Web subscriptions](web-subscriptions.md) — approved Free/Pro, Paddle and RevenueCat contract.
 
 - [MVP data model](mvp-data-model.md) — draft model derived from ClickUp and Stitch.

@@ -1,5 +1,7 @@
 # Design and architecture decisions
 
+- [ADR-010: Supabase Auth boundary](ADR-010-supabase-auth-boundary.md)
+
 - [ADR-009: RevenueCat and Paddle subscriptions](ADR-009-revenuecat-paddle-subscriptions.md)
 
 - [ADR-008: Prisma Client with Supabase CLI migrations](ADR-008-prisma-supabase-migrations.md)

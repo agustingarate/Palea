@@ -10,9 +10,30 @@ import { ProjectRepositoryImpl } from '@/features/projects/data/repositories/Pro
 import { GetProjects } from '@/features/projects/domain/usecases/GetProjects';
 import { Container } from './container';
 import { dependencyTokens } from './dependencies';
+import { SupabaseAuthRepository } from '@/features/auth/data/SupabaseAuthRepository';
+import { TrpcOnboardingRepository } from '@/features/auth/data/TrpcOnboardingRepository';
 
 export function createAppContainer(): Container {
   const container = new Container();
+  const authRepository = new SupabaseAuthRepository(
+    environment.supabaseUrl,
+    environment.supabasePublishableKey,
+    environment.authCallbackUrl,
+  );
+  const authenticatedClient = createPaleaApiClient({
+    url: `${environment.apiUrl}/trpc`,
+    headers: async () => {
+      const token = await authRepository.getAccessToken();
+      return token
+        ? { authorization: `Bearer ${token}` }
+        : ({} as Record<string, string>);
+    },
+  });
+  container.register(dependencyTokens.authRepository, authRepository);
+  container.register(
+    dependencyTokens.onboardingRepository,
+    new TrpcOnboardingRepository(authenticatedClient),
+  );
   const datasource = createProjectsDataSource();
   container.register(
     dependencyTokens.getProjects,

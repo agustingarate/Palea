@@ -7,6 +7,7 @@ module.exports = {
     '^react-native-reanimated$': '<rootDir>/test/react-native-reanimated.cjs',
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  setupFiles: ['<rootDir>/test/environment.cjs'],
   // pnpm resolves React Native through node_modules/.pnpm. Transforming dependencies
   // keeps Jest compatible with React Native's ESM setup files on Windows as well.
   transformIgnorePatterns: [],

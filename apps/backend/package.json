@@ -16,6 +16,8 @@
     "@nestjs/platform-express": "^11.1.6",
     "@palea/contracts": "workspace:*",
     "@palea/trpc": "workspace:*",
+    "@prisma/client": "6.19.1",
+    "@supabase/supabase-js": "^2.112.3",
     "@trpc/server": "^11.4.3",
     "helmet": "^8.1.0",
     "reflect-metadata": "^0.2.2",
@@ -30,6 +32,7 @@
     "@types/express": "^5.0.3",
     "@types/node": "^24.2.1",
     "@types/supertest": "^6.0.3",
+    "prisma": "6.19.1",
     "supabase": "2.113.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.1"

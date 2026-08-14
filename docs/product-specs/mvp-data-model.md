@@ -2,7 +2,7 @@
 id: SPEC-DATA-001
 title: Modelo de datos funcional del MVP
 status: approved
-version: 1.1
+version: 1.2
 stories:
   - CU-86ajvbcd
   - CU-86ajvbvcg
@@ -63,6 +63,8 @@ postulación no elimina el CV y borrar un CV no elimina la postulación.
   `unspecified`.
 - `duration_type`: `indefinite`, `temporary`, `unspecified`.
 - `experience_band`: `zero_to_one`, `two_to_four`, `five_to_eight`, `over_eight`.
+- `resume_upload_status`: `pending`, `ready`, `failed`.
+- Nationality uses ISO 3166-1 alpha-2 and registration requires a minimum age of 18.
 - Una postulación exige empresa, rol y fecha; tiene cero o un CV asociado.
 - El CV asociado debe pertenecer al mismo usuario.
 - `ended_on >= started_on`, excepto empleo actual sin fecha final.
@@ -124,8 +126,8 @@ El proyecto contiene `Applications Home (List/Board)`, `New Application (JD
 Capture)`, `Application Detail`, `Add/Edit Stage`, `Edit Application: Notes`,
 `Edit Application: Resources`, `CV / Resume Library`, onboarding de perfil y
 skills/CV, además de variantes web y estados loading/error. La pantalla
-`Onboarding: Skills & Resume` es una inconsistencia visual conocida: la función
-de CV se mantiene separada en `resumes` y Biblioteca.
+`Onboarding: Skills & Resume` permite cargar opcionalmente un CV principal; la
+administración posterior permanece separada en Biblioteca.
 
 ## Decisiones aprobadas
 

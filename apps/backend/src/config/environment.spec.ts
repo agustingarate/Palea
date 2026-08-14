@@ -14,6 +14,12 @@ describe('backend environment', () => {
       paleaEnvironment: 'staging',
       port: 3001,
       corsOrigins: ['https://app.staging.palea.com'],
+      supabaseUrl: 'http://127.0.0.1:54321',
+      supabasePublishableKey: 'local-publishable-key',
+      supabaseServiceRoleKey: 'local-service-role-key',
+      databaseUrl: 'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
+      directUrl: 'postgresql://postgres:postgres@127.0.0.1:54322/postgres',
+      resumeUploadTtlSeconds: 600,
     });
   });
 

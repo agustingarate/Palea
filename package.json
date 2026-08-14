@@ -15,6 +15,7 @@
     "architecture:check": "depcruise --config dependency-cruiser.cjs apps packages --output-type err",
     "tech-debt:sync": "node scripts/tech-debt-sync.mjs",
     "test": "turbo run test",
+    "test:e2e:web": "playwright test",
     "typecheck": "turbo run typecheck",
     "validate": "pnpm format:check && pnpm lint && pnpm architecture:check && pnpm typecheck && pnpm test && pnpm build",
     "mobile": "pnpm --filter \"@palea/mobile^...\" build && pnpm --filter @palea/mobile start",
@@ -22,6 +23,7 @@
     "backend": "pnpm --filter @palea/backend dev"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@types/jest": "^29.5.14",
     "dependency-cruiser": "^18.1.1",
     "eslint": "^10.8.0",

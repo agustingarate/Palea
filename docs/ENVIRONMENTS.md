@@ -14,11 +14,11 @@ This runbook complements [Deployment and environments](DEPLOYMENT.md) and implem
 
 ## Public variable catalog
 
-| Surface           | Variables                                                                     | Source                           |
-| ----------------- | ----------------------------------------------------------------------------- | -------------------------------- |
-| Mobile / Expo Web | `EXPO_PUBLIC_PALEA_ENV`, `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_PROJECTS_SOURCE` | `.env.local` or EAS              |
-| Institutional web | `NEXT_PUBLIC_PALEA_ENV`, `NEXT_PUBLIC_API_URL`                                | `.env.local` or Cloudflare Pages |
-| Backend           | `NODE_ENV`, `PALEA_ENV`, `PORT`, `CORS_ORIGINS`                               | `.env.local` or Cloud Run        |
+| Surface           | Variables                                                              | Source                           |
+| ----------------- | ---------------------------------------------------------------------- | -------------------------------- |
+| Mobile / Expo Web | API, Supabase publishable Auth config and enabled providers            | `.env.local` or EAS              |
+| Institutional web | `NEXT_PUBLIC_PALEA_ENV`, `NEXT_PUBLIC_API_URL`                         | `.env.local` or Cloudflare Pages |
+| Backend           | Runtime variables plus Supabase/Database secrets and resume upload TTL | `.env.local` or Cloud Run        |
 
 All client values are public. Never put provider keys, tokens, private URLs, credentials or signing material in them.
 
@@ -76,6 +76,10 @@ APP_VARIANT=development
 EXPO_PUBLIC_PALEA_ENV=development
 EXPO_PUBLIC_API_URL=http://localhost:3001
 EXPO_PUBLIC_PROJECTS_SOURCE=trpc
+EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<local anon key>
+EXPO_PUBLIC_AUTH_CALLBACK_URL=http://localhost:8081/auth/callback
+EXPO_PUBLIC_AUTH_PROVIDERS=email,google,linkedin_oidc
 ```
 
 Run or export it locally:
@@ -244,6 +248,20 @@ EAS Update channels are not configured yet. Add them only with an explicit OTA
 update workflow that also configures `expo-updates` and `runtimeVersion`.
 
 ## Provider runbook
+
+### Authentication staging checklist
+
+1. Supabase Auth: disable email confirmation and set the password minimum to 8.
+2. Allow `https://app.staging.palea.com/auth/callback` as an Auth redirect.
+3. Create staging Google and LinkedIn OIDC clients using
+   `https://<staging-ref>.supabase.co/auth/v1/callback`.
+4. Put `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` and `DIRECT_URL` only in Cloud
+   Run secrets.
+5. Build `apps/mobile` from `development`, configure the public variables and bind
+   `app.staging.palea.com` to its Cloudflare Pages branch alias.
+6. Set CORS to the staging app and expose Cloud Run as `api.staging.palea.com`.
+7. Smoke test email, Google and LinkedIn. Apple remains disabled until its deferred
+   task is complete.
 
 - EAS: configure only the public variables above in the `development`, `preview` and `production` variable sets.
 - Cloudflare Pages: set `NEXT_PUBLIC_*` values separately for preview/staging and production before `next build`.
