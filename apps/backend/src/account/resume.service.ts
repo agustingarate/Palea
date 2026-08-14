@@ -111,6 +111,9 @@ export class ResumeService {
         code: 'NOT_FOUND',
         message: 'Pending upload not found',
       });
+    if (resume.uploadExpiresAt && resume.uploadExpiresAt <= new Date()) {
+      return this.fail(resume.id, resume.storagePath, 'Upload reservation expired');
+    }
     return resume;
   }
 
