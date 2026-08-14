@@ -1,14 +1,35 @@
 import {
   healthSchema,
+  accountProfileSchema,
+  completeOnboardingInputSchema,
+  completeRegistrationInputSchema,
+  localeSchema,
+  onboardingCatalogSchema,
+  operationResultSchema,
   projectListSchema,
+  reserveResumeUploadInputSchema,
+  resumeIdInputSchema,
+  resumeUploadReservationSchema,
+  saveProfileInputSchema,
+  saveSkillsInputSchema,
+  saveWorkExperienceInputSchema,
+  type AccountProfile,
+  type CompleteRegistrationInput,
   type Health,
   type ProjectDto,
+  type Locale,
+  type OnboardingCatalog,
+  type ReserveResumeUploadInput,
+  type SaveProfileInput,
+  type SaveSkillsInput,
+  type SaveWorkExperienceInput,
 } from '@palea/contracts';
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 export interface RequestIdentity {
   subject: string;
+  email: string | null;
   roles: readonly string[];
 }
 
@@ -18,6 +39,45 @@ export interface PaleaApiServices {
     limit: number;
     signal?: AbortSignal;
   }): Promise<ProjectDto[]>;
+  getAccount(identity: RequestIdentity): Promise<AccountProfile>;
+  completeRegistration(
+    subject: string,
+    input: CompleteRegistrationInput,
+  ): Promise<{ success: true }>;
+  getOnboardingCatalog(locale: Locale): Promise<OnboardingCatalog>;
+  saveOnboardingProfile(
+    subject: string,
+    input: SaveProfileInput,
+  ): Promise<{ success: true }>;
+  saveWorkExperience(
+    subject: string,
+    input: SaveWorkExperienceInput,
+  ): Promise<{ success: true }>;
+  saveSkills(
+    subject: string,
+    input: SaveSkillsInput,
+  ): Promise<{ success: true }>;
+  completeOnboarding(
+    subject: string,
+    skipped: boolean,
+  ): Promise<{ success: true }>;
+  reserveResumeUpload(
+    subject: string,
+    input: ReserveResumeUploadInput,
+  ): Promise<{
+    resumeId: string;
+    path: string;
+    signedUrl: string;
+    expiresAt: string;
+  }>;
+  confirmResumeUpload(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ success: true }>;
+  cancelResumeUpload(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ success: true }>;
 }
 
 export interface PaleaTrpcContext {
@@ -41,6 +101,10 @@ const t = initTRPC.context<PaleaTrpcContext>().create({
 });
 
 const publicProcedure = t.procedure;
+const protectedProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.identity) throw new TRPCError({ code: 'UNAUTHORIZED' });
+  return next({ ctx: { ...ctx, identity: ctx.identity } });
+});
 
 export const systemRouter = t.router({
   health: publicProcedure
@@ -65,8 +129,80 @@ export const projectsRouter = t.router({
     ),
 });
 
+export const accountRouter = t.router({
+  me: protectedProcedure
+    .input(z.object({}).optional())
+    .output(accountProfileSchema)
+    .query(({ ctx }) => ctx.services.getAccount(ctx.identity)),
+  completeRegistration: protectedProcedure
+    .input(completeRegistrationInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.completeRegistration(ctx.identity.subject, input),
+    ),
+});
+
+export const catalogsRouter = t.router({
+  onboarding: protectedProcedure
+    .input(z.object({ locale: localeSchema.default('es') }))
+    .output(onboardingCatalogSchema)
+    .query(({ ctx, input }) => ctx.services.getOnboardingCatalog(input.locale)),
+});
+
+export const onboardingRouter = t.router({
+  saveProfile: protectedProcedure
+    .input(saveProfileInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.saveOnboardingProfile(ctx.identity.subject, input),
+    ),
+  saveWorkExperience: protectedProcedure
+    .input(saveWorkExperienceInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.saveWorkExperience(ctx.identity.subject, input),
+    ),
+  saveSkills: protectedProcedure
+    .input(saveSkillsInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.saveSkills(ctx.identity.subject, input),
+    ),
+  complete: protectedProcedure
+    .input(completeOnboardingInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.completeOnboarding(ctx.identity.subject, input.skipped),
+    ),
+});
+
+export const resumeRouter = t.router({
+  reserveUpload: protectedProcedure
+    .input(reserveResumeUploadInputSchema)
+    .output(resumeUploadReservationSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.reserveResumeUpload(ctx.identity.subject, input),
+    ),
+  confirmUpload: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.confirmResumeUpload(ctx.identity.subject, input.resumeId),
+    ),
+  cancelUpload: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.cancelResumeUpload(ctx.identity.subject, input.resumeId),
+    ),
+});
+
 export const appRouter = t.router({
   system: systemRouter,
   projects: projectsRouter,
+  account: accountRouter,
+  catalogs: catalogsRouter,
+  onboarding: onboardingRouter,
+  resume: resumeRouter,
 });
 export type AppRouter = typeof appRouter;
