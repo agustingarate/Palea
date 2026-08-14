@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useDependency } from '@/core/di/DependenciesProvider';
 import { dependencyTokens } from '@/core/di/dependencies';
+import { Platform } from 'react-native';
 
 export function useLoginViewModel() {
   const auth = useDependency(dependencyTokens.authRepository);
+  const onboarding = useDependency(dependencyTokens.onboardingRepository);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
@@ -16,7 +18,13 @@ export function useLoginViewModel() {
   };
   const socialLogin = async (provider: 'google' | 'linkedin_oidc') => {
     setError(null); setSubmitting(true);
-    try { await auth.signInWithSocial(provider); }
+    try {
+      await auth.signInWithSocial(provider);
+      if (Platform.OS !== 'web') {
+        const account = await onboarding.getAccount();
+        router.replace(account.missing.includes('personal') ? '/auth/personal-data' : '/');
+      }
+    }
     catch { setError('No pudimos completar el inicio de sesión social.'); }
     finally { setSubmitting(false); }
   };
