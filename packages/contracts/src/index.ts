@@ -16,3 +16,5 @@ export const healthSchema = z.object({ status: z.literal('ok') });
 export type ProjectDto = z.infer<typeof projectDtoSchema>;
 export type ProjectStatus = z.infer<typeof projectStatusSchema>;
 export type Health = z.infer<typeof healthSchema>;
+
+export * from './auth';
