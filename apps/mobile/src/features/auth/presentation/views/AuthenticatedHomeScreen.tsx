@@ -16,7 +16,18 @@ export function AuthenticatedHomeScreen() {
   useEffect(() => {
     if (!isRestoring && !session) router.replace('/auth/login');
   }, [isRestoring, router, session]);
-  useEffect(() => { if (session) void onboarding.getAccount().then((account) => { if (account.missing.includes('profile')) setNotice('Podés completar tu primer dato profesional cuando quieras.'); }); }, [onboarding, session]);
+  useEffect(() => {
+    if (!session) return;
+    void onboarding.getAccount().then((account) => {
+      if (account.missing.includes('personal')) {
+        router.replace('/auth/personal-data');
+        return;
+      }
+      if (account.missing.includes('profile')) {
+        setNotice('Podés completar tu primer dato profesional cuando quieras.');
+      }
+    });
+  }, [onboarding, router, session]);
   if (isRestoring || !session) return null;
   return <FocusedFormLayout title={t('loggedIn.title')}>
     {notice ? <AppText tone="muted">{notice}</AppText> : null}
