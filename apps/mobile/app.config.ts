@@ -51,6 +51,7 @@ export function createAppConfig(input: {
     plugins: [
       'expo-router',
       'expo-font',
+      'expo-document-picker',
       ['expo-dev-client', { addGeneratedScheme: appVariant === 'development' }],
     ],
     experiments: { typedRoutes: true, autolinkingModuleResolution: true },
