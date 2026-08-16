@@ -13,24 +13,38 @@ export function AuthenticatedHomeScreen() {
   const onboarding = useDependency(dependencyTokens.onboardingRepository);
   const router = useRouter();
   const [notice, setNotice] = useState<string | null>(null);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [isSigningOut, setSigningOut] = useState(false);
+
   useEffect(() => {
     if (!isRestoring && !session) router.replace('/auth/login');
   }, [isRestoring, router, session]);
+
   useEffect(() => {
-    if (!session) return;
+    let active = true;
+    if (!session) return () => { active = false; };
     void onboarding.getAccount().then((account) => {
-      if (account.missing.includes('personal')) {
-        router.replace('/auth/personal-data');
-        return;
+      if (active && account.missing.length > 0) {
+        setNotice('Tu perfil tiene información pendiente. Podrás completarla desde tu perfil cuando esa sección esté disponible.');
       }
-      if (account.missing.includes('profile')) {
-        setNotice('Podés completar tu primer dato profesional cuando quieras.');
-      }
+    }).catch(() => {
+      if (active) setNotice('No pudimos verificar los datos pendientes de tu perfil.');
     });
-  }, [onboarding, router, session]);
+    return () => { active = false; };
+  }, [onboarding, session]);
+
+  const signOut = async () => {
+    setLogoutError(null);
+    setSigningOut(true);
+    try { await auth.signOut(); }
+    catch { setLogoutError('No pudimos cerrar sesión. Volvé a intentarlo.'); }
+    finally { setSigningOut(false); }
+  };
+
   if (isRestoring || !session) return null;
   return <FocusedFormLayout title={t('loggedIn.title')}>
-    {notice ? <AppText tone="muted">{notice}</AppText> : null}
-    <Button label={t('logout')} variant="secondary" onPress={() => void auth.signOut()} />
+    {notice ? <AppText tone="info">{notice}</AppText> : null}
+    {logoutError ? <AppText tone="danger">{logoutError}</AppText> : null}
+    <Button label={t('logout')} variant="secondary" loading={isSigningOut} onPress={() => void signOut()} />
   </FocusedFormLayout>;
 }

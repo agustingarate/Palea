@@ -7,16 +7,10 @@ import {
 } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
-import {
-  AppState,
-  type AppStateStatus,
-  Platform,
-  useColorScheme as useSystemColorScheme,
-} from 'react-native';
+import { AppState, type AppStateStatus, Platform } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import { DependenciesProvider } from '../di/DependenciesProvider';
-import { useThemeStore } from '../state/themeStore';
 import { getLocales } from 'expo-localization';
+import { DependenciesProvider } from '../di/DependenciesProvider';
 import { LocaleProvider } from '../localization/LocaleProvider';
 import { AuthProvider } from '@/features/auth/presentation/providers/AuthProvider';
 
@@ -27,22 +21,12 @@ onlineManager.setEventListener((setOnline) =>
 export function AppProviders({ children }: PropsWithChildren) {
   const locale = getLocales()[0]?.languageTag ?? 'es';
   const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
-      }),
+    () => new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 }, mutations: { retry: 0 } } }),
   );
-  const preference = useThemeStore((state) => state.preference);
-  const systemScheme = useSystemColorScheme();
   const { setColorScheme } = useColorScheme();
 
-  useEffect(
-    () =>
-      setColorScheme(
-        preference === 'system' ? (systemScheme ?? 'light') : preference,
-      ),
-    [preference, setColorScheme, systemScheme],
-  );
+  // Product decision for the current release: the application is light-only.
+  useEffect(() => setColorScheme('light'), [setColorScheme]);
   useEffect(() => {
     const onChange = (status: AppStateStatus) => {
       if (Platform.OS !== 'web') focusManager.setFocused(status === 'active');

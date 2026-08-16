@@ -8,13 +8,31 @@ export class AuthRepositoryImpl implements AuthRepository {
     const session = await this.dataSource.getSession();
     return session ? { userId: session.userId, email: session.email } : null;
   }
-  async getAccessToken() { return (await this.dataSource.getSession())?.accessToken ?? null; }
-  subscribe(listener: Parameters<AuthRepository['subscribe']>[0]) {
-    return this.dataSource.subscribe((session) => listener(session ? { userId: session.userId, email: session.email } : null));
+  async getAccessToken() {
+    return (await this.dataSource.getSession())?.accessToken ?? null;
   }
-  signUp(input: Parameters<AuthRepository['signUp']>[0]) { return this.dataSource.signUp(input); }
-  signIn(input: Parameters<AuthRepository['signIn']>[0]) { return this.dataSource.signIn(input); }
-  signInWithSocial(provider: Parameters<AuthRepository['signInWithSocial']>[0]) { return this.dataSource.signInWithSocial(provider); }
-  exchangeOAuthCode(code: string) { return this.dataSource.exchangeOAuthCode(code); }
-  signOut() { return this.dataSource.signOut(); }
+  subscribe(listener: Parameters<AuthRepository['subscribe']>[0]) {
+    return this.dataSource.subscribe((session) =>
+      listener(
+        session ? { userId: session.userId, email: session.email } : null,
+      ),
+    );
+  }
+  signUp(input: Parameters<AuthRepository['signUp']>[0]) {
+    return this.dataSource.signUp(input);
+  }
+  signIn(input: Parameters<AuthRepository['signIn']>[0]) {
+    return this.dataSource.signIn(input);
+  }
+  signInWithSocial(
+    provider: Parameters<AuthRepository['signInWithSocial']>[0],
+  ) {
+    return this.dataSource.signInWithSocial(provider);
+  }
+  exchangeOAuthCode(code: string) {
+    return this.dataSource.exchangeOAuthCode(code);
+  }
+  signOut() {
+    return this.dataSource.signOut();
+  }
 }

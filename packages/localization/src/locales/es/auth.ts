@@ -12,5 +12,8 @@ const auth = {
   'field.nationality': 'Nacionalidad (código ISO)',
   'loggedIn.title': 'Estas logueado',
   'logout': 'Cerrar sesión',
+  'onboarding.skills.description': 'Subí tu CV base y seleccioná tus habilidades principales para completar la configuración de tu perfil.',
+  'onboarding.resumeNotice.title': 'Tu CV principal',
+  'onboarding.resumeNotice.message': 'El CV que cargues se usará como principal por defecto. Podrás subir otros CV cuando quieras.',
 } as const;
 export default auth;

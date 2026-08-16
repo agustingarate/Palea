@@ -8,11 +8,28 @@ import { supabaseSessionStorage } from '../platform/SupabaseSessionStorage';
 
 WebBrowser.maybeCompleteAuthSession();
 
+const requestTimeoutMs = 15_000;
+
+/** Prevents an unavailable local Supabase instance from leaving auth CTAs pending forever. */
+async function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const onAbort = () => controller.abort();
+  init?.signal?.addEventListener('abort', onAbort, { once: true });
+  const timeout = setTimeout(() => controller.abort(), requestTimeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+    init?.signal?.removeEventListener('abort', onAbort);
+  }
+}
+
 export class SupabaseAuthDataSource implements AuthDataSource {
   private readonly client;
 
   constructor(url: string, publishableKey: string) {
     this.client = createClient(url, publishableKey, {
+      global: { fetch: fetchWithTimeout },
       auth: {
         persistSession: true,
         autoRefreshToken: true,

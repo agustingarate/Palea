@@ -18,4 +18,10 @@ export function parseEnvironment(input: Record<string, string | undefined>) {
   });
 }
 
-export const environment = parseEnvironment(process.env);
+export const environment = parseEnvironment({
+  EXPO_PUBLIC_PALEA_ENV: process.env.EXPO_PUBLIC_PALEA_ENV,
+  EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,
+  EXPO_PUBLIC_PROJECTS_SOURCE: process.env.EXPO_PUBLIC_PROJECTS_SOURCE,
+  EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL,
+  EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+});

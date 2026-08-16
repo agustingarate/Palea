@@ -12,5 +12,8 @@ const auth = {
   'field.nationality': 'Nationality (ISO code)',
   'loggedIn.title': 'You are signed in',
   'logout': 'Sign out',
+  'onboarding.skills.description': 'Upload your base resume and select your core skills to complete your profile setup',
+  'onboarding.resumeNotice.title': 'Your primary resume',
+  'onboarding.resumeNotice.message': 'The resume you upload will be used as your primary resume by default. You can upload additional resumes at any time.',
 } as const;
 export default auth;
