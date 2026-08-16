@@ -23,6 +23,6 @@ export interface OnboardingRepository {
   saveProfile(input: SaveProfileInput): Promise<void>;
   saveWorkExperience(input: SaveWorkExperienceInput): Promise<void>;
   saveSkills(input: SaveSkillsInput): Promise<void>;
-  completeOnboarding(input: { skipped: boolean }): Promise<void>;
+  completeOnboarding(): Promise<void>;
   uploadResume(input: ReserveResumeUploadInput, file: ResumeUploadFile, onProgress?: (progress: number) => void): Promise<void>;
 }

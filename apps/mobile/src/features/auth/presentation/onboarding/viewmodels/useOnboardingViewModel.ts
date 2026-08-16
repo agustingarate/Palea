@@ -19,14 +19,17 @@ export function useOnboardingViewModel() {
       draft.setProfile(input);
       router.push('/onboarding/work');
     },
+    skipProfile() {
+      router.push('/onboarding/work');
+    },
     async saveWork(input: typeof draft.work) {
       const normalized = { ...input, endedOn: input.isCurrent ? null : input.endedOn || null };
       await repository.saveWorkExperience(normalized);
       draft.setWork(normalized);
       router.push('/onboarding/skills');
     },
-    async finish(skipped: boolean) {
-      await repository.completeOnboarding({ skipped });
+    async finish() {
+      await repository.completeOnboarding();
       draft.clear();
       invalidateAccount();
       router.replace('/');

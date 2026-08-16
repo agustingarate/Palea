@@ -25,8 +25,8 @@ export class TrpcOnboardingDataSource implements OnboardingDataSource {
   async saveSkills(input: Parameters<OnboardingDataSource['saveSkills']>[0]) {
     await this.client.onboarding.saveSkills.mutate(input);
   }
-  async completeOnboarding(input: { skipped: boolean }) {
-    await this.client.onboarding.complete.mutate(input);
+  async completeOnboarding() {
+    await this.client.onboarding.complete.mutate({});
   }
   async reserveResume(
     input: Parameters<OnboardingDataSource['reserveResume']>[0],

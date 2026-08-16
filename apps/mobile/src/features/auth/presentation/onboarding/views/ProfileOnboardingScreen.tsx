@@ -33,7 +33,7 @@ export function ProfileOnboardingScreen() {
       <form.Field name="interestIds">{(field) => <View className="gap-2"><AppText variant="label">Intereses (máximo 3)</AppText><View className="flex-row flex-wrap gap-2">{interests.map((item) => <Chip key={item.id} label={item.label} selected={field.state.value.includes(item.id)} onPress={() => field.handleChange(field.state.value.includes(item.id) ? field.state.value.filter((id) => id !== item.id) : [...field.state.value, item.id].slice(0, 3))} />)}</View></View>}</form.Field>
       {error ? <AppText tone="danger">{error}</AppText> : null}
       <form.Subscribe selector={(state) => state.canSubmit}>{(canSubmit) => <Button label="Continuar" fullWidth disabled={!canSubmit} onPress={() => form.handleSubmit()} />}</form.Subscribe>
-      <Button label="Omitir onboarding" variant="ghost" fullWidth onPress={() => void vm.finish(true)} />
+      <Button label="Omitir este paso" variant="ghost" fullWidth onPress={vm.skipProfile} />
     </AuthFormLayout>
   );
 }

@@ -28,31 +28,22 @@ export class OnboardingRepositoryImpl implements OnboardingRepository {
   saveSkills(input: Parameters<OnboardingRepository['saveSkills']>[0]) {
     return this.dataSource.saveSkills(input);
   }
-  completeOnboarding(input: { skipped: boolean }) {
-    return this.dataSource.completeOnboarding(input);
+  completeOnboarding() {
+    return this.dataSource.completeOnboarding();
   }
   async uploadResume(
     input: Parameters<OnboardingRepository['uploadResume']>[0],
     file: ResumeUploadFile,
     onProgress?: (progress: number) => void,
   ) {
-    onProgress?.(10);
     const reservation = await this.dataSource.reserveResume(input);
     try {
-      onProgress?.(25);
       const bytes = await file.readBytes();
       const body = bytes.buffer.slice(
         bytes.byteOffset,
         bytes.byteOffset + bytes.byteLength,
       ) as ArrayBuffer;
-      onProgress?.(45);
-      const response = await fetch(reservation.signedUrl, {
-        method: 'PUT',
-        headers: { 'content-type': file.mimeType },
-        body: new Blob([body]),
-      });
-      if (!response.ok) throw new Error('resume.uploadFailed');
-      onProgress?.(85);
+      await putWithProgress(reservation.signedUrl, body, file.mimeType, onProgress);
       await this.dataSource.confirmResume(reservation.resumeId);
       onProgress?.(100);
     } catch (error) {
@@ -62,4 +53,26 @@ export class OnboardingRepositoryImpl implements OnboardingRepository {
       throw error;
     }
   }
+}
+
+function putWithProgress(
+  url: string,
+  body: ArrayBuffer,
+  mimeType: string,
+  onProgress?: (progress: number) => void,
+) {
+  return new Promise<void>((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open('PUT', url);
+    request.setRequestHeader('content-type', mimeType);
+    request.timeout = 30_000;
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress?.(Math.round((event.loaded / event.total) * 95));
+    };
+    request.onload = () => request.status >= 200 && request.status < 300
+      ? resolve()
+      : reject(new Error('resume.uploadFailed'));
+    request.onerror = request.ontimeout = () => reject(new Error('resume.uploadFailed'));
+    request.send(body);
+  });
 }
