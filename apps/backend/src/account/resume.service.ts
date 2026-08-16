@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Inject, Injectable, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
 import { TRPCError } from '@trpc/server';
 import type { ReserveResumeUploadInput } from '@palea/contracts';
@@ -9,7 +9,7 @@ import { PrismaService } from '../database/prisma.service';
 const BUCKET = 'resumes';
 
 @Injectable()
-export class ResumeService implements OnModuleInit, OnModuleDestroy {
+export class ResumeService {
   private readonly storage = createClient(
     environment.supabaseUrl,
     environment.supabaseServiceRoleKey,
@@ -19,21 +19,10 @@ export class ResumeService implements OnModuleInit, OnModuleDestroy {
   );
 
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
-  private cleanupTimer: NodeJS.Timeout | undefined;
-
-  onModuleInit() {
-    // Cleanup is deliberately independent of new uploads: abandoned signed URLs
-    // cannot leave rows or Storage objects behind indefinitely.
-    this.cleanupTimer = setInterval(() => void this.cleanupExpired(), 60_000);
-    this.cleanupTimer.unref();
-  }
-
-  onModuleDestroy() {
-    if (this.cleanupTimer) clearInterval(this.cleanupTimer);
-  }
 
   async reserve(subject: string, input: ReserveResumeUploadInput) {
     await this.cleanupExpired(subject);
+    await this.assertReservationQuota(subject);
     const resumeId = randomUUID();
     const path = `${subject}/${resumeId}.pdf`;
     const expiresAt = new Date(
@@ -57,10 +46,10 @@ export class ResumeService implements OnModuleInit, OnModuleDestroy {
       .from(BUCKET)
       .createSignedUploadUrl(path);
     if (error) {
-      await this.prisma.resume.delete({ where: { id: resumeId } });
+      // Preserve the reservation for a later cleanup/retry; Storage is external.
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Could not reserve upload',
+        message: 'resume.cleanup_failed',
       });
     }
     return {
@@ -109,8 +98,12 @@ export class ResumeService implements OnModuleInit, OnModuleDestroy {
 
   async cancel(subject: string, resumeId: string) {
     const resume = await this.ownedPending(subject, resumeId);
-    await this.storage.storage.from(BUCKET).remove([resume.storagePath]);
-    await this.prisma.resume.delete({ where: { id: resumeId } });
+    const { error } = await this.storage.storage.from(BUCKET).remove([resume.storagePath]);
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'resume.cleanup_failed' });
+    await this.prisma.resume.update({
+      where: { id: resumeId },
+      data: { uploadStatus: 'failed', uploadExpiresAt: null },
+    });
     return { success: true as const };
   }
 
@@ -134,7 +127,8 @@ export class ResumeService implements OnModuleInit, OnModuleDestroy {
     path: string,
     message: string,
   ): Promise<never> {
-    await this.storage.storage.from(BUCKET).remove([path]);
+    const { error } = await this.storage.storage.from(BUCKET).remove([path]);
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'resume.cleanup_failed' });
     await this.prisma.resume.update({
       where: { id: resumeId },
       data: { uploadStatus: 'failed', uploadExpiresAt: null },
@@ -151,11 +145,26 @@ export class ResumeService implements OnModuleInit, OnModuleDestroy {
       },
     });
     if (!expired.length) return;
-    await this.storage.storage
+    const { error } = await this.storage.storage
       .from(BUCKET)
       .remove(expired.map((item) => item.storagePath));
-    await this.prisma.resume.deleteMany({
+    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'resume.cleanup_failed' });
+    await this.prisma.resume.updateMany({
       where: { id: { in: expired.map((item) => item.id) } },
+      data: { uploadStatus: 'failed', uploadExpiresAt: null },
     });
+  }
+
+  private async assertReservationQuota(subject: string) {
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - environment.resumeReservationWindowSeconds * 1000);
+    const [pending, reservations] = await this.prisma.$transaction([
+      this.prisma.resume.count({ where: { profileId: subject, uploadStatus: 'pending', uploadExpiresAt: { gt: now } } }),
+      this.prisma.resume.count({ where: { profileId: subject, createdAt: { gte: windowStart } } }),
+    ]);
+    if (pending >= environment.resumeMaxPendingUploads)
+      throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'resume.too_many_pending' });
+    if (reservations >= environment.resumeMaxReservationsPerWindow)
+      throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'resume.rate_limited' });
   }
 }

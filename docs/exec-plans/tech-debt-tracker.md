@@ -6,6 +6,7 @@
 | TD-002 | Configure auth and secure credential storage | Authentication story is approved             |
 | TD-003 | Add EAS ownership and native identifiers     | First distributable build is planned         |
 | TD-004 | Execute Maestro in hosted emulator CI        | Stable mobile flow and runner budget exist   |
+| TD-005 | Run durable CV reservation cleanup job       | Deploy scheduled worker with Storage retry semantics |
 
 ## Sincronización con ClickUp
 
