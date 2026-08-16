@@ -18,26 +18,20 @@ export const environmentSchema = z.object({
         .filter(Boolean),
     )
     .pipe(z.array(z.url()).min(1)),
-  SUPABASE_URL: z.url().default('http://127.0.0.1:54321'),
-  SUPABASE_PUBLISHABLE_KEY: z.string().min(1).default('local-publishable-key'),
-  SUPABASE_SERVICE_ROLE_KEY: z
-    .string()
-    .min(1)
-    .default('local-service-role-key'),
-  DATABASE_URL: z
-    .string()
-    .min(1)
-    .default('postgresql://postgres:postgres@127.0.0.1:54322/postgres'),
-  DIRECT_URL: z
-    .string()
-    .min(1)
-    .default('postgresql://postgres:postgres@127.0.0.1:54322/postgres'),
+  SUPABASE_URL: z.url(),
+  SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  DATABASE_URL: z.string().min(1),
+  DIRECT_URL: z.string().min(1),
   RESUME_UPLOAD_TTL_SECONDS: z.coerce
     .number()
     .int()
     .min(60)
     .max(3600)
     .default(600),
+  RESUME_MAX_PENDING_UPLOADS: z.coerce.number().int().min(1).max(20),
+  RESUME_MAX_RESERVATIONS_PER_WINDOW: z.coerce.number().int().min(1).max(100),
+  RESUME_RESERVATION_WINDOW_SECONDS: z.coerce.number().int().min(60).max(86_400),
 });
 
 export function parseEnvironment(input: Record<string, string | undefined>) {
@@ -53,6 +47,9 @@ export function parseEnvironment(input: Record<string, string | undefined>) {
     databaseUrl: parsed.DATABASE_URL,
     directUrl: parsed.DIRECT_URL,
     resumeUploadTtlSeconds: parsed.RESUME_UPLOAD_TTL_SECONDS,
+    resumeMaxPendingUploads: parsed.RESUME_MAX_PENDING_UPLOADS,
+    resumeMaxReservationsPerWindow: parsed.RESUME_MAX_RESERVATIONS_PER_WINDOW,
+    resumeReservationWindowSeconds: parsed.RESUME_RESERVATION_WINDOW_SECONDS,
   };
 }
 

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { TRPCError } from '@trpc/server';
+import { AppError } from '@palea/trpc';
 import type {
   AccountProfile,
   CompleteRegistrationInput,
@@ -26,7 +26,7 @@ export class AccountService {
       },
     });
     if (!profile)
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+      throw new AppError('account.profile_not_found', 'NOT_FOUND');
     const missing: AccountProfile['missing'] = [];
     if (!profile.fullName || !profile.birthDate || !profile.nationality)
       missing.push('personal');
@@ -44,7 +44,7 @@ export class AccountService {
       email,
       fullName: profile.fullName,
       birthDate: profile.birthDate ? toDate(profile.birthDate) : null,
-      nationality: profile.nationality,
+      nationality: profile.nationality as AccountProfile['nationality'],
       roleDescription: profile.roleDescription,
       experienceBand: profile.experienceBand,
       interestIds: profile.interests.map((item) => item.interestId),
@@ -68,13 +68,15 @@ export class AccountService {
     input: CompleteRegistrationInput,
   ) {
     assertAdult(input.birthDate);
-    await this.prisma.profile.update({
-      where: { id: subject },
-      data: {
-        fullName: input.fullName,
-        birthDate: new Date(`${input.birthDate}T00:00:00.000Z`),
-        nationality: input.nationality,
-      },
+    await this.prisma.$transaction(async (tx) => {
+      const profile = await tx.profile.findUnique({ where: { id: subject } });
+      if (!profile) throw new AppError('account.profile_not_found', 'NOT_FOUND');
+      // Idempotent retries are safe; conflicting completed data is never silently replaced.
+      if (profile.fullName && profile.birthDate && profile.nationality) return;
+      await tx.profile.update({
+        where: { id: subject },
+        data: { fullName: input.fullName, birthDate: new Date(`${input.birthDate}T00:00:00.000Z`), nationality: input.nationality },
+      });
     });
     return { success: true as const };
   }
@@ -109,10 +111,7 @@ export class AccountService {
       where: { id: { in: input.interestIds }, isActive: true },
     });
     if (available !== new Set(input.interestIds).size)
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'Invalid interests',
-      });
+      throw new AppError('account.invalid_interests');
     await this.prisma.$transaction(async (tx) => {
       await tx.profile.update({
         where: { id: subject },
@@ -157,7 +156,7 @@ export class AccountService {
       where: { id: { in: input.skillIds }, isActive: true },
     });
     if (available !== new Set(input.skillIds).size)
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Invalid skills' });
+      throw new AppError('account.invalid_skills');
     await this.prisma.$transaction(async (tx) => {
       await tx.userSkill.deleteMany({ where: { profileId: subject } });
       if (input.skillIds.length)
@@ -185,7 +184,7 @@ function assertAdult(birthDate: string) {
   const threshold = new Date();
   threshold.setUTCFullYear(threshold.getUTCFullYear() - 18);
   if (birth > threshold)
-    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Minimum age is 18' });
+    throw new AppError('account.minimum_age');
 }
 
 function toDate(value: Date) {

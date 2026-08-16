@@ -26,6 +26,8 @@ import {
 } from '@palea/contracts';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import { AppError } from './AppError';
+export { AppError } from './AppError';
 
 export interface RequestIdentity {
   subject: string;
@@ -59,7 +61,6 @@ export interface PaleaApiServices {
   ): Promise<{ success: true }>;
   completeOnboarding(
     subject: string,
-    skipped: boolean,
   ): Promise<{ success: true }>;
   reserveResumeUpload(
     subject: string,
@@ -88,14 +89,18 @@ export interface PaleaTrpcContext {
 }
 
 const t = initTRPC.context<PaleaTrpcContext>().create({
-  errorFormatter({ shape, ctx }) {
+  errorFormatter({ shape, ctx, error }) {
     return {
       ...shape,
       message:
         shape.data.code === 'INTERNAL_SERVER_ERROR'
           ? 'Internal server error'
           : shape.message,
-      data: { ...shape.data, requestId: ctx?.requestId ?? 'unknown' },
+      data: {
+        ...shape.data,
+        requestId: ctx?.requestId ?? 'unknown',
+        appCode: error instanceof AppError ? error.appCode : undefined,
+      },
     };
   },
 });
@@ -171,9 +176,7 @@ export const onboardingRouter = t.router({
   complete: protectedProcedure
     .input(completeOnboardingInputSchema)
     .output(operationResultSchema)
-    .mutation(({ ctx, input }) =>
-      ctx.services.completeOnboarding(ctx.identity.subject, input.skipped),
-    ),
+    .mutation(({ ctx }) => ctx.services.completeOnboarding(ctx.identity.subject)),
 });
 
 export const resumeRouter = t.router({
