@@ -12,10 +12,25 @@ export function useOnboardingViewModel() {
   const catalog = useQuery({ queryKey: ['auth', 'onboarding-catalog', 'es'], queryFn: () => repository.getCatalog('es') });
   const invalidateAccount = () => queryClient.invalidateQueries({ queryKey: ['auth', 'account'] });
   return {
-    ...draft, catalog, 
-    async saveProfile() { await repository.saveProfile(draft.profile); router.push('/onboarding/work'); },
-    async saveWork() { await repository.saveWorkExperience({ ...draft.work, endedOn: draft.work.isCurrent ? null : draft.work.endedOn || null }); router.push('/onboarding/skills'); },
-    async finish(skipped: boolean) { await repository.completeOnboarding({ skipped }); draft.clear(); invalidateAccount(); router.replace('/'); },
+    ...draft,
+    catalog,
+    async saveProfile(input: typeof draft.profile) {
+      await repository.saveProfile(input);
+      draft.setProfile(input);
+      router.push('/onboarding/work');
+    },
+    async saveWork(input: typeof draft.work) {
+      const normalized = { ...input, endedOn: input.isCurrent ? null : input.endedOn || null };
+      await repository.saveWorkExperience(normalized);
+      draft.setWork(normalized);
+      router.push('/onboarding/skills');
+    },
+    async finish(skipped: boolean) {
+      await repository.completeOnboarding({ skipped });
+      draft.clear();
+      invalidateAccount();
+      router.replace('/');
+    },
     repository,
   };
 }
