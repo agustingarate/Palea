@@ -13,6 +13,7 @@ import { AuthFormLayout } from '../components/AuthFormLayout';
 import { formatFieldError } from '../formatFieldError';
 import { useRegisterViewModel } from '../viewmodels/useRegisterViewModel';
 import { useLocale } from '@/core/localization/LocaleProvider';
+import { NationalitySelectField } from '../components/NationalitySelectField';
 
 export function RegisterScreen() {
   const { t } = useLocale('auth');
@@ -124,15 +125,9 @@ export function RegisterScreen() {
       </form.Field>
       <form.Field name="nationality">
         {(field) => (
-          <TextField
-            label={t('field.nationality')}
-            required
-            placeholder="AR"
-            autoCapitalize="characters"
-            maxLength={2}
+          <NationalitySelectField
             value={field.state.value}
-            onChangeText={(value) => field.handleChange(value.toUpperCase())}
-            onBlur={field.handleBlur}
+            onChange={field.handleChange}
             error={formatFieldError(field.state.meta.errors)}
           />
         )}

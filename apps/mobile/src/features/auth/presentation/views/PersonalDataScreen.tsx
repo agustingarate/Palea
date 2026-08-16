@@ -10,6 +10,7 @@ import { useDependency } from '@/core/di/DependenciesProvider';
 import { dependencyTokens } from '@/core/di/dependencies';
 import { AuthFormLayout } from '../components/AuthFormLayout';
 import { formatFieldError } from '../formatFieldError';
+import { NationalitySelectField } from '../components/NationalitySelectField';
 
 export function PersonalDataScreen() {
   const repository = useDependency(dependencyTokens.onboardingRepository);
@@ -75,15 +76,9 @@ export function PersonalDataScreen() {
       </form.Field>
       <form.Field name="nationality">
         {(field) => (
-          <TextField
-            label="Nacionalidad (ISO)"
-            required
-            placeholder="AR"
-            maxLength={2}
-            autoCapitalize="characters"
+          <NationalitySelectField
             value={field.state.value}
-            onChangeText={(value) => field.handleChange(value.toUpperCase())}
-            onBlur={field.handleBlur}
+            onChange={field.handleChange}
             error={formatFieldError(field.state.meta.errors)}
           />
         )}

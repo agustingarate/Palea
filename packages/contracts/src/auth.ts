@@ -1,8 +1,12 @@
 import { z } from 'zod';
+import { isIsoAlpha2 } from './countries';
 
 export const localeSchema = z.enum(['es', 'en']);
 export const isoDateSchema = z.iso.date();
-export const isoNationalitySchema = z.string().regex(/^[A-Z]{2}$/);
+export const isoNationalitySchema: z.ZodType<string, string> = z
+  .string()
+  .regex(/^[A-Z]{2}$/)
+  .refine((value) => isIsoAlpha2(value), 'nationality.invalid');
 export const emailSchema = z.email();
 export const fullNameSchema = z.string().trim().min(2).max(120);
 export const passwordSchema = z
@@ -90,7 +94,7 @@ export const saveSkillsInputSchema = z
     uniqueIds('skills.duplicate')(value.skillIds, context),
   );
 
-export const completeOnboardingInputSchema = z.object({ skipped: z.boolean() });
+export const completeOnboardingInputSchema = z.object({});
 
 export const reserveResumeUploadInputSchema = z.object({
   displayName: z.string().trim().min(1).max(160),
@@ -150,9 +154,17 @@ export const appErrorCodeSchema = z.enum([
   'auth.network',
   'auth.unknown',
   'account.profile_not_found',
+  'account.personal_data_required',
+  'account.invalid_nationality',
+  'account.minimum_age',
+  'account.invalid_interests',
+  'account.invalid_skills',
   'resume.expired',
   'resume.invalid_file',
   'resume.not_found',
+  'resume.rate_limited',
+  'resume.too_many_pending',
+  'resume.cleanup_failed',
 ]);
 export const operationResultSchema = z.object({ success: z.literal(true) });
 
