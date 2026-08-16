@@ -111,12 +111,14 @@ export function FocusedFormLayout({
             className="w-full gap-6"
             style={{ alignSelf: 'center', maxWidth: layout.formMaxWidth }}
           >
-            <View className="gap-2">
-              <AppText variant="screenTitle">{title}</AppText>
-              {description ? (
-                <AppText tone="muted">{description}</AppText>
-              ) : null}
+            <View className="gap-4">
               {progress}
+              <View className="gap-2">
+                <AppText variant="screenTitle">{title}</AppText>
+                {description ? (
+                  <AppText tone="muted">{description}</AppText>
+                ) : null}
+              </View>
             </View>
             {children}
           </View>

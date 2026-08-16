@@ -27,7 +27,7 @@ export function StepProgress({
           {stepLabel}
         </AppText>
       </View>
-      <ProgressIndicator current={current} total={total} label={stepLabel} />
+      <ProgressIndicator current={current} total={total} />
     </View>
   );
 }

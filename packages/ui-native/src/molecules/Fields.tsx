@@ -246,3 +246,65 @@ export type FileTriggerProps = Omit<TriggerFieldProps, 'icon' | 'trailingIcon'>;
 export function FileTrigger(props: FileTriggerProps) {
   return <TriggerField icon="file" trailingIcon="upload" {...props} />;
 }
+
+export interface FileUploadFieldProps {
+  label?: string;
+  idleActionLabel?: string;
+  loadingLabel?: string;
+  acceptedTypes: string;
+  maxSizeLabel: string;
+  fileName?: string;
+  progress?: number;
+  isLoading?: boolean;
+  disabled?: boolean;
+  error?: string;
+  onPress: () => void;
+}
+
+/** A reusable file selector. The host owns the picker and upload transport. */
+export function FileUploadField({
+  label,
+  idleActionLabel = 'Seleccioná un archivo',
+  loadingLabel = 'Cargando archivo…',
+  acceptedTypes,
+  maxSizeLabel,
+  fileName,
+  progress,
+  isLoading = false,
+  disabled = false,
+  error,
+  onPress,
+}: FileUploadFieldProps) {
+  const safeProgress = Math.min(Math.max(progress ?? 0, 0), 100);
+  const blocked = disabled || isLoading;
+  return (
+    <View className="gap-2">
+      {label ? <AppText variant="label">{label}</AppText> : null}
+      <Pressable
+        accessibilityHint={`${acceptedTypes}. Tamaño máximo: ${maxSizeLabel}.`}
+        accessibilityLabel={label ?? idleActionLabel}
+        accessibilityRole="button"
+        accessibilityState={{ busy: isLoading, disabled: blocked }}
+        className={`min-h-36 border-border bg-surface dark:border-dark-border dark:bg-dark-surface items-center justify-center gap-2 rounded-md border border-dashed px-6 py-5 ${error ? 'border-danger dark:border-dark-danger' : ''} ${blocked ? 'opacity-disabled' : ''}`}
+        disabled={blocked}
+        onPress={onPress}
+      >
+        <View className="bg-surface-subtle dark:bg-dark-surface-subtle h-12 w-12 items-center justify-center rounded-full">
+          <Icon name={isLoading ? 'upload' : 'fileText'} size="md" tone="interaction" />
+        </View>
+        <AppText variant="label" tone="interaction">
+          {isLoading ? loadingLabel : fileName ?? idleActionLabel}
+        </AppText>
+        <AppText variant="label" tone="muted">
+          {isLoading ? `Progreso: ${safeProgress}%` : `${acceptedTypes} · Máx. ${maxSizeLabel}`}
+        </AppText>
+        {isLoading ? (
+          <View accessibilityLabel={`Progreso de carga: ${safeProgress}%`} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: safeProgress }} className="bg-surface-subtle dark:bg-dark-surface-subtle h-2 w-full overflow-hidden rounded-full">
+            <View className="bg-interaction dark:bg-dark-interaction h-full rounded-full" style={{ width: `${safeProgress}%` }} />
+          </View>
+        ) : null}
+      </Pressable>
+      {error ? <AppText accessibilityLiveRegion="polite" variant="label" tone="danger">{error}</AppText> : null}
+    </View>
+  );
+}

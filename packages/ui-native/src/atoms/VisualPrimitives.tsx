@@ -10,12 +10,15 @@ import {
 } from 'react-native';
 import {
   createAnimatedComponent,
+  interpolateColor,
   ReduceMotion,
   cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withTiming,
+  ZoomIn,
+  ZoomOut,
 } from 'react-native-reanimated';
 import { primitives } from '@palea/design-tokens';
 import { AppText } from './AppText';
@@ -90,52 +93,78 @@ export function Chip({
   ...props
 }: ChipProps) {
   const press = usePressFeedback('control');
+  const theme = useThemeColors();
+  const selection = useSharedValue(selected ? 1 : 0);
+  const selectionStyle = useAnimatedStyle(
+    () => ({
+      backgroundColor: interpolateColor(selection.value, [0, 1], [theme.surface, theme.interactionSubtle]),
+      borderColor: interpolateColor(selection.value, [0, 1], [theme.border, theme.interaction]),
+    }),
+    [selection, theme.border, theme.interaction, theme.interactionSubtle, theme.surface],
+  );
+  useEffect(() => {
+    selection.value = withTiming(selected ? 1 : 0, {
+      duration: primitives.motion.duration.fast,
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [selected, selection]);
   const content = (
     <>
-      {selected ? <Icon name="check" size="sm" tone="interaction" /> : null}
+      {selected ? (
+        <AnimatedView entering={ZoomIn.duration(primitives.motion.duration.fast).reduceMotion(ReduceMotion.System)} exiting={ZoomOut.duration(primitives.motion.duration.fast).reduceMotion(ReduceMotion.System)}>
+          <Icon name="check" size="sm" tone="interaction" />
+        </AnimatedView>
+      ) : null}
       <AppText variant="bodySmall" tone={selected ? 'interaction' : 'default'}>
         {label}
       </AppText>
     </>
   );
   return (
-    <AnimatedView style={press.animatedStyle}>
-      <View
-        className={`min-h-control-sm flex-row items-center gap-1 self-start rounded-full border px-3 ${selected ? 'border-interaction bg-interaction-subtle dark:border-dark-interaction dark:bg-dark-interaction-subtle' : 'border-border bg-surface dark:border-dark-border dark:bg-dark-surface'} ${disabled ? 'opacity-disabled' : ''}`}
-      >
-        {onPress ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ selected, disabled }}
-            className="min-h-control-sm flex-row items-center gap-1"
-            disabled={disabled}
-            {...props}
-            onPressIn={(event) => {
-              press.onPressIn();
-              props.onPressIn?.(event);
-            }}
-            onPressOut={(event) => {
-              press.onPressOut();
-              props.onPressOut?.(event);
-            }}
-            onPress={onPress}
-          >
-            {content}
-          </Pressable>
-        ) : (
-          content
-        )}
-        {onRemove ? (
-          <Pressable
-            accessibilityLabel={`Remove ${label}`}
-            accessibilityRole="button"
-            hitSlop={8}
-            onPress={onRemove}
-          >
-            <Icon name="close" size="sm" tone="muted" />
-          </Pressable>
-        ) : null}
-      </View>
+    <AnimatedView
+      style={[
+        {
+          alignItems: 'center',
+          alignSelf: 'flex-start',
+          borderRadius: primitives.radius.full,
+          borderWidth: 1,
+          flexDirection: 'row',
+          gap: primitives.spacing.xs,
+          minHeight: primitives.size.controlSm,
+          opacity: disabled ? primitives.opacity.disabled : 1,
+          paddingHorizontal: 12,
+        },
+        selectionStyle,
+        press.animatedStyle,
+      ]}
+    >
+      {onPress ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected, disabled }}
+          className="min-h-control-sm flex-row items-center gap-1"
+          disabled={disabled}
+          {...props}
+          onPressIn={(event) => {
+            press.onPressIn();
+            props.onPressIn?.(event);
+          }}
+          onPressOut={(event) => {
+            press.onPressOut();
+            props.onPressOut?.(event);
+          }}
+          onPress={onPress}
+        >
+          {content}
+        </Pressable>
+      ) : (
+        content
+      )}
+      {onRemove ? (
+        <Pressable accessibilityLabel={`Remove ${label}`} accessibilityRole="button" hitSlop={8} onPress={onRemove}>
+          <Icon name="close" size="sm" tone="muted" />
+        </Pressable>
+      ) : null}
     </AnimatedView>
   );
 }
