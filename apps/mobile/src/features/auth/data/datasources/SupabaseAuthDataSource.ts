@@ -35,7 +35,8 @@ export class SupabaseAuthDataSource implements AuthDataSource {
         autoRefreshToken: true,
         flowType: 'pkce',
         storage: supabaseSessionStorage,
-        detectSessionInUrl: Platform.OS === 'web',
+        // The callback screen owns the single PKCE code exchange on every platform.
+        detectSessionInUrl: false,
       },
     });
   }

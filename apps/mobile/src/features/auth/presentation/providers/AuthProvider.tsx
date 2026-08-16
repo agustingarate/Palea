@@ -19,9 +19,9 @@ function AuthSessionProvider({ children, repository }: PropsWithChildren<{ repos
 
   useEffect(() => {
     let mounted = true;
-    void repository.getSession().then((next) => {
-      if (mounted) { setSession(next); setRestoring(false); }
-    });
+    void repository.getSession()
+      .then((next) => { if (mounted) setSession(next); })
+      .finally(() => { if (mounted) setRestoring(false); });
     const unsubscribe = repository.subscribe(setSession);
     return () => { mounted = false; unsubscribe(); };
   }, [repository]);

@@ -5,6 +5,7 @@ import { useAuthSession } from '../providers/AuthProvider';
 import { useDependency } from '@/core/di/DependenciesProvider';
 import { dependencyTokens } from '@/core/di/dependencies';
 import { useLocale } from '@/core/localization/LocaleProvider';
+import { resolvePostAuthRoute } from '../navigation/resolvePostAuthRoute';
 
 export function AuthenticatedHomeScreen() {
   const { t } = useLocale('auth');
@@ -24,14 +25,17 @@ export function AuthenticatedHomeScreen() {
     let active = true;
     if (!session) return () => { active = false; };
     void onboarding.getAccount().then((account) => {
-      if (active && account.missing.length > 0) {
-        setNotice('Tu perfil tiene información pendiente. Podrás completarla desde tu perfil cuando esa sección esté disponible.');
+      if (!active) return;
+      const destination = resolvePostAuthRoute(account);
+      if (destination !== '/') router.replace(destination);
+      else if (account.missing.length > 0) {
+        setNotice('Tu perfil tiene información profesional pendiente. Podrás completarla desde tu perfil cuando esa sección esté disponible.');
       }
     }).catch(() => {
       if (active) setNotice('No pudimos verificar los datos pendientes de tu perfil.');
     });
     return () => { active = false; };
-  }, [onboarding, session]);
+  }, [onboarding, router, session]);
 
   const signOut = async () => {
     setLogoutError(null);
