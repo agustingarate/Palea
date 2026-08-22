@@ -7,6 +7,7 @@
 | TD-003 | Add EAS ownership and native identifiers     | First distributable build is planned         |
 | TD-004 | Execute Maestro in hosted emulator CI        | Stable mobile flow and runner budget exist   |
 | TD-005 | Run durable CV reservation cleanup job       | Deploy scheduled worker with Storage retry semantics |
+| TD-006 | Add timeout and cancellation to tRPC client requests | Any mobile flow depends on a remote API |
 
 ## Sincronización con ClickUp
 
