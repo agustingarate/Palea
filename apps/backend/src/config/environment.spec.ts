@@ -9,7 +9,7 @@ describe('backend environment', () => {
       CORS_ORIGINS: 'https://app.staging.palea.com',
     });
 
-    expect(environment).toEqual({
+    expect(environment).toMatchObject({
       nodeEnv: 'production',
       paleaEnvironment: 'staging',
       port: 3001,

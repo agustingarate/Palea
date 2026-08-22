@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ExperienceBand {
+  zero_to_one
+  two_to_four
+  five_to_eight
+  over_eight
+
+  @@map("experience_band")
+}
+
+enum ResumeUploadStatus {
+  pending
+  ready
+  failed
+
+  @@map("resume_upload_status")
+}
+
+model Profile {
+  id                    String          @id @db.Uuid
+  fullName              String?         @map("full_name")
+  birthDate             DateTime?       @map("birth_date") @db.Date
+  nationality           String?
+  roleDescription       String?         @map("role_description")
+  experienceBand        ExperienceBand? @map("experience_band")
+  onboardingCompletedAt DateTime?       @map("onboarding_completed_at") @db.Timestamptz(6)
+  createdAt             DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  interests             UserInterest[]
+  skills                UserSkill[]
+  workExperiences       WorkExperience[]
+  resumes               Resume[]
+
+  @@map("profiles")
+}
+
+model InterestCatalog {
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String         @unique
+  labelEs   String         @map("label_es")
+  labelEn   String         @map("label_en")
+  isActive  Boolean        @default(true) @map("is_active")
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+  users     UserInterest[]
+
+  @@map("profile_interests")
+}
+
+model UserInterest {
+  profileId  String          @map("profile_id") @db.Uuid
+  interestId String          @map("interest_id") @db.Uuid
+  createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  profile    Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  interest   InterestCatalog @relation(fields: [interestId], references: [id], onDelete: Restrict)
+
+  @@id([profileId, interestId])
+  @@map("user_interests")
+}
+
+model SkillCatalog {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String      @unique
+  labelEs   String      @map("label_es")
+  labelEn   String      @map("label_en")
+  isActive  Boolean     @default(true) @map("is_active")
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  users     UserSkill[]
+
+  @@map("skills")
+}
+
+model UserSkill {
+  profileId String       @map("profile_id") @db.Uuid
+  skillId   String       @map("skill_id") @db.Uuid
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  profile   Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill     SkillCatalog @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([profileId, skillId])
+  @@map("user_skills")
+}
+
+model WorkExperience {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId   String    @map("profile_id") @db.Uuid
+  companyName String    @map("company_name")
+  role        String
+  startedOn   DateTime  @map("started_on") @db.Date
+  endedOn     DateTime? @map("ended_on") @db.Date
+  isCurrent   Boolean   @default(false) @map("is_current")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("work_experiences")
+}
+
+model Resume {
+  id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId       String             @map("profile_id") @db.Uuid
+  storagePath     String             @unique @map("storage_path")
+  displayName     String             @map("display_name")
+  mimeType        String             @map("mime_type")
+  sizeBytes       BigInt             @map("size_bytes")
+  isPrimary       Boolean            @default(false) @map("is_primary")
+  uploadStatus    ResumeUploadStatus @map("upload_status")
+  uploadExpiresAt DateTime?          @map("upload_expires_at") @db.Timestamptz(6)
+  uploadedAt      DateTime?          @map("uploaded_at") @db.Timestamptz(6)
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime           @default(now()) @map("updated_at") @db.Timestamptz(6)
+  profile         Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([uploadExpiresAt])
+  @@map("resumes")
+}

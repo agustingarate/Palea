@@ -9,6 +9,9 @@ import { AppModule } from './app.module';
 import { environment } from './config/environment';
 import { ProjectsService } from './projects/projects.service';
 import { HealthService } from './system/health.service';
+import { AuthService } from './auth/auth.service';
+import { AccountService } from './account/account.service';
+import { ResumeService } from './account/resume.service';
 
 export async function createApp(): Promise<INestApplication> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -17,13 +20,16 @@ export async function createApp(): Promise<INestApplication> {
 
   const health = app.get(HealthService);
   const projects = app.get(ProjectsService);
+  const auth = app.get(AuthService);
+  const account = app.get(AccountService);
+  const resumes = app.get(ResumeService);
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.use(
     '/trpc',
     createExpressMiddleware({
       router: appRouter,
-      createContext: ({ req }): PaleaTrpcContext =>
-        createContext(req, health, projects),
+      createContext: ({ req }): Promise<PaleaTrpcContext> =>
+        createContext(req, health, projects, auth, account, resumes),
       onError: ({ error, path }) =>
         app
           .getHttpAdapter()
@@ -34,21 +40,41 @@ export async function createApp(): Promise<INestApplication> {
   return app;
 }
 
-function createContext(
+async function createContext(
   req: Request,
   health: HealthService,
   projects: ProjectsService,
-): PaleaTrpcContext {
+  auth: AuthService,
+  account: AccountService,
+  resumes: ResumeService,
+): Promise<PaleaTrpcContext> {
   const requestIdHeader = req.header('x-request-id');
+  const identity = await auth.authenticate(req.header('authorization'));
   return {
     requestId:
       requestIdHeader && requestIdHeader.length <= 128
         ? requestIdHeader
         : randomUUID(),
-    identity: null,
+    identity,
     services: {
       systemHealth: () => health.get(),
       listProjects: (input) => projects.list(input),
+      getAccount: (requestIdentity) =>
+        account.getMe(requestIdentity.subject, requestIdentity.email),
+      completeRegistration: (subject, input) =>
+        account.completeRegistration(subject, input),
+      getOnboardingCatalog: (locale) => account.catalogs(locale),
+      saveOnboardingProfile: (subject, input) =>
+        account.saveProfile(subject, input),
+      saveWorkExperience: (subject, input) =>
+        account.saveWorkExperience(subject, input),
+      saveSkills: (subject, input) => account.saveSkills(subject, input),
+      completeOnboarding: (subject) => account.completeOnboarding(subject),
+      reserveResumeUpload: (subject, input) => resumes.reserve(subject, input),
+      confirmResumeUpload: (subject, resumeId) =>
+        resumes.confirm(subject, resumeId),
+      cancelResumeUpload: (subject, resumeId) =>
+        resumes.cancel(subject, resumeId),
     },
   };
 }

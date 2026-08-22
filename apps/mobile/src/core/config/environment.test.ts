@@ -6,6 +6,8 @@ describe('mobile environment', () => {
       EXPO_PUBLIC_PALEA_ENV: 'staging',
       EXPO_PUBLIC_API_URL: 'https://api.staging.palea.com',
       EXPO_PUBLIC_PROJECTS_SOURCE: 'trpc',
+      EXPO_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'publishable-test-key',
     });
 
     expect(environment).toMatchObject({

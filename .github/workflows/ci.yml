@@ -13,11 +13,22 @@ jobs:
       EXPO_PUBLIC_PALEA_ENV: development
       EXPO_PUBLIC_API_URL: http://localhost:3001
       EXPO_PUBLIC_PROJECTS_SOURCE: trpc
+      EXPO_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-publishable-key
       NEXT_PUBLIC_PALEA_ENV: development
       NEXT_PUBLIC_API_URL: http://localhost:3001
       PALEA_ENV: development
       PORT: 3001
       CORS_ORIGINS: http://localhost:3000,http://localhost:8081
+      SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_PUBLISHABLE_KEY: ci-publishable-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      RESUME_UPLOAD_TTL_SECONDS: 600
+      RESUME_MAX_PENDING_UPLOADS: 3
+      RESUME_MAX_RESERVATIONS_PER_WINDOW: 10
+      RESUME_RESERVATION_WINDOW_SECONDS: 3600
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

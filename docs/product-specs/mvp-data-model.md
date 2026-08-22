@@ -2,7 +2,7 @@
 id: SPEC-DATA-001
 title: Modelo de datos funcional del MVP
 status: approved
-version: 1.1
+version: 1.2
 stories:
   - CU-86ajvbcd
   - CU-86ajvbvcg
@@ -63,6 +63,11 @@ postulación no elimina el CV y borrar un CV no elimina la postulación.
   `unspecified`.
 - `duration_type`: `indefinite`, `temporary`, `unspecified`.
 - `experience_band`: `zero_to_one`, `two_to_four`, `five_to_eight`, `over_eight`.
+- `profiles.nationality` almacena códigos ISO 3166-1 alpha-2.
+- Los catálogos de intereses y habilidades conservan `label_es` y `label_en`.
+- `resume_upload_status`: `pending`, `ready`, `failed`. Una reserva `pending`
+  tiene expiración; sólo un CV `ready` puede ser principal. El CV opcional del
+  onboarding se marca principal al confirmarse.
 - Una postulación exige empresa, rol y fecha; tiene cero o un CV asociado.
 - El CV asociado debe pertenecer al mismo usuario.
 - `ended_on >= started_on`, excepto empleo actual sin fecha final.
@@ -146,3 +151,9 @@ existen datos de usuarios que conservar.
 - Diseñar contratos tRPC/REST y capacidades de backoffice.
 - Implementar el flujo completo de carga y limpieza de CVs huérfanos.
 - Definir observabilidad y rate limits de los endpoints de escritura.
+
+## Revisión 1.2
+
+La versión 1.2 incorpora las reglas de `SPEC-AUTH-001` para CU-86ajvbvcd:
+nacionalidad ISO, etiquetas localizadas y ciclo de carga de CV. Está aprobada
+para contratos, migraciones y pruebas de la story.

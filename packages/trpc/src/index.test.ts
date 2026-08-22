@@ -1,11 +1,15 @@
-import { appRouter, type PaleaTrpcContext } from './index';
+import {
+  appRouter,
+  type PaleaApiServices,
+  type PaleaTrpcContext,
+} from './index';
 
 const context: PaleaTrpcContext = {
   requestId: 'test-request',
   identity: null,
   services: {
     systemHealth: async () => ({ status: 'ok' }),
-    listProjects: async ({ limit }) =>
+    listProjects: async ({ limit }: { limit: number }) =>
       [
         {
           id: 'p-1',
@@ -15,7 +19,7 @@ const context: PaleaTrpcContext = {
           updatedAt: '2026-08-03T12:00:00.000Z',
         },
       ].slice(0, limit),
-  },
+  } as unknown as PaleaApiServices,
 };
 
 describe('appRouter', () => {

@@ -11,3 +11,4 @@ export * from './organisms/Navigation';
 export * from './organisms/StageAndMetrics';
 export * from './templates/Layouts';
 export * from './internal/useResponsiveLayout';
+export * from './molecules/StepProgress';
