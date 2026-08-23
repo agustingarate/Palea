@@ -10,7 +10,8 @@ jest.mock('../providers/AuthProvider', () => ({
 }));
 jest.mock('expo-router', () => ({
   Redirect: ({ href }: { href: string }) => {
-    const { Text: MockText } = jest.requireActual<typeof ReactNative>('react-native');
+    const { Text: MockText } =
+      jest.requireActual<typeof ReactNative>('react-native');
 
     return <MockText>{`redirect:${href}`}</MockText>;
   },
