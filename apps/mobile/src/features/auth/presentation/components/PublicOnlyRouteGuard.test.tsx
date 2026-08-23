@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react-native';
+import type * as ReactNative from 'react-native';
 import { Text } from 'react-native';
 import { PublicOnlyRouteGuard } from './PublicOnlyRouteGuard';
 
@@ -9,7 +10,8 @@ jest.mock('../providers/AuthProvider', () => ({
 }));
 jest.mock('expo-router', () => ({
   Redirect: ({ href }: { href: string }) => {
-    const { Text: MockText } = require('react-native');
+    const { Text: MockText } = jest.requireActual<typeof ReactNative>('react-native');
+
     return <MockText>{`redirect:${href}`}</MockText>;
   },
 }));
