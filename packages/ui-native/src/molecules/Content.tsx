@@ -111,13 +111,20 @@ export function Notice({
   message,
   tone = 'info',
 }: Pick<FeedbackMessageProps, 'title' | 'message' | 'tone'>) {
-  return <View accessibilityRole="summary" className="bg-surface-subtle dark:bg-dark-surface-subtle flex-row gap-3 rounded-sm px-3 py-3">
-    <Icon name={tone === 'danger' ? 'error' : 'info'} size="sm" tone={tone} />
-    <View className="flex-1 gap-1">
-      <AppText variant="label">{title}</AppText>
-      <AppText variant="bodySmall" tone="muted">{message}</AppText>
+  return (
+    <View
+      accessibilityRole="summary"
+      className="bg-surface-subtle dark:bg-dark-surface-subtle flex-row gap-3 rounded-sm px-3 py-3"
+    >
+      <Icon name={tone === 'danger' ? 'error' : 'info'} size="sm" tone={tone} />
+      <View className="flex-1 gap-1">
+        <AppText variant="label">{title}</AppText>
+        <AppText variant="bodySmall" tone="muted">
+          {message}
+        </AppText>
+      </View>
     </View>
-  </View>;
+  );
 }
 
 export function FeedbackMessage({

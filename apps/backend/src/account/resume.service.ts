@@ -98,8 +98,14 @@ export class ResumeService {
 
   async cancel(subject: string, resumeId: string) {
     const resume = await this.ownedPending(subject, resumeId);
-    const { error } = await this.storage.storage.from(BUCKET).remove([resume.storagePath]);
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'resume.cleanup_failed' });
+    const { error } = await this.storage.storage
+      .from(BUCKET)
+      .remove([resume.storagePath]);
+    if (error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'resume.cleanup_failed',
+      });
     await this.prisma.resume.update({
       where: { id: resumeId },
       data: { uploadStatus: 'failed', uploadExpiresAt: null },
@@ -117,7 +123,11 @@ export class ResumeService {
         message: 'Pending upload not found',
       });
     if (resume.uploadExpiresAt && resume.uploadExpiresAt <= new Date()) {
-      return this.fail(resume.id, resume.storagePath, 'Upload reservation expired');
+      return this.fail(
+        resume.id,
+        resume.storagePath,
+        'Upload reservation expired',
+      );
     }
     return resume;
   }
@@ -128,7 +138,11 @@ export class ResumeService {
     message: string,
   ): Promise<never> {
     const { error } = await this.storage.storage.from(BUCKET).remove([path]);
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'resume.cleanup_failed' });
+    if (error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'resume.cleanup_failed',
+      });
     await this.prisma.resume.update({
       where: { id: resumeId },
       data: { uploadStatus: 'failed', uploadExpiresAt: null },
@@ -148,7 +162,11 @@ export class ResumeService {
     const { error } = await this.storage.storage
       .from(BUCKET)
       .remove(expired.map((item) => item.storagePath));
-    if (error) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'resume.cleanup_failed' });
+    if (error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'resume.cleanup_failed',
+      });
     await this.prisma.resume.updateMany({
       where: { id: { in: expired.map((item) => item.id) } },
       data: { uploadStatus: 'failed', uploadExpiresAt: null },
@@ -157,14 +175,30 @@ export class ResumeService {
 
   private async assertReservationQuota(subject: string) {
     const now = new Date();
-    const windowStart = new Date(now.getTime() - environment.resumeReservationWindowSeconds * 1000);
+    const windowStart = new Date(
+      now.getTime() - environment.resumeReservationWindowSeconds * 1000,
+    );
     const [pending, reservations] = await this.prisma.$transaction([
-      this.prisma.resume.count({ where: { profileId: subject, uploadStatus: 'pending', uploadExpiresAt: { gt: now } } }),
-      this.prisma.resume.count({ where: { profileId: subject, createdAt: { gte: windowStart } } }),
+      this.prisma.resume.count({
+        where: {
+          profileId: subject,
+          uploadStatus: 'pending',
+          uploadExpiresAt: { gt: now },
+        },
+      }),
+      this.prisma.resume.count({
+        where: { profileId: subject, createdAt: { gte: windowStart } },
+      }),
     ]);
     if (pending >= environment.resumeMaxPendingUploads)
-      throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'resume.too_many_pending' });
+      throw new TRPCError({
+        code: 'TOO_MANY_REQUESTS',
+        message: 'resume.too_many_pending',
+      });
     if (reservations >= environment.resumeMaxReservationsPerWindow)
-      throw new TRPCError({ code: 'TOO_MANY_REQUESTS', message: 'resume.rate_limited' });
+      throw new TRPCError({
+        code: 'TOO_MANY_REQUESTS',
+        message: 'resume.rate_limited',
+      });
   }
 }

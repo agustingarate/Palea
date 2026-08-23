@@ -56,24 +56,22 @@ describe('ApplicationsService', () => {
     const transaction = {
       application: {
         findFirst: jest.fn().mockResolvedValue(rows[1]),
-        findMany: jest
-          .fn()
-          .mockResolvedValue([
-            rows[0],
-            rows[1],
-            {
-              ...rows[0],
-              id: '00000000-0000-4000-8000-000000000013',
-              status: 'offer',
-              position: 0,
-            },
-            {
-              ...rows[0],
-              id: '00000000-0000-4000-8000-000000000014',
-              status: 'offer',
-              position: 1,
-            },
-          ]),
+        findMany: jest.fn().mockResolvedValue([
+          rows[0],
+          rows[1],
+          {
+            ...rows[0],
+            id: '00000000-0000-4000-8000-000000000013',
+            status: 'offer',
+            position: 0,
+          },
+          {
+            ...rows[0],
+            id: '00000000-0000-4000-8000-000000000014',
+            status: 'offer',
+            position: 1,
+          },
+        ]),
         update,
       },
     };

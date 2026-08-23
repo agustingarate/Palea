@@ -33,8 +33,12 @@ describe('auth contracts', () => {
   });
 
   it('calculates the minimum age at an exact calendar boundary', () => {
-    expect(isAtLeastAge('2008-08-14', 18, new Date('2026-08-14T12:00:00Z'))).toBe(true);
-    expect(isAtLeastAge('2008-08-15', 18, new Date('2026-08-14T12:00:00Z'))).toBe(false);
+    expect(
+      isAtLeastAge('2008-08-14', 18, new Date('2026-08-14T12:00:00Z')),
+    ).toBe(true);
+    expect(
+      isAtLeastAge('2008-08-15', 18, new Date('2026-08-14T12:00:00Z')),
+    ).toBe(false);
   });
 
   it('rejects duplicate skills and invalid current work dates', () => {

@@ -1,0 +1,1 @@
+SELECT profiles.id, profiles.full_name, resumes.created_at FROM resumes LEFT JOIN profiles ON profiles.id = resumes.profile_id;

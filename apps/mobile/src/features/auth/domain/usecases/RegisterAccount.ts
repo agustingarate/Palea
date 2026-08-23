@@ -8,8 +8,14 @@ export class RegisterAccount {
     private readonly onboarding: OnboardingRepository,
   ) {}
 
-  async execute(input: CompleteRegistrationInput & { email: string; password: string }) {
-    await this.auth.signUp({ email: input.email, password: input.password, fullName: input.fullName });
+  async execute(
+    input: CompleteRegistrationInput & { email: string; password: string },
+  ) {
+    await this.auth.signUp({
+      email: input.email,
+      password: input.password,
+      fullName: input.fullName,
+    });
     await this.onboarding.completeRegistration({
       fullName: input.fullName,
       birthDate: input.birthDate,

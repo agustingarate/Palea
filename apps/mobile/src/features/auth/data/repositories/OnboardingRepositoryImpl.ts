@@ -43,7 +43,12 @@ export class OnboardingRepositoryImpl implements OnboardingRepository {
         bytes.byteOffset,
         bytes.byteOffset + bytes.byteLength,
       ) as ArrayBuffer;
-      await putWithProgress(reservation.signedUrl, body, file.mimeType, onProgress);
+      await putWithProgress(
+        reservation.signedUrl,
+        body,
+        file.mimeType,
+        onProgress,
+      );
       await this.dataSource.confirmResume(reservation.resumeId);
       onProgress?.(100);
     } catch (error) {
@@ -67,12 +72,15 @@ function putWithProgress(
     request.setRequestHeader('content-type', mimeType);
     request.timeout = 30_000;
     request.upload.onprogress = (event) => {
-      if (event.lengthComputable) onProgress?.(Math.round((event.loaded / event.total) * 95));
+      if (event.lengthComputable)
+        onProgress?.(Math.round((event.loaded / event.total) * 95));
     };
-    request.onload = () => request.status >= 200 && request.status < 300
-      ? resolve()
-      : reject(new Error('resume.uploadFailed'));
-    request.onerror = request.ontimeout = () => reject(new Error('resume.uploadFailed'));
+    request.onload = () =>
+      request.status >= 200 && request.status < 300
+        ? resolve()
+        : reject(new Error('resume.uploadFailed'));
+    request.onerror = request.ontimeout = () =>
+      reject(new Error('resume.uploadFailed'));
     request.send(body);
   });
 }

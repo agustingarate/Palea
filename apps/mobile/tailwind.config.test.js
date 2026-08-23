@@ -4,7 +4,9 @@ import { pathToFileURL } from 'node:url';
 import { themes } from '@palea/design-tokens';
 
 function loadTailwindColors() {
-  const url = pathToFileURL(path.resolve(__dirname, 'tailwind.config.mjs')).href;
+  const url = pathToFileURL(
+    path.resolve(__dirname, 'tailwind.config.mjs'),
+  ).href;
   const script = `const { default: config } = await import(${JSON.stringify(url)}); console.log(JSON.stringify(config.theme.extend.colors));`;
   return JSON.parse(
     execFileSync(process.execPath, ['--input-type=module', '--eval', script], {

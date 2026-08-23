@@ -302,9 +302,16 @@ export function SearchableSelect<Value extends string = string>({
     const normalizedQuery = normalizeSearch(query.trim());
     if (!normalizedQuery) return options;
     return options.filter((option) =>
-      [option.label, option.description, option.value, ...(option.keywords ?? [])]
+      [
+        option.label,
+        option.description,
+        option.value,
+        ...(option.keywords ?? []),
+      ]
         .filter(Boolean)
-        .some((candidate) => normalizeSearch(candidate!).includes(normalizedQuery)),
+        .some((candidate) =>
+          normalizeSearch(candidate!).includes(normalizedQuery),
+        ),
     );
   }, [options, query]);
   const close = () => {
@@ -317,13 +324,21 @@ export function SearchableSelect<Value extends string = string>({
     onValueChange(option.value);
     close();
   };
-  const border = error ? 'border-danger dark:border-dark-danger' : 'border-border dark:border-dark-border';
+  const border = error
+    ? 'border-danger dark:border-dark-danger'
+    : 'border-border dark:border-dark-border';
 
   return (
     <View className="gap-1">
       <View className="flex-row items-center gap-1">
-        <AppText variant="label" tone={error ? 'danger' : 'default'}>{label}</AppText>
-        {required ? <AppText variant="label" tone="danger">*</AppText> : null}
+        <AppText variant="label" tone={error ? 'danger' : 'default'}>
+          {label}
+        </AppText>
+        {required ? (
+          <AppText variant="label" tone="danger">
+            *
+          </AppText>
+        ) : null}
       </View>
       <Pressable
         ref={trigger}
@@ -335,45 +350,94 @@ export function SearchableSelect<Value extends string = string>({
         disabled={disabled}
         onPress={() => setOpen(true)}
       >
-        {selected && renderLeading ? renderLeading(selected) : <Icon name="list" size="sm" tone="muted" />}
-        <AppText className="flex-1" tone={selected ? 'default' : 'muted'}>{selected?.label ?? placeholder}</AppText>
+        {selected && renderLeading ? (
+          renderLeading(selected)
+        ) : (
+          <Icon name="list" size="sm" tone="muted" />
+        )}
+        <AppText className="flex-1" tone={selected ? 'default' : 'muted'}>
+          {selected?.label ?? placeholder}
+        </AppText>
         <Icon name="chevronDown" size="sm" tone="muted" />
       </Pressable>
-      {error ? <AppText accessibilityLiveRegion="polite" variant="label" tone="danger">{error}</AppText> : null}
-      <Modal transparent animationType="fade" visible={open} onRequestClose={close}>
+      {error ? (
+        <AppText accessibilityLiveRegion="polite" variant="label" tone="danger">
+          {error}
+        </AppText>
+      ) : null}
+      <Modal
+        transparent
+        animationType="fade"
+        visible={open}
+        onRequestClose={close}
+      >
         <Pressable className="bg-overlay flex-1 justify-end" onPress={close}>
           <Pressable
             accessibilityViewIsModal
-            className="bg-surface dark:bg-dark-surface max-h-[80%] gap-3 rounded-t-lg px-4 pb-8 pt-5"
+            className="bg-surface dark:bg-dark-surface max-h-[80%] gap-3 rounded-t-lg px-4 pt-5 pb-8"
             onPress={() => undefined}
           >
             <View className="flex-row items-center justify-between gap-3">
               <AppText variant="sectionTitle">{label}</AppText>
-              <IconButton accessibilityLabel="Cerrar" icon="close" iconSize="sm" onPress={close} />
+              <IconButton
+                accessibilityLabel="Cerrar"
+                icon="close"
+                iconSize="sm"
+                onPress={close}
+              />
             </View>
-            {searchable ? <SearchField label={searchPlaceholder} placeholder={searchPlaceholder} value={query} onChangeText={setQuery} autoFocus /> : null}
-            {loading ? <AppText accessibilityLiveRegion="polite" tone="muted">{emptyMessage}</AppText> : filtered.length === 0 ? <AppText accessibilityLiveRegion="polite" tone="muted">{emptyMessage}</AppText> : (
+            {searchable ? (
+              <SearchField
+                label={searchPlaceholder}
+                placeholder={searchPlaceholder}
+                value={query}
+                onChangeText={setQuery}
+                autoFocus
+              />
+            ) : null}
+            {loading ? (
+              <AppText accessibilityLiveRegion="polite" tone="muted">
+                {emptyMessage}
+              </AppText>
+            ) : filtered.length === 0 ? (
+              <AppText accessibilityLiveRegion="polite" tone="muted">
+                {emptyMessage}
+              </AppText>
+            ) : (
               <FlatList
                 data={filtered}
                 keyExtractor={(option) => option.value}
                 keyboardShouldPersistTaps="handled"
                 renderItem={({ item, index }) => {
                   const isSelected = item.value === value;
-                  return <Pressable
-                    accessibilityRole="radio"
-                    accessibilityState={{ selected: isSelected, disabled: item.disabled }}
-                    accessibilityValue={{ text: `${index + 1} de ${filtered.length}` }}
-                    className={`min-h-12 flex-row items-center gap-3 rounded-sm px-3 py-2 ${isSelected ? 'bg-accent-subtle dark:bg-dark-accent-subtle' : ''} ${item.disabled ? 'opacity-disabled' : ''}`}
-                    disabled={item.disabled}
-                    onPress={() => choose(item)}
-                  >
-                    {renderLeading ? renderLeading(item) : null}
-                    <View className="flex-1">
-                      <AppText>{item.label}</AppText>
-                      {item.description ? <AppText variant="label" tone="muted">{item.description}</AppText> : null}
-                    </View>
-                    {isSelected ? <Icon name="check" size="sm" tone="interaction" /> : null}
-                  </Pressable>;
+                  return (
+                    <Pressable
+                      accessibilityRole="radio"
+                      accessibilityState={{
+                        selected: isSelected,
+                        disabled: item.disabled,
+                      }}
+                      accessibilityValue={{
+                        text: `${index + 1} de ${filtered.length}`,
+                      }}
+                      className={`min-h-12 flex-row items-center gap-3 rounded-sm px-3 py-2 ${isSelected ? 'bg-accent-subtle dark:bg-dark-accent-subtle' : ''} ${item.disabled ? 'opacity-disabled' : ''}`}
+                      disabled={item.disabled}
+                      onPress={() => choose(item)}
+                    >
+                      {renderLeading ? renderLeading(item) : null}
+                      <View className="flex-1">
+                        <AppText>{item.label}</AppText>
+                        {item.description ? (
+                          <AppText variant="label" tone="muted">
+                            {item.description}
+                          </AppText>
+                        ) : null}
+                      </View>
+                      {isSelected ? (
+                        <Icon name="check" size="sm" tone="interaction" />
+                      ) : null}
+                    </Pressable>
+                  );
                 }}
               />
             )}
@@ -432,26 +496,44 @@ export function FileUploadField({
         accessibilityLabel={label ?? idleActionLabel}
         accessibilityRole="button"
         accessibilityState={{ busy: isLoading, disabled: blocked }}
-        className={`min-h-36 border-border bg-surface dark:border-dark-border dark:bg-dark-surface items-center justify-center gap-2 rounded-md border border-dashed px-6 py-5 ${error ? 'border-danger dark:border-dark-danger' : ''} ${blocked ? 'opacity-disabled' : ''}`}
+        className={`border-border bg-surface dark:border-dark-border dark:bg-dark-surface min-h-36 items-center justify-center gap-2 rounded-md border border-dashed px-6 py-5 ${error ? 'border-danger dark:border-dark-danger' : ''} ${blocked ? 'opacity-disabled' : ''}`}
         disabled={blocked}
         onPress={onPress}
       >
         <View className="bg-surface-subtle dark:bg-dark-surface-subtle h-12 w-12 items-center justify-center rounded-full">
-          <Icon name={isLoading ? 'upload' : 'fileText'} size="md" tone="interaction" />
+          <Icon
+            name={isLoading ? 'upload' : 'fileText'}
+            size="md"
+            tone="interaction"
+          />
         </View>
         <AppText variant="label" tone="interaction">
-          {isLoading ? loadingLabel : fileName ?? idleActionLabel}
+          {isLoading ? loadingLabel : (fileName ?? idleActionLabel)}
         </AppText>
         <AppText variant="label" tone="muted">
-          {isLoading ? `Progreso: ${safeProgress}%` : `${acceptedTypes} · Máx. ${maxSizeLabel}`}
+          {isLoading
+            ? `Progreso: ${safeProgress}%`
+            : `${acceptedTypes} · Máx. ${maxSizeLabel}`}
         </AppText>
         {isLoading ? (
-          <View accessibilityLabel={`Progreso de carga: ${safeProgress}%`} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: safeProgress }} className="bg-surface-subtle dark:bg-dark-surface-subtle h-2 w-full overflow-hidden rounded-full">
-            <View className="bg-interaction dark:bg-dark-interaction h-full rounded-full" style={{ width: `${safeProgress}%` }} />
+          <View
+            accessibilityLabel={`Progreso de carga: ${safeProgress}%`}
+            accessibilityRole="progressbar"
+            accessibilityValue={{ min: 0, max: 100, now: safeProgress }}
+            className="bg-surface-subtle dark:bg-dark-surface-subtle h-2 w-full overflow-hidden rounded-full"
+          >
+            <View
+              className="bg-interaction dark:bg-dark-interaction h-full rounded-full"
+              style={{ width: `${safeProgress}%` }}
+            />
           </View>
         ) : null}
       </Pressable>
-      {error ? <AppText accessibilityLiveRegion="polite" variant="label" tone="danger">{error}</AppText> : null}
+      {error ? (
+        <AppText accessibilityLiveRegion="polite" variant="label" tone="danger">
+          {error}
+        </AppText>
+      ) : null}
     </View>
   );
 }

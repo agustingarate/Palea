@@ -9,8 +9,12 @@ export function useOnboardingViewModel() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const draft = useOnboardingDraftStore();
-  const catalog = useQuery({ queryKey: ['auth', 'onboarding-catalog', 'es'], queryFn: () => repository.getCatalog('es') });
-  const invalidateAccount = () => queryClient.invalidateQueries({ queryKey: ['auth', 'account'] });
+  const catalog = useQuery({
+    queryKey: ['auth', 'onboarding-catalog', 'es'],
+    queryFn: () => repository.getCatalog('es'),
+  });
+  const invalidateAccount = () =>
+    queryClient.invalidateQueries({ queryKey: ['auth', 'account'] });
   return {
     ...draft,
     catalog,
@@ -23,7 +27,10 @@ export function useOnboardingViewModel() {
       router.push('/onboarding/work');
     },
     async saveWork(input: typeof draft.work) {
-      const normalized = { ...input, endedOn: input.isCurrent ? null : input.endedOn || null };
+      const normalized = {
+        ...input,
+        endedOn: input.isCurrent ? null : input.endedOn || null,
+      };
       await repository.saveWorkExperience(normalized);
       draft.setWork(normalized);
       router.push('/onboarding/skills');

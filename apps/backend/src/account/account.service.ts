@@ -25,8 +25,7 @@ export class AccountService {
         resumes: { where: { isPrimary: true, uploadStatus: 'ready' }, take: 1 },
       },
     });
-    if (!profile)
-      throw new AppError('account.profile_not_found', 'NOT_FOUND');
+    if (!profile) throw new AppError('account.profile_not_found', 'NOT_FOUND');
     const missing: AccountProfile['missing'] = [];
     if (!profile.fullName || !profile.birthDate || !profile.nationality)
       missing.push('personal');
@@ -70,12 +69,17 @@ export class AccountService {
     assertAdult(input.birthDate);
     await this.prisma.$transaction(async (tx) => {
       const profile = await tx.profile.findUnique({ where: { id: subject } });
-      if (!profile) throw new AppError('account.profile_not_found', 'NOT_FOUND');
+      if (!profile)
+        throw new AppError('account.profile_not_found', 'NOT_FOUND');
       // Idempotent retries are safe; conflicting completed data is never silently replaced.
       if (profile.fullName && profile.birthDate && profile.nationality) return;
       await tx.profile.update({
         where: { id: subject },
-        data: { fullName: input.fullName, birthDate: new Date(`${input.birthDate}T00:00:00.000Z`), nationality: input.nationality },
+        data: {
+          fullName: input.fullName,
+          birthDate: new Date(`${input.birthDate}T00:00:00.000Z`),
+          nationality: input.nationality,
+        },
       });
     });
     return { success: true as const };
@@ -183,8 +187,7 @@ function assertAdult(birthDate: string) {
   const birth = new Date(`${birthDate}T00:00:00.000Z`);
   const threshold = new Date();
   threshold.setUTCFullYear(threshold.getUTCFullYear() - 18);
-  if (birth > threshold)
-    throw new AppError('account.minimum_age');
+  if (birth > threshold) throw new AppError('account.minimum_age');
 }
 
 function toDate(value: Date) {
