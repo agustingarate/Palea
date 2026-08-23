@@ -64,12 +64,19 @@ const toneMap = {
 export function Badge({
   label,
   tone = 'neutral',
+  leadingIcon,
 }: {
   label: string;
   tone?: StatusTone;
+  leadingIcon?: IconName;
 }) {
   return (
-    <View className={`w-min rounded-sm px-2 py-1 ${badgeClasses[tone]}`}>
+    <View
+      className={`w-min flex-row items-center gap-1 rounded-sm px-2 py-1 ${badgeClasses[tone]}`}
+    >
+      {leadingIcon ? (
+        <Icon name={leadingIcon} size={12} tone={toneMap[tone]} />
+      ) : null}
       <AppText variant="label" tone={toneMap[tone]}>
         {label}
       </AppText>
@@ -79,6 +86,7 @@ export function Badge({
 
 export interface ChipProps extends Omit<PressableProps, 'children'> {
   label: string;
+  size?: 'sm' | 'md';
   selected?: boolean;
   disabled?: boolean;
   onRemove?: () => void;
@@ -86,6 +94,7 @@ export interface ChipProps extends Omit<PressableProps, 'children'> {
 
 export function Chip({
   label,
+  size = 'md',
   selected = false,
   disabled = false,
   onRemove,
@@ -97,10 +106,24 @@ export function Chip({
   const selection = useSharedValue(selected ? 1 : 0);
   const selectionStyle = useAnimatedStyle(
     () => ({
-      backgroundColor: interpolateColor(selection.value, [0, 1], [theme.surface, theme.interactionSubtle]),
-      borderColor: interpolateColor(selection.value, [0, 1], [theme.border, theme.interaction]),
+      backgroundColor: interpolateColor(
+        selection.value,
+        [0, 1],
+        [theme.surface, theme.interactionSubtle],
+      ),
+      borderColor: interpolateColor(
+        selection.value,
+        [0, 1],
+        [theme.border, theme.interaction],
+      ),
     }),
-    [selection, theme.border, theme.interaction, theme.interactionSubtle, theme.surface],
+    [
+      selection,
+      theme.border,
+      theme.interaction,
+      theme.interactionSubtle,
+      theme.surface,
+    ],
   );
   useEffect(() => {
     selection.value = withTiming(selected ? 1 : 0, {
@@ -111,11 +134,21 @@ export function Chip({
   const content = (
     <>
       {selected ? (
-        <AnimatedView entering={ZoomIn.duration(primitives.motion.duration.fast).reduceMotion(ReduceMotion.System)} exiting={ZoomOut.duration(primitives.motion.duration.fast).reduceMotion(ReduceMotion.System)}>
+        <AnimatedView
+          entering={ZoomIn.duration(
+            primitives.motion.duration.fast,
+          ).reduceMotion(ReduceMotion.System)}
+          exiting={ZoomOut.duration(
+            primitives.motion.duration.fast,
+          ).reduceMotion(ReduceMotion.System)}
+        >
           <Icon name="check" size="sm" tone="interaction" />
         </AnimatedView>
       ) : null}
-      <AppText variant="bodySmall" tone={selected ? 'interaction' : 'default'}>
+      <AppText
+        variant={size === 'sm' ? 'label' : 'bodySmall'}
+        tone={selected ? 'interaction' : 'default'}
+      >
         {label}
       </AppText>
     </>
@@ -130,9 +163,9 @@ export function Chip({
           borderWidth: 1,
           flexDirection: 'row',
           gap: primitives.spacing.xs,
-          minHeight: primitives.size.controlSm,
+          minHeight: size === 'sm' ? 24 : primitives.size.controlSm,
           opacity: disabled ? primitives.opacity.disabled : 1,
-          paddingHorizontal: 12,
+          paddingHorizontal: size === 'sm' ? primitives.spacing.sm : 12,
         },
         selectionStyle,
         press.animatedStyle,
@@ -161,7 +194,12 @@ export function Chip({
         content
       )}
       {onRemove ? (
-        <Pressable accessibilityLabel={`Remove ${label}`} accessibilityRole="button" hitSlop={8} onPress={onRemove}>
+        <Pressable
+          accessibilityLabel={`Remove ${label}`}
+          accessibilityRole="button"
+          hitSlop={8}
+          onPress={onRemove}
+        >
           <Icon name="close" size="sm" tone="muted" />
         </Pressable>
       ) : null}

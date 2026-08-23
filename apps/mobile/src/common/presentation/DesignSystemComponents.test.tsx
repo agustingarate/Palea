@@ -7,7 +7,9 @@ import {
   Checkbox,
   CollectionFeedback,
   SegmentedControl,
+  SnackbarProvider,
   TextField,
+  useSnackbar,
 } from '@palea/ui-native';
 import { DesignSystemCatalogScreen } from './DesignSystemCatalogScreen';
 
@@ -21,6 +23,18 @@ function renderWithSafeArea(node: ReactNode) {
     >
       {node}
     </SafeAreaProvider>,
+  );
+}
+
+function SnackbarTrigger() {
+  const { showSnackbar } = useSnackbar();
+  return (
+    <Button
+      label="Show feedback"
+      onPress={() =>
+        showSnackbar({ variant: 'success', message: 'Application moved' })
+      }
+    />
   );
 }
 
@@ -128,6 +142,19 @@ describe('mobile design system', () => {
     expect(
       view.getByLabelText('Notifications, 2 unread notifications'),
     ).toBeTruthy();
+  });
+
+  it('shows and dismisses accessible snackbar feedback', () => {
+    const view = render(
+      <SnackbarProvider defaultDuration={0}>
+        <SnackbarTrigger />
+      </SnackbarProvider>,
+    );
+
+    fireEvent.press(view.getByRole('button', { name: 'Show feedback' }));
+    expect(view.getByRole('alert')).toHaveTextContent('Application moved');
+    fireEvent.press(view.getByRole('button', { name: 'Cerrar notificación' }));
+    expect(view.queryByText('Application moved')).toBeNull();
   });
 
   it('smoke-renders the complete development catalog', () => {

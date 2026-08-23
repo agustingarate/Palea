@@ -76,6 +76,20 @@ export const primitives = {
       lineHeight: 16,
       letterSpacing: 0.24,
     },
+    caption: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 11,
+      fontWeight: '500',
+      lineHeight: 14,
+      letterSpacing: 0.2,
+    },
+    micro: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 10,
+      fontWeight: '500',
+      lineHeight: 12,
+      letterSpacing: 0.16,
+    },
   },
   size: {
     controlSm: 40,

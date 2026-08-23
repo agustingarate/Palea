@@ -2,7 +2,14 @@ import type { PropsWithChildren } from 'react';
 import { Text, type TextProps } from 'react-native';
 
 export type TextVariant =
-  'display' | 'screenTitle' | 'sectionTitle' | 'body' | 'bodySmall' | 'label';
+  | 'display'
+  | 'screenTitle'
+  | 'sectionTitle'
+  | 'body'
+  | 'bodySmall'
+  | 'label'
+  | 'caption'
+  | 'micro';
 
 export type TextTone =
   | 'default'
@@ -21,6 +28,8 @@ const variants: Record<TextVariant, string> = {
   body: 'font-sans text-body',
   bodySmall: 'font-sans text-body-small',
   label: 'font-medium text-label',
+  caption: 'font-medium text-caption',
+  micro: 'font-medium text-micro',
 };
 
 const tones: Record<TextTone, string> = {
