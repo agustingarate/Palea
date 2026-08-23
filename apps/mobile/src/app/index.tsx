@@ -1,1 +1,1 @@
-export { AuthenticatedHomeScreen as default } from '@/features/auth/presentation/views/AuthenticatedHomeScreen';
+export { ApplicationsHomeScreen as default } from '@/features/applications/presentation/views/ApplicationsHomeScreen';

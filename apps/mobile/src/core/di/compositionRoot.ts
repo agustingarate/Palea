@@ -14,6 +14,11 @@ import { SupabaseAuthDataSource } from '@/features/auth/data/datasources/Supabas
 import { TrpcOnboardingDataSource } from '@/features/auth/data/datasources/TrpcOnboardingDataSource';
 import { AuthRepositoryImpl } from '@/features/auth/data/repositories/AuthRepositoryImpl';
 import { OnboardingRepositoryImpl } from '@/features/auth/data/repositories/OnboardingRepositoryImpl';
+import { ApplicationRepositoryImpl } from '@/features/applications/data/repositories/ApplicationRepositoryImpl';
+import { TrpcApplicationsDataSource } from '@/features/applications/data/datasources/TrpcApplicationsDataSource';
+import { ListApplications } from '@/features/applications/domain/usecases/ListApplications';
+import { UpdateApplicationStatus } from '@/features/applications/domain/usecases/UpdateApplicationStatus';
+import { DeleteApplication } from '@/features/applications/domain/usecases/DeleteApplication';
 
 export function createAppContainer(): Container {
   const container = new Container();
@@ -27,13 +32,36 @@ export function createAppContainer(): Container {
     url: `${environment.apiUrl}/trpc`,
     headers: async () => {
       const token = await authRepository.getAccessToken();
-      return token ? { authorization: `Bearer ${token}` } : ({} as Record<string, string>);
+      return token
+        ? { authorization: `Bearer ${token}` }
+        : ({} as Record<string, string>);
     },
   });
   container.register(dependencyTokens.authRepository, authRepository);
   container.register(
     dependencyTokens.onboardingRepository,
-    new OnboardingRepositoryImpl(new TrpcOnboardingDataSource(authenticatedClient)),
+    new OnboardingRepositoryImpl(
+      new TrpcOnboardingDataSource(authenticatedClient),
+    ),
+  );
+  const applicationRepository = new ApplicationRepositoryImpl(
+    new TrpcApplicationsDataSource(authenticatedClient),
+  );
+  container.register(
+    dependencyTokens.applicationRepository,
+    applicationRepository,
+  );
+  container.register(
+    dependencyTokens.listApplications,
+    new ListApplications(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.updateApplicationStatus,
+    new UpdateApplicationStatus(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.deleteApplication,
+    new DeleteApplication(applicationRepository),
   );
   const datasource = createProjectsDataSource();
   container.register(
