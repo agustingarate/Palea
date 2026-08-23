@@ -18,6 +18,16 @@ manual.
 
 ## Rules
 
+- In mobile features, TanStack Query exclusively owns remote asynchronous
+  state. Zustand is limited to cross-screen client state; views and ViewModels
+  do not duplicate server data in `useState`/`useEffect`.
+- Every transport or provider SDK is encapsulated by a feature datasource. A
+  repository depends on its datasource port, never on tRPC, HTTP clients,
+  Supabase, or another provider SDK directly.
+- Keep mobile views as composition and interaction adapters. Extract reusable
+  feature components and non-rendering interaction coordination into dedicated
+  components and hooks before a view becomes a mixed orchestration module.
+
 - Do not preserve backward compatibility. Remove obsolete paths instead of adding compatibility layers, fallbacks, or migrations.
 - Choose the simplest implementation that fully meets the current requirements. Avoid speculative abstractions, configuration, and indirection.
 - Grow the system in layers. Start from the smallest version that works end to end, and add each new capability on top of a product that already works. Never trade a working product for unfinished complexity.

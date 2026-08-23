@@ -23,6 +23,13 @@ import {
   type SaveProfileInput,
   type SaveSkillsInput,
   type SaveWorkExperienceInput,
+  applicationListInputSchema,
+  applicationPageSchema,
+  updateApplicationStatusInputSchema,
+  applicationIdSchema,
+  type ApplicationListInput,
+  type ApplicationPage,
+  type UpdateApplicationStatusInput,
 } from '@palea/contracts';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -59,9 +66,7 @@ export interface PaleaApiServices {
     subject: string,
     input: SaveSkillsInput,
   ): Promise<{ success: true }>;
-  completeOnboarding(
-    subject: string,
-  ): Promise<{ success: true }>;
+  completeOnboarding(subject: string): Promise<{ success: true }>;
   reserveResumeUpload(
     subject: string,
     input: ReserveResumeUploadInput,
@@ -78,6 +83,18 @@ export interface PaleaApiServices {
   cancelResumeUpload(
     subject: string,
     resumeId: string,
+  ): Promise<{ success: true }>;
+  listApplications(
+    subject: string,
+    input: ApplicationListInput,
+  ): Promise<ApplicationPage>;
+  updateApplicationStatus(
+    subject: string,
+    input: UpdateApplicationStatusInput,
+  ): Promise<{ success: true }>;
+  deleteApplication(
+    subject: string,
+    applicationId: string,
   ): Promise<{ success: true }>;
 }
 
@@ -176,7 +193,9 @@ export const onboardingRouter = t.router({
   complete: protectedProcedure
     .input(completeOnboardingInputSchema)
     .output(operationResultSchema)
-    .mutation(({ ctx }) => ctx.services.completeOnboarding(ctx.identity.subject)),
+    .mutation(({ ctx }) =>
+      ctx.services.completeOnboarding(ctx.identity.subject),
+    ),
 });
 
 export const resumeRouter = t.router({
@@ -200,6 +219,27 @@ export const resumeRouter = t.router({
     ),
 });
 
+export const applicationsRouter = t.router({
+  list: protectedProcedure
+    .input(applicationListInputSchema)
+    .output(applicationPageSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.listApplications(ctx.identity.subject, input),
+    ),
+  updateStatus: protectedProcedure
+    .input(updateApplicationStatusInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.updateApplicationStatus(ctx.identity.subject, input),
+    ),
+  delete: protectedProcedure
+    .input(applicationIdSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.deleteApplication(ctx.identity.subject, input.applicationId),
+    ),
+});
+
 export const appRouter = t.router({
   system: systemRouter,
   projects: projectsRouter,
@@ -207,5 +247,6 @@ export const appRouter = t.router({
   catalogs: catalogsRouter,
   onboarding: onboardingRouter,
   resume: resumeRouter,
+  applications: applicationsRouter,
 });
 export type AppRouter = typeof appRouter;
