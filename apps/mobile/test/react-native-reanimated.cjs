@@ -20,6 +20,7 @@ module.exports = {
   ReduceMotion: { System: 'system', Always: 'always', Never: 'never' },
   FadeIn: animationBuilder(),
   FadeInDown: animationBuilder(),
+  FadeOutDown: animationBuilder(),
   FadeOut: animationBuilder(),
   FadeOutUp: animationBuilder(),
   ZoomIn: animationBuilder(),

@@ -2,5 +2,9 @@ import { OnboardingRouteGuard } from '@/features/auth/presentation/components/On
 import { ProfileOnboardingScreen } from '@/features/auth/presentation/onboarding/views/ProfileOnboardingScreen';
 
 export default function ProfileOnboardingRoute() {
-  return <OnboardingRouteGuard><ProfileOnboardingScreen /></OnboardingRouteGuard>;
+  return (
+    <OnboardingRouteGuard>
+      <ProfileOnboardingScreen />
+    </OnboardingRouteGuard>
+  );
 }

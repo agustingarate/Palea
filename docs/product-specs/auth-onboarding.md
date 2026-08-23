@@ -70,13 +70,13 @@ Una reserva de CV crea una fila `pending` con expiración y path bajo el UUID au
 
 ## Test mapping
 
-| Requisitos | Evidencia |
-| --- | --- |
-| BR-01–BR-03, AC-01–AC-03 | Forms, contratos, Auth y E2E web |
-| BR-04–BR-07, AC-04–AC-07 | ViewModels, tRPC, SQL y navegación |
-| BR-06, AC-06 | SQL, Storage y pruebas de expiración/ownership |
-| BR-08–BR-09, AC-08–AC-09 | Sesión, i18n, visual y responsive |
-| NFR-01–NFR-06, AC-10 | Tests de capas, lint de arquitectura y CI |
+| Requisitos               | Evidencia                                      |
+| ------------------------ | ---------------------------------------------- |
+| BR-01–BR-03, AC-01–AC-03 | Forms, contratos, Auth y E2E web               |
+| BR-04–BR-07, AC-04–AC-07 | ViewModels, tRPC, SQL y navegación             |
+| BR-06, AC-06             | SQL, Storage y pruebas de expiración/ownership |
+| BR-08–BR-09, AC-08–AC-09 | Sesión, i18n, visual y responsive              |
+| NFR-01–NFR-06, AC-10     | Tests de capas, lint de arquitectura y CI      |
 
 ## Estado de aprobación
 

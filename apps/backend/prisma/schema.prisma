@@ -25,6 +25,25 @@ enum ResumeUploadStatus {
   @@map("resume_upload_status")
 }
 
+enum ApplicationStatus {
+  draft
+  applied
+  interview
+  offer
+  rejected
+
+  @@map("application_status")
+}
+
+enum WorkMode {
+  remote
+  hybrid
+  onsite
+  unspecified
+
+  @@map("work_mode")
+}
+
 model Profile {
   id                    String          @id @db.Uuid
   fullName              String?         @map("full_name")
@@ -39,8 +58,26 @@ model Profile {
   skills                UserSkill[]
   workExperiences       WorkExperience[]
   resumes               Resume[]
+  applications          Application[]
 
   @@map("profiles")
+}
+
+model Application {
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId   String            @map("profile_id") @db.Uuid
+  companyName String            @map("company_name")
+  role        String
+  appliedOn   DateTime          @map("applied_on") @db.Date
+  status      ApplicationStatus @default(draft)
+  position    Int               @default(0)
+  workMode    WorkMode          @default(unspecified) @map("work_mode")
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  profile     Profile           @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status, position])
+  @@map("applications")
 }
 
 model InterestCatalog {

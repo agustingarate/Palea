@@ -7,11 +7,11 @@ local y en los entornos remotos.
 
 ## Aplicaciones
 
-| Aplicación | Ubicación | Tecnología | URL local |
-| ---------- | --------- | ---------- | --------- |
-| Producto | `apps/mobile` | Expo SDK 54 (iOS, Android y Web) | `http://localhost:8081` para Expo Web |
-| Sitio institucional | `apps/web` | Next.js | `http://localhost:3000` |
-| API | `apps/backend` | NestJS, REST y tRPC | `http://localhost:3001` |
+| Aplicación          | Ubicación      | Tecnología                       | URL local                             |
+| ------------------- | -------------- | -------------------------------- | ------------------------------------- |
+| Producto            | `apps/mobile`  | Expo SDK 54 (iOS, Android y Web) | `http://localhost:8081` para Expo Web |
+| Sitio institucional | `apps/web`     | Next.js                          | `http://localhost:3000`               |
+| API                 | `apps/backend` | NestJS, REST y tRPC              | `http://localhost:3001`               |
 
 ## Requisitos
 
@@ -84,11 +84,11 @@ no dejes los valores de ejemplo si son distintos.
 
 La configuración versionada usa estos puertos locales:
 
-| Servicio | Dirección |
-| -------- | --------- |
-| API de Supabase | `http://127.0.0.1:54321` |
-| PostgreSQL | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
-| Supabase Studio | `http://127.0.0.1:54323` |
+| Servicio        | Dirección                                                 |
+| --------------- | --------------------------------------------------------- |
+| API de Supabase | `http://127.0.0.1:54321`                                  |
+| PostgreSQL      | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+| Supabase Studio | `http://127.0.0.1:54323`                                  |
 
 Para volver a aplicar todas las migraciones y los datos de prueba locales:
 
@@ -139,11 +139,11 @@ EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<clave-publica-local>
 
 Usa una URL de API alcanzable por el runtime:
 
-| Runtime | `EXPO_PUBLIC_API_URL` |
-| ------- | --------------------- |
-| Expo Web o simulador iOS | `http://localhost:3001` |
-| Emulador Android | `http://10.0.2.2:3001` |
-| Dispositivo físico | `http://<IP-LAN-de-tu-equipo>:3001` |
+| Runtime                  | `EXPO_PUBLIC_API_URL`               |
+| ------------------------ | ----------------------------------- |
+| Expo Web o simulador iOS | `http://localhost:3001`             |
+| Emulador Android         | `http://10.0.2.2:3001`              |
+| Dispositivo físico       | `http://<IP-LAN-de-tu-equipo>:3001` |
 
 ### Una configuración para varios dispositivos
 
@@ -158,11 +158,11 @@ EXPO_PUBLIC_API_URL=http://192.168.1.10:3001
 Obtén la dirección IPv4 de la interfaz conectada a tu red local con el comando
 correspondiente:
 
-| Sistema operativo | Comando | Busca |
-| ----------------- | ------- | ----- |
-| macOS | `ipconfig getifaddr en0` | Una dirección como `192.168.x.x` o `10.x.x.x`. Si no devuelve valor, prueba `en1`. |
-| Windows (PowerShell) | `Get-NetIPAddress -AddressFamily IPv4` | La dirección de la interfaz Wi-Fi o Ethernet, no `127.0.0.1`. |
-| Linux | `hostname -I` | La dirección privada de la red, no `127.0.0.1`. |
+| Sistema operativo    | Comando                                | Busca                                                                              |
+| -------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- |
+| macOS                | `ipconfig getifaddr en0`               | Una dirección como `192.168.x.x` o `10.x.x.x`. Si no devuelve valor, prueba `en1`. |
+| Windows (PowerShell) | `Get-NetIPAddress -AddressFamily IPv4` | La dirección de la interfaz Wi-Fi o Ethernet, no `127.0.0.1`.                      |
+| Linux                | `hostname -I`                          | La dirección privada de la red, no `127.0.0.1`.                                    |
 
 El teléfono debe estar en la misma red local y el firewall debe permitir
 conexiones entrantes al puerto `3001`. No guardes esta IP en valores de EAS ni
@@ -213,17 +213,17 @@ pnpm --dir apps/backend exec supabase stop
 
 ## Ejecutar cada aplicación
 
-| Objetivo | Comando desde la raíz |
-| -------- | --------------------- |
-| API NestJS en modo watch | `pnpm backend` |
-| Sitio Next.js en desarrollo | `pnpm web` |
-| Metro / Expo | `pnpm mobile` |
-| Expo en Android | `pnpm --filter @palea/mobile android` |
-| Expo en iOS | `pnpm --filter @palea/mobile ios` |
-| Producto como Expo Web | `pnpm --filter @palea/mobile web` |
-| Export estático del producto Web | `pnpm --filter @palea/mobile build` |
-| Build de producción del sitio | `pnpm --filter @palea/web build` |
-| Build de producción de la API | `pnpm --filter @palea/backend build` |
+| Objetivo                         | Comando desde la raíz                 |
+| -------------------------------- | ------------------------------------- |
+| API NestJS en modo watch         | `pnpm backend`                        |
+| Sitio Next.js en desarrollo      | `pnpm web`                            |
+| Metro / Expo                     | `pnpm mobile`                         |
+| Expo en Android                  | `pnpm --filter @palea/mobile android` |
+| Expo en iOS                      | `pnpm --filter @palea/mobile ios`     |
+| Producto como Expo Web           | `pnpm --filter @palea/mobile web`     |
+| Export estático del producto Web | `pnpm --filter @palea/mobile build`   |
+| Build de producción del sitio    | `pnpm --filter @palea/web build`      |
+| Build de producción de la API    | `pnpm --filter @palea/backend build`  |
 
 Para ejecutar todas las tareas `dev` de los paquetes que las exponen, usa
 `pnpm dev`. Normalmente conviene iniciar cada superficie explícitamente para

@@ -1,10 +1,11 @@
 {
   "name": "@palea/backend",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
+    "postinstall": "prisma generate",
     "start": "node dist/main.js",
     "lint": "eslint src test",
     "test": "jest --runInBand",

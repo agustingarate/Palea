@@ -31,7 +31,11 @@ export const environmentSchema = z.object({
     .default(600),
   RESUME_MAX_PENDING_UPLOADS: z.coerce.number().int().min(1).max(20),
   RESUME_MAX_RESERVATIONS_PER_WINDOW: z.coerce.number().int().min(1).max(100),
-  RESUME_RESERVATION_WINDOW_SECONDS: z.coerce.number().int().min(60).max(86_400),
+  RESUME_RESERVATION_WINDOW_SECONDS: z.coerce
+    .number()
+    .int()
+    .min(60)
+    .max(86_400),
 });
 
 export function parseEnvironment(input: Record<string, string | undefined>) {

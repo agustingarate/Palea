@@ -12,8 +12,3 @@ input:-webkit-autofill:active {
   caret-color: #171717;
   transition: background-color 9999s ease-out 0s;
 }
-
-input:-moz-autofill {
-  box-shadow: 0 0 0 1000px #ffffff inset !important;
-  filter: none;
-}

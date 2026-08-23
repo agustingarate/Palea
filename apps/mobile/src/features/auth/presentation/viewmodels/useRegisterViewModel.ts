@@ -12,13 +12,18 @@ export function useRegisterViewModel() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const register = async (input: RegistrationInput) => {
-    setError(null); setSubmitting(true);
+    setError(null);
+    setSubmitting(true);
     try {
       await new RegisterAccount(auth, onboarding).execute(input);
       router.replace('/onboarding/profile');
     } catch {
-      setError('No pudimos crear tu cuenta. Si tu cuenta fue creada, iniciá sesión y reintentá tus datos personales.');
-    } finally { setSubmitting(false); }
+      setError(
+        'No pudimos crear tu cuenta. Si tu cuenta fue creada, iniciá sesión y reintentá tus datos personales.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
   return { error, isSubmitting, register };
 }

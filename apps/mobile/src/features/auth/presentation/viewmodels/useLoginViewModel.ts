@@ -11,19 +11,29 @@ export function useLoginViewModel() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const login = async (email: string, password: string) => {
-    setError(null); setSubmitting(true);
+    setError(null);
+    setSubmitting(true);
     try {
       await auth.signIn({ email, password });
       router.replace(resolvePostAuthRoute(await onboarding.getAccount()));
+    } catch {
+      setError(
+        'No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.',
+      );
+    } finally {
+      setSubmitting(false);
     }
-    catch { setError('No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.'); }
-    finally { setSubmitting(false); }
   };
   const socialLogin = async (provider: 'google' | 'linkedin_oidc') => {
-    setError(null); setSubmitting(true);
-    try { await auth.signInWithSocial(provider); }
-    catch { setError('No pudimos completar el inicio de sesión social.'); }
-    finally { setSubmitting(false); }
+    setError(null);
+    setSubmitting(true);
+    try {
+      await auth.signInWithSocial(provider);
+    } catch {
+      setError('No pudimos completar el inicio de sesión social.');
+    } finally {
+      setSubmitting(false);
+    }
   };
   return { error, isSubmitting, login, socialLogin };
 }

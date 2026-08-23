@@ -12,6 +12,7 @@ import { HealthService } from './system/health.service';
 import { AuthService } from './auth/auth.service';
 import { AccountService } from './account/account.service';
 import { ResumeService } from './account/resume.service';
+import { ApplicationsService } from './applications/applications.service';
 
 export async function createApp(): Promise<INestApplication> {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -23,13 +24,22 @@ export async function createApp(): Promise<INestApplication> {
   const auth = app.get(AuthService);
   const account = app.get(AccountService);
   const resumes = app.get(ResumeService);
+  const applications = app.get(ApplicationsService);
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.use(
     '/trpc',
     createExpressMiddleware({
       router: appRouter,
       createContext: ({ req }): Promise<PaleaTrpcContext> =>
-        createContext(req, health, projects, auth, account, resumes),
+        createContext(
+          req,
+          health,
+          projects,
+          auth,
+          account,
+          resumes,
+          applications,
+        ),
       onError: ({ error, path }) =>
         app
           .getHttpAdapter()
@@ -47,6 +57,7 @@ async function createContext(
   auth: AuthService,
   account: AccountService,
   resumes: ResumeService,
+  applications: ApplicationsService,
 ): Promise<PaleaTrpcContext> {
   const requestIdHeader = req.header('x-request-id');
   const identity = await auth.authenticate(req.header('authorization'));
@@ -75,6 +86,16 @@ async function createContext(
         resumes.confirm(subject, resumeId),
       cancelResumeUpload: (subject, resumeId) =>
         resumes.cancel(subject, resumeId),
+      listApplications: (subject, input) => applications.list(subject, input),
+      updateApplicationStatus: (subject, input) =>
+        applications.updateStatus(
+          subject,
+          input.applicationId,
+          input.status,
+          input.targetIndex,
+        ),
+      deleteApplication: (subject, applicationId) =>
+        applications.remove(subject, applicationId),
     },
   };
 }

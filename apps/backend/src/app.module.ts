@@ -7,6 +7,7 @@ import { AuthService } from './auth/auth.service';
 import { AccountService } from './account/account.service';
 import { ResumeService } from './account/resume.service';
 import { PrismaService } from './database/prisma.service';
+import { ApplicationsService } from './applications/applications.service';
 
 @Module({
   controllers: [HealthController, ProjectsController],
@@ -17,6 +18,7 @@ import { PrismaService } from './database/prisma.service';
     AccountService,
     ResumeService,
     PrismaService,
+    ApplicationsService,
   ],
 })
 export class AppModule {}

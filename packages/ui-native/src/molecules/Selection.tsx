@@ -11,7 +11,7 @@ import {
 } from 'react-native-reanimated';
 import { primitives } from '@palea/design-tokens';
 import { AppText } from '../atoms/AppText';
-import { Icon } from '../atoms/Icon';
+import { Icon, type IconName } from '../atoms/Icon';
 import { usePressFeedback } from '../internal/usePressFeedback';
 import { useThemeColors } from '../internal/useThemeColors';
 
@@ -79,6 +79,7 @@ export function Checkbox({
 export interface SelectionItem {
   value: string;
   label: string;
+  icon?: IconName;
   disabled?: boolean;
 }
 
@@ -88,6 +89,7 @@ export interface SegmentedControlProps {
   onValueChange: (value: string) => void;
   label: string;
   disabled?: boolean;
+  compact?: boolean;
 }
 
 export function SegmentedControl({
@@ -96,6 +98,7 @@ export function SegmentedControl({
   onValueChange,
   label,
   disabled = false,
+  compact = false,
 }: SegmentedControlProps) {
   const theme = useThemeColors();
   const [containerWidth, setContainerWidth] = useState(0);
@@ -122,7 +125,7 @@ export function SegmentedControl({
     <View
       accessibilityLabel={label}
       accessibilityRole="radiogroup"
-      className={`bg-surface-subtle dark:bg-dark-surface-subtle m-2 flex-row overflow-hidden rounded-md p-1 ${disabled ? 'opacity-disabled' : ''}`}
+      className={`bg-surface-subtle dark:bg-dark-surface-subtle flex-row overflow-hidden rounded-md p-1 ${compact ? 'self-end' : 'm-2'} ${disabled ? 'opacity-disabled' : ''}`}
       onLayout={(event) => setContainerWidth(event.nativeEvent.layout.width)}
     >
       {indicatorWidth > 0 ? (
@@ -154,18 +157,26 @@ export function SegmentedControl({
               checked: selected,
               disabled: disabled || item.disabled,
             }}
-            className="min-h-control-sm relative z-10 flex-1 items-center justify-center overflow-hidden rounded-sm px-2"
+            className={`min-h-control-sm relative z-10 items-center justify-center overflow-hidden rounded-sm ${compact ? 'w-control-sm' : 'flex-1 px-2'}`}
             disabled={disabled || item.disabled}
             onPress={() => onValueChange(item.value)}
           >
-            <AppText
-              className="z-10"
-              variant="label"
-              tone={selected ? 'interaction' : 'muted'}
-              style={selected ? { color: theme.text } : undefined}
-            >
-              {item.label}
-            </AppText>
+            {item.icon ? (
+              <Icon
+                name={item.icon}
+                size="md"
+                tone={selected ? 'interaction' : 'muted'}
+              />
+            ) : (
+              <AppText
+                className="z-10"
+                variant="label"
+                tone={selected ? 'interaction' : 'muted'}
+                style={selected ? { color: theme.text } : undefined}
+              >
+                {item.label}
+              </AppText>
+            )}
           </Pressable>
         );
       })}

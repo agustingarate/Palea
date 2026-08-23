@@ -99,7 +99,11 @@ export const completeOnboardingInputSchema = z.object({});
 export const reserveResumeUploadInputSchema = z.object({
   displayName: z.string().trim().min(1).max(160),
   mimeType: z.literal('application/pdf'),
-  sizeBytes: z.number().int().positive().max(10 * 1024 * 1024, 'resume.maxSize'),
+  sizeBytes: z
+    .number()
+    .int()
+    .positive()
+    .max(10 * 1024 * 1024, 'resume.maxSize'),
 });
 
 export const resumeIdInputSchema = z.object({ resumeId: z.uuid() });
@@ -165,6 +169,7 @@ export const appErrorCodeSchema = z.enum([
   'resume.rate_limited',
   'resume.too_many_pending',
   'resume.cleanup_failed',
+  'applications.not_found',
 ]);
 export const operationResultSchema = z.object({ success: z.literal(true) });
 

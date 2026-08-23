@@ -13,6 +13,7 @@ import { getLocales } from 'expo-localization';
 import { DependenciesProvider } from '../di/DependenciesProvider';
 import { LocaleProvider } from '../localization/LocaleProvider';
 import { AuthProvider } from '@/features/auth/presentation/providers/AuthProvider';
+import { SnackbarProvider } from '@palea/ui-native';
 
 onlineManager.setEventListener((setOnline) =>
   NetInfo.addEventListener((state) => setOnline(Boolean(state.isConnected))),
@@ -21,7 +22,13 @@ onlineManager.setEventListener((setOnline) =>
 export function AppProviders({ children }: PropsWithChildren) {
   const locale = getLocales()[0]?.languageTag ?? 'es';
   const [queryClient] = useState(
-    () => new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 }, mutations: { retry: 0 } } }),
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { retry: 1, staleTime: 30_000 },
+          mutations: { retry: 0 },
+        },
+      }),
   );
   const { setColorScheme } = useColorScheme();
 
@@ -39,7 +46,9 @@ export function AppProviders({ children }: PropsWithChildren) {
     <LocaleProvider locale={locale}>
       <DependenciesProvider>
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <SnackbarProvider>{children}</SnackbarProvider>
+          </AuthProvider>
         </QueryClientProvider>
       </DependenciesProvider>
     </LocaleProvider>

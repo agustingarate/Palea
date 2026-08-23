@@ -29,6 +29,14 @@
 - No imports from one application into another.
 - No transport/framework dependencies in a mobile feature domain layer.
 - No data-layer imports from presentation.
+- TanStack Query exclusively owns remote asynchronous client state. Do not
+  recreate query, mutation, pagination, loading, error, or cache state with
+  `useState` and `useEffect` in a ViewModel or view.
+- Zustand is only for small client-owned cross-screen state. Do not use it as a
+  cache for server data, and do not introduce it for feature-local UI state.
+- A feature datasource is the only layer that imports a transport or provider
+  SDK. Repositories depend on datasource ports and transform trusted boundary
+  values into domain values; they never invoke tRPC, HTTP, Supabase, or SDKs.
 - Validate environment variables, HTTP payloads, and tRPC inputs with Zod.
 - Keep mobile variants separate from deployment targets; never use `NODE_ENV`
   to choose staging or production.

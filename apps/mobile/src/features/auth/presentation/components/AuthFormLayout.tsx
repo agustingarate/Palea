@@ -23,11 +23,22 @@ export function AuthFormLayout({
       keyboardAware
       progress={
         currentStep ? (
-          <StepProgress current={currentStep} total={3} title="Onboarding" stepLabel={`Paso ${currentStep} de 3`} />
+          <StepProgress
+            current={currentStep}
+            total={3}
+            title="Onboarding"
+            stepLabel={`Paso ${currentStep} de 3`}
+          />
         ) : undefined
       }
     >
-      {contained ? <Surface variant="elevated" padding="lg">{content}</Surface> : content}
+      {contained ? (
+        <Surface variant="elevated" padding="lg">
+          {content}
+        </Surface>
+      ) : (
+        content
+      )}
     </FocusedFormLayout>
   );
 }
