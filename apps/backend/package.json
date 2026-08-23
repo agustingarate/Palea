@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
+    "postinstall": "prisma generate",
     "start": "node dist/main.js",
     "lint": "eslint src test",
     "test": "jest --runInBand",
