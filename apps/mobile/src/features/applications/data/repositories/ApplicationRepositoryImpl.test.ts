@@ -3,6 +3,7 @@ import { ApplicationRepositoryImpl } from './ApplicationRepositoryImpl';
 const applicationId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 const dataSource = {
   list: jest.fn(),
+  create: jest.fn(),
   updateStatus: jest.fn(),
   remove: jest.fn(),
 };
@@ -50,7 +51,30 @@ describe('ApplicationRepositoryImpl', () => {
       applicationId,
       'offer',
       undefined,
+      undefined,
+      undefined,
     );
     expect(dataSource.remove).toHaveBeenCalledWith(applicationId);
+  });
+
+  it('delegates creation through the datasource boundary', async () => {
+    dataSource.create.mockResolvedValue({ id: applicationId });
+    const input = {
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      workMode: 'unspecified' as const,
+      commitment: 'unspecified' as const,
+      contractType: 'unspecified' as const,
+      durationType: 'unspecified' as const,
+      resumeId: null,
+      jobDescription: null,
+      privateNotes: '',
+      expectedCompensation: null,
+      offeredCompensation: null,
+      timeZone: 'UTC',
+    };
+    await repository.create(input);
+    expect(dataSource.create).toHaveBeenCalledWith(input);
   });
 });

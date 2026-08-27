@@ -19,6 +19,9 @@ import { TrpcApplicationsDataSource } from '@/features/applications/data/datasou
 import { ListApplications } from '@/features/applications/domain/usecases/ListApplications';
 import { UpdateApplicationStatus } from '@/features/applications/domain/usecases/UpdateApplicationStatus';
 import { DeleteApplication } from '@/features/applications/domain/usecases/DeleteApplication';
+import { CreateApplication } from '@/features/applications/domain/usecases/CreateApplication';
+import { ResumeRepositoryImpl } from '@/features/resumes/data/repositories/ResumeRepositoryImpl';
+import { TrpcResumesDataSource } from '@/features/resumes/data/datasources/TrpcResumesDataSource';
 
 export function createAppContainer(): Container {
   const container = new Container();
@@ -38,10 +41,15 @@ export function createAppContainer(): Container {
     },
   });
   container.register(dependencyTokens.authRepository, authRepository);
+  const resumeRepository = new ResumeRepositoryImpl(
+    new TrpcResumesDataSource(authenticatedClient),
+  );
+  container.register(dependencyTokens.resumeRepository, resumeRepository);
   container.register(
     dependencyTokens.onboardingRepository,
     new OnboardingRepositoryImpl(
       new TrpcOnboardingDataSource(authenticatedClient),
+      resumeRepository,
     ),
   );
   const applicationRepository = new ApplicationRepositoryImpl(
@@ -54,6 +62,10 @@ export function createAppContainer(): Container {
   container.register(
     dependencyTokens.listApplications,
     new ListApplications(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.createApplication,
+    new CreateApplication(applicationRepository),
   );
   container.register(
     dependencyTokens.updateApplicationStatus,

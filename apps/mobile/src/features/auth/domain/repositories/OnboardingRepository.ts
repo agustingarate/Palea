@@ -8,13 +8,9 @@ import type {
   SaveSkillsInput,
   SaveWorkExperienceInput,
 } from '@palea/contracts';
+import type { ResumeUploadFile } from '@/features/resumes/domain/repositories/ResumeRepository';
 
-export interface ResumeUploadFile {
-  name: string;
-  mimeType: 'application/pdf';
-  sizeBytes: number;
-  readBytes(): Promise<Uint8Array>;
-}
+export type { ResumeUploadFile };
 
 export interface OnboardingRepository {
   getAccount(): Promise<AccountProfile>;

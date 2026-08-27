@@ -1,16 +1,19 @@
 import {
   Alert,
+  Modal,
+  Pressable,
   ScrollView,
   TextInput,
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useEffect, useState } from 'react';
-import { Redirect, useRouter } from 'expo-router';
+import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import {
   AppText,
   BottomNavigation,
   Button,
+  DatePickerField,
   Screen,
   SegmentedControl,
   TopAppBar,
@@ -24,8 +27,7 @@ import type {
 import { useLocale } from '@/core/localization/LocaleProvider';
 import { useDependency } from '@/core/di/DependenciesProvider';
 import { dependencyTokens } from '@/core/di/dependencies';
-import { useAuthSession } from '@/features/auth/presentation/providers/AuthProvider';
-import { resolvePostAuthRoute } from '@/features/auth/presentation/navigation/resolvePostAuthRoute';
+import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationActionMenu } from '../components/ApplicationActionMenu';
 import { BoardColumn, ListGroup } from '../components/ApplicationsCollections';
 import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
@@ -34,39 +36,14 @@ import {
   applicationStatuses,
   useApplicationsViewModel,
 } from '../viewmodels/useApplicationsViewModel';
+import { todayLocal } from '../create/applicationCreateModel';
 
 export function ApplicationsHomeScreen() {
-  const { session, isRestoring } = useAuthSession();
-  if (isRestoring) return null;
-  if (!session) return <Redirect href="/auth/login" />;
-  return <AuthenticatedApplicationsHome key={session.userId} />;
-}
-
-function AuthenticatedApplicationsHome() {
-  const onboarding = useDependency(dependencyTokens.onboardingRepository);
-  const router = useRouter();
-  const [isResolvingRoute, setResolvingRoute] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    void onboarding
-      .getAccount()
-      .then((account) => {
-        if (!active) return;
-        const destination = resolvePostAuthRoute(account);
-        if (destination !== '/') router.replace(destination);
-        else setResolvingRoute(false);
-      })
-      .catch(() => {
-        if (active) setResolvingRoute(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [onboarding, router]);
-
-  if (isResolvingRoute) return null;
-  return <ApplicationsHomeContent />;
+  return (
+    <PostAuthRouteGuard>
+      <ApplicationsHomeContent />
+    </PostAuthRouteGuard>
+  );
 }
 
 function ApplicationsHomeContent() {
@@ -90,6 +67,12 @@ function ApplicationsHomeContent() {
   } | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [isSigningOut, setSigningOut] = useState(false);
+  const [pendingMove, setPendingMove] = useState<{
+    application: Application;
+    status: ApplicationStatus;
+    targetIndex?: number;
+  } | null>(null);
+  const [moveDate, setMoveDate] = useState<string | null>(todayLocal());
   const expandStatus = (status: ApplicationStatus) =>
     setExpanded((current) =>
       current[status] ? current : { ...current, [status]: true },
@@ -99,6 +82,15 @@ function ApplicationsHomeContent() {
     status: ApplicationStatus,
     targetIndex?: number,
   ) => {
+    if (
+      application.status === 'draft' &&
+      status !== 'draft' &&
+      !application.appliedOn
+    ) {
+      setMoveDate(todayLocal());
+      setPendingMove({ application, status, targetIndex });
+      return;
+    }
     try {
       const changed = await vm.move(application, status, targetIndex);
       if (changed)
@@ -145,10 +137,14 @@ function ApplicationsHomeContent() {
       setSigningOut(false);
     }
   };
-  const notifyPending = () =>
+  const notifyPending = (destination: string) => {
+    if (destination === 'applications') return;
+    // TODO(CU-86ajvbvec): navigate to the complete CV Library.
+    // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
+    // TODO(CU-86ajvbvfq): navigate to the candidate profile.
     showSnackbar({ variant: 'info', message: t('nav.pending') });
-  const notifyAddPending = () =>
-    showSnackbar({ variant: 'info', message: t('add.pending') });
+  };
+  const addApplication = () => router.push('/applications/new');
 
   return (
     <Screen edges={layout.isExpanded ? ['top', 'bottom'] : ['bottom']}>
@@ -164,7 +160,7 @@ function ApplicationsHomeContent() {
               tracker: t('sidebar.tracker'),
               logout: t('nav.logout'),
             }}
-            onAdd={notifyAddPending}
+            onAdd={addApplication}
             onPending={notifyPending}
             onSignOut={() => void signOut()}
             signingOut={isSigningOut}
@@ -210,7 +206,7 @@ function ApplicationsHomeContent() {
             listLabel={t('view.list')}
             viewLabel={t('view.label')}
             addLabel={t('add')}
-            onAdd={notifyAddPending}
+            onAdd={addApplication}
           />
           <View className="flex-1">
             {isBoard ? (
@@ -274,7 +270,7 @@ function ApplicationsHomeContent() {
                             ? dragAndDrop.dropPreview.index
                             : null
                         }
-                        onAdd={notifyAddPending}
+                        onAdd={addApplication}
                         addLabel={t('add')}
                         dateLocale={i18n.language}
                         workModeLabel={(workMode) => t(`workMode.${workMode}`)}
@@ -344,7 +340,7 @@ function ApplicationsHomeContent() {
                     more={vm.collections[status].hasNextPage}
                     loadMoreLabel={t('list.loadMore')}
                     addLabel={t('add')}
-                    onAdd={notifyAddPending}
+                    onAdd={addApplication}
                     workModeLabel={(workMode) => t(`workMode.${workMode}`)}
                     actionsLabel={t('actions.label')}
                     dateLocale={i18n.language}
@@ -374,7 +370,7 @@ function ApplicationsHomeContent() {
               <Button
                 label="+"
                 accessibilityLabel={t('add')}
-                onPress={notifyAddPending}
+                onPress={addApplication}
               />
             </View>
           ) : null}
@@ -393,6 +389,75 @@ function ApplicationsHomeContent() {
               }}
             />
           ) : null}
+          <Modal
+            transparent
+            animationType="fade"
+            visible={Boolean(pendingMove)}
+            onRequestClose={() => setPendingMove(null)}
+          >
+            <Pressable
+              className="flex-1 items-center justify-center bg-overlay px-6"
+              onPress={() => setPendingMove(null)}
+            >
+              <Pressable
+                accessibilityViewIsModal
+                className="w-full max-w-md gap-5 rounded-lg bg-surface p-5 dark:bg-dark-surface"
+                onPress={() => undefined}
+              >
+                <View className="gap-1">
+                  <AppText variant="sectionTitle">
+                    {t('moveDate.title')}
+                  </AppText>
+                  <AppText tone="muted">{t('moveDate.message')}</AppText>
+                </View>
+                <DatePickerField
+                  label={t('create.date')}
+                  value={moveDate}
+                  maximum={todayLocal()}
+                  placeholder={t('create.datePlaceholder')}
+                  clearLabel={t('create.clearDate')}
+                  cancelLabel={t('create.cancel')}
+                  confirmLabel={t('create.confirm')}
+                  onChange={setMoveDate}
+                />
+                <View className="flex-row justify-end gap-2">
+                  <Button
+                    label={t('create.cancel')}
+                    variant="ghost"
+                    onPress={() => setPendingMove(null)}
+                  />
+                  <Button
+                    label={t('moveDate.confirm')}
+                    disabled={!moveDate}
+                    onPress={() => {
+                      if (!pendingMove || !moveDate) return;
+                      const requested = pendingMove;
+                      setPendingMove(null);
+                      void vm
+                        .move(
+                          requested.application,
+                          requested.status,
+                          requested.targetIndex,
+                          moveDate,
+                        )
+                        .then(() =>
+                          showSnackbar({
+                            variant: 'success',
+                            message: t('feedback.moved'),
+                          }),
+                        )
+                        .catch(() =>
+                          showSnackbar({
+                            variant: 'error',
+                            message: t('error.move'),
+                          }),
+                        );
+                    }}
+                  />
+                </View>
+              </Pressable>
+            </Pressable>
+          </Modal>
         </View>
       </View>
     </Screen>

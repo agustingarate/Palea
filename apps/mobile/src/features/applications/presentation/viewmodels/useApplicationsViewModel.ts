@@ -149,11 +149,20 @@ export function useApplicationsViewModel() {
       applicationId,
       status,
       targetIndex,
+      appliedOn,
     }: {
       applicationId: string;
       status: ApplicationStatus;
       targetIndex: number;
-    }) => updateApplicationStatus.execute(applicationId, status, targetIndex),
+      appliedOn?: string;
+    }) =>
+      updateApplicationStatus.execute(
+        applicationId,
+        status,
+        targetIndex,
+        appliedOn,
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ),
   });
   const deleteMutation = useMutation({
     mutationFn: (applicationId: string) =>
@@ -194,6 +203,7 @@ export function useApplicationsViewModel() {
       application: Application,
       status: ApplicationStatus,
       targetIndex?: number,
+      appliedOn?: string,
     ) => {
       const source = pages[application.status].items;
       const destination = pages[status].items.filter(
@@ -261,7 +271,11 @@ export function useApplicationsViewModel() {
       );
       patch(status, (items) => {
         const next = items.filter((item) => item.id !== application.id);
-        next.splice(insertionIndex, 0, { ...application, status });
+        next.splice(insertionIndex, 0, {
+          ...application,
+          status,
+          appliedOn: application.appliedOn ?? appliedOn ?? null,
+        });
         return next.map((item, position) => ({ ...item, position }));
       });
       try {
@@ -269,6 +283,7 @@ export function useApplicationsViewModel() {
           applicationId: application.id,
           status,
           targetIndex: insertionIndex,
+          appliedOn,
         });
         await refresh().catch(() => undefined);
         await ensureApplicationVisible(application.id, status).catch(

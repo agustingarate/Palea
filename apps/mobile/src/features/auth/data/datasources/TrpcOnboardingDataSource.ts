@@ -28,16 +28,4 @@ export class TrpcOnboardingDataSource implements OnboardingDataSource {
   async completeOnboarding() {
     await this.client.onboarding.complete.mutate({});
   }
-  async reserveResume(
-    input: Parameters<OnboardingDataSource['reserveResume']>[0],
-  ) {
-    const data = await this.client.resume.reserveUpload.mutate(input);
-    return { resumeId: data.resumeId, signedUrl: data.signedUrl };
-  }
-  async confirmResume(resumeId: string) {
-    await this.client.resume.confirmUpload.mutate({ resumeId });
-  }
-  async cancelResume(resumeId: string) {
-    await this.client.resume.cancelUpload.mutate({ resumeId });
-  }
 }

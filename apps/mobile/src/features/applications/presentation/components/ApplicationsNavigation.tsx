@@ -20,7 +20,7 @@ export function ApplicationsDesktopNavigation({
 }: {
   labels: DesktopNavigationLabels;
   onAdd: () => void;
-  onPending: () => void;
+  onPending: (destination: 'resumes' | 'metrics' | 'profile') => void;
   onSignOut: () => void;
   signingOut: boolean;
 }) {
@@ -36,29 +36,33 @@ export function ApplicationsDesktopNavigation({
         </AppText>
       </View>
       <View className="mt-6">
-        <Button label={`+ ${labels.add}`} onPress={onAdd} />
+        <Button
+          label={labels.add}
+          leadingIcon="filePlusCorner"
+          onPress={onAdd}
+        />
       </View>
       <View className="mt-6 flex-1 gap-1">
         <DesktopNavItem
           label={labels.applications}
           icon="briefcase"
           selected
-          onPress={onPending}
+          onPress={() => undefined}
         />
         <DesktopNavItem
           label={labels.resumes}
           icon="fileText"
-          onPress={onPending}
+          onPress={() => onPending('resumes')}
         />
         <DesktopNavItem
           label={labels.metrics}
           icon="barChart"
-          onPress={onPending}
+          onPress={() => onPending('metrics')}
         />
         <DesktopNavItem
           label={labels.profile}
           icon="user"
-          onPress={onPending}
+          onPress={() => onPending('profile')}
         />
       </View>
       <Button

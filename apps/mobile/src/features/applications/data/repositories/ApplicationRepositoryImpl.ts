@@ -1,7 +1,9 @@
 import type { ApplicationRepository } from '../../domain/repositories/ApplicationRepository';
 import type {
+  Application,
   ApplicationPage,
   ApplicationStatus,
+  CreateApplicationInput,
 } from '../../domain/entities/Application';
 import type { ApplicationsDataSource } from '../datasources/ApplicationsDataSource';
 
@@ -13,12 +15,23 @@ export class ApplicationRepositoryImpl implements ApplicationRepository {
   ): Promise<ApplicationPage> {
     return this.dataSource.list(status, options);
   }
+  async create(input: CreateApplicationInput): Promise<Application> {
+    return this.dataSource.create(input);
+  }
   async updateStatus(
     applicationId: string,
     status: ApplicationStatus,
     targetIndex?: number,
+    appliedOn?: string,
+    timeZone?: string,
   ): Promise<void> {
-    await this.dataSource.updateStatus(applicationId, status, targetIndex);
+    await this.dataSource.updateStatus(
+      applicationId,
+      status,
+      targetIndex,
+      appliedOn,
+      timeZone,
+    );
   }
   async remove(applicationId: string): Promise<void> {
     await this.dataSource.remove(applicationId);

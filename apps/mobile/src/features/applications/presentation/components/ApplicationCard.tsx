@@ -16,6 +16,16 @@ import type { Application } from '../../domain/entities/Application';
 const AnimatedView = createAnimatedComponent(View);
 const metadataTypography = primitives.typography.micro;
 
+function formatAppliedOn(appliedOn: string | null, locale: string) {
+  if (!appliedOn) return null;
+  const date = new Date(`${appliedOn}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+  }).format(date);
+}
+
 export interface ApplicationCardProps {
   application: Application;
   onAction: (
@@ -49,6 +59,7 @@ export function ApplicationCard({
   actionsLabel,
   dateLocale,
 }: ApplicationCardProps) {
+  const formattedAppliedOn = formatAppliedOn(application.appliedOn, dateLocale);
   const cardRef = useRef<View>(null);
   const actionRef = useRef<View>(null);
   const armed = useRef(false);
@@ -138,6 +149,7 @@ export function ApplicationCard({
       }),
     [dragInitiation, scrollCompensation, x, y],
   );
+  // TODO(CU-86ajvbvd3): make the card open the application detail route.
   return (
     <AnimatedView
       {...(onDrop ? responder.panHandlers : {})}
@@ -210,27 +222,26 @@ export function ApplicationCard({
           </View>
         </View>
         <View className="flex-row flex-wrap items-center gap-2">
-          <View className="flex-row items-center gap-1">
-            <Icon
-              name="calendar"
-              size={metadataTypography.fontSize}
-              tone="muted"
-            />
-            <AppText
-              variant="micro"
-              tone="muted"
-              style={{
-                fontSize: metadataTypography.fontSize,
-                lineHeight: metadataTypography.lineHeight,
-                letterSpacing: metadataTypography.letterSpacing,
-              }}
-            >
-              {new Intl.DateTimeFormat(dateLocale, {
-                day: 'numeric',
-                month: 'short',
-              }).format(new Date(`${application.appliedOn}T12:00:00`))}
-            </AppText>
-          </View>
+          {formattedAppliedOn ? (
+            <View className="flex-row items-center gap-1">
+              <Icon
+                name="calendar"
+                size={metadataTypography.fontSize}
+                tone="muted"
+              />
+              <AppText
+                variant="micro"
+                tone="muted"
+                style={{
+                  fontSize: metadataTypography.fontSize,
+                  lineHeight: metadataTypography.lineHeight,
+                  letterSpacing: metadataTypography.letterSpacing,
+                }}
+              >
+                {formattedAppliedOn}
+              </AppText>
+            </View>
+          ) : null}
           <View className="ml-auto">
             <Chip label={workModeLabel} size="sm" />
           </View>
