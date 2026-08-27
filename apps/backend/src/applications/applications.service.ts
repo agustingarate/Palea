@@ -126,6 +126,120 @@ export class ApplicationsService {
     };
   }
 
+  async get(subject: string, applicationId: string) {
+    const application = await this.prisma.application.findFirst({
+      where: { id: applicationId, profileId: subject },
+      include: {
+        resume: { select: { id: true, displayName: true, isPrimary: true } },
+        compensations: {
+          select: {
+            kind: true,
+            minimumMinor: true,
+            maximumMinor: true,
+            currency: true,
+            period: true,
+          },
+          orderBy: { kind: 'asc' },
+        },
+        requiredSkills: {
+          select: {
+            skill: { select: { id: true, labelEs: true, labelEn: true } },
+          },
+        },
+      },
+    });
+    if (!application) throw new AppError('applications.not_found', 'NOT_FOUND');
+    return {
+      ...toApplication(application),
+      commitment: application.commitment,
+      contractType: application.contractType,
+      durationType: application.durationType,
+      url: application.url,
+      location: application.location,
+      schedule: application.schedule,
+      descriptionHtml: application.descriptionHtml,
+      description: application.description,
+      skillAnalysisStatus: application.skillAnalysisStatus,
+      requiredSkills: application.requiredSkills.map(({ skill }) => skill),
+      resume: application.resume,
+      compensations: application.compensations.map((compensation) => ({
+        ...compensation,
+        minimumMinor: compensation.minimumMinor?.toString() ?? null,
+        maximumMinor: compensation.maximumMinor?.toString() ?? null,
+      })),
+    };
+  }
+
+  async listStages(subject: string, applicationId: string) {
+    await this.assertOwned(subject, applicationId);
+    const stages = await this.prisma.applicationStage.findMany({
+      where: { applicationId },
+      orderBy: [{ eventOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+    });
+    return stages.map((stage) => ({
+      id: stage.id,
+      name: stage.name,
+      details: stage.details,
+      eventOn: stage.eventOn?.toISOString().slice(0, 10) ?? null,
+      createdAt: stage.createdAt.toISOString(),
+    }));
+  }
+
+  async getNote(subject: string, applicationId: string) {
+    await this.assertOwned(subject, applicationId);
+    const note = await this.prisma.applicationNote.findUnique({
+      where: { applicationId },
+    });
+    return note
+      ? { body: note.body, updatedAt: note.updatedAt.toISOString() }
+      : null;
+  }
+
+  async listResources(subject: string, applicationId: string) {
+    await this.assertOwned(subject, applicationId);
+    const resources = await this.prisma.applicationResource.findMany({
+      where: { applicationId },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    });
+    return resources.map((resource) => ({
+      id: resource.id,
+      name: resource.name,
+      url: resource.url,
+      resourceType: resource.resourceType,
+    }));
+  }
+
+  async updateResume(
+    subject: string,
+    input: { applicationId: string; resumeId: string | null },
+  ) {
+    await this.prisma.$transaction(async (transaction) => {
+      const application = await transaction.application.findFirst({
+        where: { id: input.applicationId, profileId: subject },
+        select: { id: true },
+      });
+      if (!application)
+        throw new AppError('applications.not_found', 'NOT_FOUND');
+      if (input.resumeId) {
+        const resume = await transaction.resume.findFirst({
+          where: {
+            id: input.resumeId,
+            profileId: subject,
+            uploadStatus: 'ready',
+          },
+          select: { id: true },
+        });
+        if (!resume)
+          throw new AppError('applications.invalid_resume', 'BAD_REQUEST');
+      }
+      await transaction.application.update({
+        where: { id: application.id },
+        data: { resumeId: input.resumeId },
+      });
+    });
+    return { success: true as const };
+  }
+
   async updateStatus(
     subject: string,
     applicationId: string,
@@ -212,6 +326,14 @@ export class ApplicationsService {
     if (result.count !== 1)
       throw new AppError('applications.not_found', 'NOT_FOUND');
     return { success: true as const };
+  }
+
+  private async assertOwned(subject: string, applicationId: string) {
+    const application = await this.prisma.application.findFirst({
+      where: { id: applicationId, profileId: subject },
+      select: { id: true },
+    });
+    if (!application) throw new AppError('applications.not_found', 'NOT_FOUND');
   }
 }
 

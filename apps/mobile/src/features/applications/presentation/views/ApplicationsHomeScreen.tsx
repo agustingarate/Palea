@@ -252,6 +252,9 @@ function ApplicationsHomeContent() {
                         onAction={(application, anchor) =>
                           setActionFor({ application, anchor })
                         }
+                        onOpen={(application) =>
+                          router.push(`/applications/${application.id}`)
+                        }
                         onDrop={dragAndDrop.onBoardDrop}
                         onDragMove={dragAndDrop.onBoardDragMove}
                         onDrag={dragAndDrop.onDrag}
@@ -335,6 +338,9 @@ function ApplicationsHomeContent() {
                     layoutVersion={dragAndDrop.listScrollOffset}
                     onAction={(application, anchor) =>
                       setActionFor({ application, anchor })
+                    }
+                    onOpen={(application) =>
+                      router.push(`/applications/${application.id}`)
                     }
                     onMore={() => void vm.collections[status].loadMore()}
                     more={vm.collections[status].hasNextPage}

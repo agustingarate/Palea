@@ -32,6 +32,7 @@ export interface ApplicationCardProps {
     application: Application,
     anchor: { x: number; y: number },
   ) => void;
+  onOpen?: (application: Application) => void;
   onDrag?: (application: Application | null) => void;
   onDrop?: (application: Application, point: { x: number; y: number }) => void;
   onDragMove?: (point: { x: number; y: number }) => void;
@@ -48,6 +49,7 @@ export interface ApplicationCardProps {
 export function ApplicationCard({
   application,
   onAction,
+  onOpen,
   onDrag,
   onDrop,
   onDragMove,
@@ -179,6 +181,8 @@ export function ApplicationCard({
           <Pressable
             className="flex-1 gap-1"
             accessibilityRole="button"
+            accessibilityLabel={`${application.role}, ${application.companyName}`}
+            onPress={() => onOpen?.(application)}
             onLongPress={() => {
               armed.current = true;
               onDrag?.(application);

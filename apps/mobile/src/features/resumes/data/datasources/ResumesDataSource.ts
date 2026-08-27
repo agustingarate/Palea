@@ -11,4 +11,5 @@ export interface ResumesDataSource {
   ): Promise<{ resumeId: string; signedUrl: string }>;
   confirm(input: ConfirmResumeUploadInput): Promise<void>;
   cancel(resumeId: string): Promise<void>;
+  createDownload(resumeId: string): Promise<{ signedUrl: string }>;
 }

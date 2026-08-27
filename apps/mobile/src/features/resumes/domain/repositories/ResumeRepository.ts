@@ -17,4 +17,5 @@ export interface ResumeRepository {
       onProgress?: (progress: number) => void;
     },
   ): Promise<string>;
+  createDownload(resumeId: string): Promise<string>;
 }

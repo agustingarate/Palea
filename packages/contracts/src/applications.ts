@@ -110,6 +110,9 @@ export const manualJobDescriptionSchema = z.object({
   html: z.string().max(100_000),
 });
 export const applicationIdSchema = z.object({ applicationId: z.uuid() });
+export const applicationResumeInputSchema = applicationIdSchema.extend({
+  resumeId: z.uuid().nullable(),
+});
 export const applicationListInputSchema = z.object({
   status: applicationStatusSchema,
   search: z.string().trim().max(120).optional(),
@@ -130,6 +133,57 @@ export const applicationPageSchema = z.object({
   nextCursor: z.uuid().nullable(),
   total: z.number().int().nonnegative(),
 });
+export const applicationCompensationSchema = z.object({
+  kind: compensationKindSchema,
+  minimumMinor: z.string().nullable(),
+  maximumMinor: z.string().nullable(),
+  currency: currencyCodeSchema,
+  period: compensationPeriodSchema,
+});
+export const applicationSkillSchema = z.object({
+  id: z.uuid(),
+  labelEs: z.string().min(1),
+  labelEn: z.string().min(1),
+});
+export const applicationDetailSchema = applicationSchema.extend({
+  commitment: commitmentSchema,
+  contractType: contractTypeSchema,
+  durationType: durationTypeSchema,
+  url: z.url().nullable(),
+  location: z.string().nullable(),
+  schedule: z.string().nullable(),
+  descriptionHtml: z.string().nullable(),
+  description: z.string().nullable(),
+  skillAnalysisStatus: skillAnalysisStatusSchema,
+  requiredSkills: z.array(applicationSkillSchema),
+  resume: z
+    .object({
+      id: z.uuid(),
+      displayName: z.string().min(1).max(160),
+      isPrimary: z.boolean(),
+    })
+    .nullable(),
+  compensations: z.array(applicationCompensationSchema),
+});
+export const applicationStageSchema = z.object({
+  id: z.uuid(),
+  name: z.string().min(1),
+  details: z.string().nullable(),
+  eventOn: z.iso.date().nullable(),
+  createdAt: z.iso.datetime(),
+});
+export const applicationStagesSchema = z.array(applicationStageSchema);
+export const applicationNoteSchema = z.object({
+  body: z.string(),
+  updatedAt: z.iso.datetime(),
+});
+export const applicationResourceSchema = z.object({
+  id: z.uuid(),
+  name: z.string().min(1),
+  url: z.url().refine((value) => /^https?:\/\//i.test(value), 'resource.url'),
+  resourceType: z.string().nullable(),
+});
+export const applicationResourcesSchema = z.array(applicationResourceSchema);
 export const updateApplicationStatusInputSchema = applicationIdSchema.extend({
   status: applicationStatusSchema,
   targetIndex: z.number().int().nonnegative().optional(),
@@ -154,6 +208,13 @@ export const createApplicationInputSchema = z.object({
 export type Application = z.infer<typeof applicationSchema>;
 export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
 export type ApplicationPage = z.infer<typeof applicationPageSchema>;
+export type ApplicationDetail = z.infer<typeof applicationDetailSchema>;
+export type ApplicationStage = z.infer<typeof applicationStageSchema>;
+export type ApplicationNote = z.infer<typeof applicationNoteSchema>;
+export type ApplicationResource = z.infer<typeof applicationResourceSchema>;
+export type ApplicationResumeInput = z.infer<
+  typeof applicationResumeInputSchema
+>;
 export type ApplicationListInput = z.infer<typeof applicationListInputSchema>;
 export type CreateApplicationInput = z.infer<
   typeof createApplicationInputSchema

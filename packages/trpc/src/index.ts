@@ -11,6 +11,7 @@ import {
   resumeIdInputSchema,
   resumeUploadReservationSchema,
   resumeListSchema,
+  resumeDownloadSchema,
   confirmResumeUploadInputSchema,
   saveProfileInputSchema,
   saveSkillsInputSchema,
@@ -31,11 +32,20 @@ import {
   createApplicationInputSchema,
   applicationSchema,
   applicationIdSchema,
+  applicationResumeInputSchema,
+  applicationDetailSchema,
+  applicationStagesSchema,
+  applicationNoteSchema,
+  applicationResourcesSchema,
   type ApplicationListInput,
   type ApplicationPage,
   type UpdateApplicationStatusInput,
   type CreateApplicationInput,
   type Application,
+  type ApplicationDetail,
+  type ApplicationStage,
+  type ApplicationNote,
+  type ApplicationResource,
   type Resume,
   type ConfirmResumeUploadInput,
 } from '@palea/contracts';
@@ -89,6 +99,10 @@ export interface PaleaApiServices {
     input: ConfirmResumeUploadInput,
   ): Promise<{ success: true }>;
   listResumes(subject: string): Promise<Resume[]>;
+  createResumeDownload(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ signedUrl: string; expiresAt: string }>;
   cancelResumeUpload(
     subject: string,
     resumeId: string,
@@ -101,6 +115,26 @@ export interface PaleaApiServices {
     subject: string,
     input: CreateApplicationInput,
   ): Promise<Application>;
+  getApplication(
+    subject: string,
+    applicationId: string,
+  ): Promise<ApplicationDetail>;
+  listApplicationStages(
+    subject: string,
+    applicationId: string,
+  ): Promise<ApplicationStage[]>;
+  getApplicationNote(
+    subject: string,
+    applicationId: string,
+  ): Promise<ApplicationNote | null>;
+  listApplicationResources(
+    subject: string,
+    applicationId: string,
+  ): Promise<ApplicationResource[]>;
+  updateApplicationResume(
+    subject: string,
+    input: { applicationId: string; resumeId: string | null },
+  ): Promise<{ success: true }>;
   updateApplicationStatus(
     subject: string,
     input: UpdateApplicationStatusInput,
@@ -234,6 +268,12 @@ export const resumeRouter = t.router({
     .mutation(({ ctx, input }) =>
       ctx.services.cancelResumeUpload(ctx.identity.subject, input.resumeId),
     ),
+  createDownload: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(resumeDownloadSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.createResumeDownload(ctx.identity.subject, input.resumeId),
+    ),
 });
 
 export const applicationsRouter = t.router({
@@ -248,6 +288,45 @@ export const applicationsRouter = t.router({
     .output(applicationPageSchema)
     .query(({ ctx, input }) =>
       ctx.services.listApplications(ctx.identity.subject, input),
+    ),
+  get: protectedProcedure
+    .input(applicationIdSchema)
+    .output(applicationDetailSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.getApplication(ctx.identity.subject, input.applicationId),
+    ),
+  listStages: protectedProcedure
+    .input(applicationIdSchema)
+    .output(applicationStagesSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.listApplicationStages(
+        ctx.identity.subject,
+        input.applicationId,
+      ),
+    ),
+  getNote: protectedProcedure
+    .input(applicationIdSchema)
+    .output(applicationNoteSchema.nullable())
+    .query(({ ctx, input }) =>
+      ctx.services.getApplicationNote(
+        ctx.identity.subject,
+        input.applicationId,
+      ),
+    ),
+  listResources: protectedProcedure
+    .input(applicationIdSchema)
+    .output(applicationResourcesSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.listApplicationResources(
+        ctx.identity.subject,
+        input.applicationId,
+      ),
+    ),
+  updateResume: protectedProcedure
+    .input(applicationResumeInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.updateApplicationResume(ctx.identity.subject, input),
     ),
   updateStatus: protectedProcedure
     .input(updateApplicationStatusInputSchema)

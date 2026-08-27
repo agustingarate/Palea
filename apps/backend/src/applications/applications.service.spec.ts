@@ -260,4 +260,111 @@ describe('ApplicationsService', () => {
     ).rejects.toMatchObject({ appCode: 'applications.future_date' });
     jest.useRealTimers();
   });
+
+  it('returns an owner-scoped detail with CV, skills and compensation data', async () => {
+    const findFirst = jest.fn().mockResolvedValue({
+      ...rows[0],
+      commitment: 'full_time',
+      contractType: 'employment',
+      durationType: 'indefinite',
+      url: null,
+      location: null,
+      schedule: null,
+      descriptionHtml: '<p>Role</p>',
+      description: 'Role',
+      skillAnalysisStatus: 'completed',
+      resume: {
+        id: '00000000-0000-4000-8000-000000000021',
+        displayName: 'CV.pdf',
+        isPrimary: false,
+      },
+      requiredSkills: [
+        {
+          skill: {
+            id: '00000000-0000-4000-8000-000000000022',
+            labelEs: 'TypeScript',
+            labelEn: 'TypeScript',
+          },
+        },
+      ],
+      compensations: [
+        {
+          kind: 'expected',
+          minimumMinor: 100000n,
+          maximumMinor: null,
+          currency: 'USD',
+          period: 'month',
+        },
+      ],
+    });
+    const service = new ApplicationsService({
+      application: { findFirst },
+    } as never);
+
+    await expect(service.get(subject, rows[0]!.id)).resolves.toMatchObject({
+      resume: { displayName: 'CV.pdf' },
+      requiredSkills: [{ labelEs: 'TypeScript' }],
+      compensations: [{ minimumMinor: '100000' }],
+    });
+    expect(findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: rows[0]!.id, profileId: subject },
+      }),
+    );
+  });
+
+  it('does not expose stages, notes or resources from an unowned application', async () => {
+    const service = new ApplicationsService({
+      application: { findFirst: jest.fn().mockResolvedValue(null) },
+    } as never);
+    await expect(
+      service.listStages(subject, rows[0]!.id),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    await expect(service.getNote(subject, rows[0]!.id)).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
+    await expect(
+      service.listResources(subject, rows[0]!.id),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+
+  it('orders stages descending and permits a null note', async () => {
+    const findMany = jest.fn().mockResolvedValue([]);
+    const service = new ApplicationsService({
+      application: {
+        findFirst: jest.fn().mockResolvedValue({ id: rows[0]!.id }),
+      },
+      applicationStage: { findMany },
+      applicationNote: { findUnique: jest.fn().mockResolvedValue(null) },
+    } as never);
+    await expect(service.listStages(subject, rows[0]!.id)).resolves.toEqual([]);
+    await expect(service.getNote(subject, rows[0]!.id)).resolves.toBeNull();
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [{ eventOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+      }),
+    );
+  });
+
+  it('only associates an owned ready CV', async () => {
+    const update = jest.fn();
+    const transaction = {
+      application: {
+        findFirst: jest.fn().mockResolvedValue({ id: rows[0]!.id }),
+        update,
+      },
+      resume: { findFirst: jest.fn().mockResolvedValue(null) },
+    };
+    const service = new ApplicationsService({
+      $transaction: (run: (tx: typeof transaction) => Promise<unknown>) =>
+        run(transaction),
+    } as never);
+    await expect(
+      service.updateResume(subject, {
+        applicationId: rows[0]!.id,
+        resumeId: '00000000-0000-4000-8000-000000000031',
+      }),
+    ).rejects.toMatchObject({ appCode: 'applications.invalid_resume' });
+    expect(update).not.toHaveBeenCalled();
+  });
 });

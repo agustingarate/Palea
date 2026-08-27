@@ -14,6 +14,10 @@ export const confirmResumeUploadInputSchema = z.object({
   resumeId: z.uuid(),
   makePrimary: z.boolean(),
 });
+export const resumeDownloadSchema = z.object({
+  signedUrl: z.url(),
+  expiresAt: z.iso.datetime(),
+});
 
 export type Resume = z.infer<typeof resumeSchema>;
 export type ConfirmResumeUploadInput = z.infer<

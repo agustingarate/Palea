@@ -27,6 +27,7 @@ export interface BoardColumnProps {
   title: string;
   items: Application[];
   onAction: CardActionHandler;
+  onOpen?: (application: Application) => void;
   onDrop: (application: Application, point: { x: number; y: number }) => void;
   onLayout: (x: number, y: number, width: number, height: number) => void;
   onCardLayout: (applicationId: string, y: number, height: number) => void;
@@ -60,6 +61,7 @@ export function BoardColumn({
   title,
   items,
   onAction,
+  onOpen,
   onDrop,
   onLayout,
   onCardLayout,
@@ -144,6 +146,7 @@ export function BoardColumn({
                     application={item}
                     selected={draggingId === item.id}
                     onAction={onAction}
+                    onOpen={onOpen}
                     onDrop={onDrop}
                     onDrag={onDrag}
                     onDragMove={onDragMove}
@@ -207,6 +210,7 @@ export interface ListGroupProps {
   onDrag: (application: Application | null) => void;
   onDragMove: (position: number) => void;
   onAction: CardActionHandler;
+  onOpen?: (application: Application) => void;
   onMore: () => void;
   more: boolean;
   onDrop: (application: Application, position: number) => void;
@@ -240,6 +244,7 @@ export function ListGroup({
   onDrag,
   onDragMove,
   onAction,
+  onOpen,
   onMore,
   more,
   onDrop,
@@ -338,6 +343,7 @@ export function ListGroup({
                       dragInitiation="immediate"
                       scrollOffset={layoutVersion}
                       onAction={onAction}
+                      onOpen={onOpen}
                       onDrag={onDrag}
                       onDragMove={(point) => onDragMove(point.y)}
                       onDrop={(application, point) =>

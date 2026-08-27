@@ -40,6 +40,11 @@ export class ResumeRepositoryImpl implements ResumeRepository {
       throw error;
     }
   }
+
+  async createDownload(resumeId: string) {
+    const result = await this.dataSource.createDownload(resumeId);
+    return result.signedUrl;
+  }
 }
 
 function putWithProgress(

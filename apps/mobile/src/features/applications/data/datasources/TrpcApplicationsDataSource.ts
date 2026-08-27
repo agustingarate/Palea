@@ -3,6 +3,11 @@ import {
   applicationListInputSchema,
   applicationPageSchema,
   applicationSchema,
+  applicationDetailSchema,
+  applicationStagesSchema,
+  applicationNoteSchema,
+  applicationResourcesSchema,
+  applicationResumeInputSchema,
   createApplicationInputSchema,
   type CreateApplicationInput,
   type ApplicationStatus,
@@ -30,6 +35,46 @@ export class TrpcApplicationsDataSource implements ApplicationsDataSource {
       await this.client.applications.create.mutate(
         createApplicationInputSchema.parse(input),
       ),
+    );
+  }
+
+  async get(applicationId: string) {
+    return applicationDetailSchema.parse(
+      await this.client.applications.get.query(
+        applicationIdSchema.parse({ applicationId }),
+      ),
+    );
+  }
+
+  async listStages(applicationId: string) {
+    return applicationStagesSchema.parse(
+      await this.client.applications.listStages.query(
+        applicationIdSchema.parse({ applicationId }),
+      ),
+    );
+  }
+
+  async getNote(applicationId: string) {
+    return applicationNoteSchema
+      .nullable()
+      .parse(
+        await this.client.applications.getNote.query(
+          applicationIdSchema.parse({ applicationId }),
+        ),
+      );
+  }
+
+  async listResources(applicationId: string) {
+    return applicationResourcesSchema.parse(
+      await this.client.applications.listResources.query(
+        applicationIdSchema.parse({ applicationId }),
+      ),
+    );
+  }
+
+  async updateResume(applicationId: string, resumeId: string | null) {
+    await this.client.applications.updateResume.mutate(
+      applicationResumeInputSchema.parse({ applicationId, resumeId }),
     );
   }
 

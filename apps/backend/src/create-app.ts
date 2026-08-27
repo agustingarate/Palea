@@ -85,11 +85,23 @@ async function createContext(
       confirmResumeUpload: (subject, resumeId) =>
         resumes.confirm(subject, resumeId.resumeId, resumeId.makePrimary),
       listResumes: (subject) => resumes.list(subject),
+      createResumeDownload: (subject, resumeId) =>
+        resumes.createDownload(subject, resumeId),
       cancelResumeUpload: (subject, resumeId) =>
         resumes.cancel(subject, resumeId),
       listApplications: (subject, input) => applications.list(subject, input),
       createApplication: (subject, input) =>
         applications.create(subject, input),
+      getApplication: (subject, applicationId) =>
+        applications.get(subject, applicationId),
+      listApplicationStages: (subject, applicationId) =>
+        applications.listStages(subject, applicationId),
+      getApplicationNote: (subject, applicationId) =>
+        applications.getNote(subject, applicationId),
+      listApplicationResources: (subject, applicationId) =>
+        applications.listResources(subject, applicationId),
+      updateApplicationResume: (subject, input) =>
+        applications.updateResume(subject, input),
       updateApplicationStatus: (subject, input) =>
         applications.updateStatus(
           subject,

@@ -1,5 +1,8 @@
 import {
   applicationListInputSchema,
+  applicationDetailSchema,
+  applicationResourceSchema,
+  applicationResumeInputSchema,
   applicationPageSchema,
   createApplicationInputSchema,
   currencyCodes,
@@ -158,5 +161,53 @@ describe('application contracts', () => {
         jobDescription: { source: 'url', url: 'https://example.com/job' },
       }).success,
     ).toBe(false);
+  });
+
+  it('validates the nullable detail fields, CV association and HTTP(S) resources', () => {
+    expect(
+      applicationResumeInputSchema.safeParse({
+        applicationId: 'invalid',
+        resumeId: null,
+      }).success,
+    ).toBe(false);
+    expect(
+      applicationResourceSchema.safeParse({
+        id,
+        name: 'Portfolio',
+        url: 'ftp://example.com',
+        resourceType: null,
+      }).success,
+    ).toBe(false);
+    expect(
+      applicationDetailSchema.parse({
+        id,
+        companyName: 'Palea',
+        role: 'Engineer',
+        appliedOn: null,
+        status: 'draft',
+        workMode: 'unspecified',
+        position: 0,
+        commitment: 'unspecified',
+        contractType: 'unspecified',
+        durationType: 'unspecified',
+        url: null,
+        location: null,
+        schedule: null,
+        descriptionHtml: null,
+        description: null,
+        skillAnalysisStatus: 'not_requested',
+        requiredSkills: [],
+        resume: null,
+        compensations: [
+          {
+            kind: 'expected',
+            minimumMinor: '1000',
+            maximumMinor: null,
+            currency: 'USD',
+            period: 'month',
+          },
+        ],
+      }).compensations,
+    ).toHaveLength(1);
   });
 });

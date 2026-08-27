@@ -8,6 +8,11 @@ const repository = {
   create: jest.fn().mockResolvedValue({}),
   updateStatus: jest.fn().mockResolvedValue(undefined),
   remove: jest.fn().mockResolvedValue(undefined),
+  get: jest.fn().mockResolvedValue({}),
+  listStages: jest.fn().mockResolvedValue([]),
+  getNote: jest.fn().mockResolvedValue(null),
+  listResources: jest.fn().mockResolvedValue([]),
+  updateResume: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('application use cases', () => {
