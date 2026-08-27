@@ -2,7 +2,7 @@
 id: SPEC-DATA-001
 title: Modelo de datos funcional del MVP
 status: approved
-version: 1.2
+version: 1.3
 stories:
   - CU-86ajvbcd
   - CU-86ajvbvcg
@@ -24,7 +24,7 @@ delivery_tasks:
   validation: https://app.clickup.com/t/86ak0kyxz
   legal_gate: https://app.clickup.com/t/86ak0kyy4
 stitch: projects/16272299109015713935
-last_reviewed: 2026-08-13
+last_reviewed: 2026-08-23
 ---
 
 # Modelo de datos funcional del MVP
@@ -37,17 +37,20 @@ esta entrega.
 
 ## Modelo relacional
 
-| Tabla                                  | Campos y propósito                                                                                                          |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `profiles`                             | Extiende `auth.users`: identidad, nombre, nacimiento, nacionalidad, descripción profesional, experiencia y onboarding.      |
-| `profile_interests` / `user_interests` | Catálogo administrable y relación usuario–catálogo; máximo tres intereses por usuario.                                      |
-| `skills` / `user_skills`               | Catálogo administrable y relación usuario–catálogo; máximo diez habilidades sin duplicados.                                 |
-| `work_experiences`                     | Empresa, rol, inicio, fin, empleo actual y timestamps. Onboarding captura como máximo una; Perfil permite varias.           |
-| `resumes`                              | Path privado, nombre, MIME, tamaño y marca de principal. Sólo PDF, máximo 10 MiB y uno principal.                           |
-| `applications`                         | Empresa, rol, fecha, estado, URL, ubicación, descripción, modalidad, dedicación, contrato, duración, horario y CV opcional. |
-| `application_stages`                   | Nombre, detalles, fecha opcional e historial independiente del estado actual.                                               |
-| `application_notes`                    | Una nota privada editable por postulación.                                                                                  |
-| `application_resources`                | Nombre, URL y tipo opcional por postulación.                                                                                |
+| Tabla                                  | Campos y propósito                                                                                                      |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `profiles`                             | Extiende `auth.users`: identidad, nombre, nacimiento, nacionalidad, descripción profesional, experiencia y onboarding.  |
+| `profile_interests` / `user_interests` | Catálogo administrable y relación usuario–catálogo; máximo tres intereses por usuario.                                  |
+| `skills` / `user_skills`               | Catálogo administrable y relación usuario–catálogo; máximo diez habilidades sin duplicados.                             |
+| `work_experiences`                     | Empresa, rol, inicio, fin, empleo actual y timestamps. Onboarding captura como máximo una; Perfil permite varias.       |
+| `resumes`                              | Path privado, nombre, MIME, tamaño y marca de principal. Sólo PDF, máximo 10 MiB y uno principal.                       |
+| `applications`                         | Empresa, rol, fecha opcional, estado, captura de JD, modalidad, dedicación, contrato, duración, horario, CV y análisis. |
+| `application_compensations`            | Rangos esperado/ofrecido en unidades menores, moneda ISO 4217 y periodicidad.                                           |
+| `resume_skills`                        | Skills extraídas por CV, confianza y fecha de extracción.                                                               |
+| `application_required_skills`          | Skills requeridas por la JD de una postulación, confianza y fecha de extracción.                                        |
+| `application_stages`                   | Nombre, detalles, fecha opcional e historial independiente del estado actual.                                           |
+| `application_notes`                    | Una nota privada editable por postulación.                                                                              |
+| `application_resources`                | Nombre, URL y tipo opcional por postulación.                                                                            |
 
 Todos los IDs son UUID y las tablas de producto usan timestamps del servidor.
 Las entidades hijas de una postulación usan `ON DELETE CASCADE`.
@@ -68,7 +71,8 @@ postulación no elimina el CV y borrar un CV no elimina la postulación.
 - `resume_upload_status`: `pending`, `ready`, `failed`. Una reserva `pending`
   tiene expiración; sólo un CV `ready` puede ser principal. El CV opcional del
   onboarding se marca principal al confirmarse.
-- Una postulación exige empresa, rol y fecha; tiene cero o un CV asociado.
+- Una postulación exige empresa y rol; la fecha es opcional en borrador y se
+  exige al salir de borrador si todavía no existe. Tiene cero o un CV asociado.
 - El CV asociado debe pertenecer al mismo usuario.
 - `ended_on >= started_on`, excepto empleo actual sin fecha final.
 - Las etapas se ordenan por `event_on` y luego `created_at`; no se crean etapas
@@ -157,3 +161,9 @@ existen datos de usuarios que conservar.
 La versión 1.2 incorpora las reglas de `SPEC-AUTH-001` para CU-86ajvbvcd:
 nacionalidad ISO, etiquetas localizadas y ciclo de carga de CV. Está aprobada
 para contratos, migraciones y pruebas de la story.
+
+## Revisión 1.3
+
+La versión 1.3 incorpora `SPEC-APPLICATIONS-002`: fecha nullable para borradores,
+compensaciones normalizadas y relaciones por CV/postulación preparadas para el
+análisis futuro de skills. La automatización permanece fuera de alcance.

@@ -5,6 +5,8 @@ export * from './atoms/Surface';
 export * from './atoms/VisualPrimitives';
 export * from './molecules/Content';
 export * from './molecules/Fields';
+export * from './molecules/DatePickerField';
+export * from './molecules/RichTextEditor';
 export * from './molecules/Selection';
 export * from './molecules/Snackbar';
 export * from './organisms/Cards';

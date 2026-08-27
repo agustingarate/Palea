@@ -247,6 +247,7 @@ export function SelectTrigger(props: SelectTriggerProps) {
 export interface SelectOption<Value extends string = string> {
   value: Value;
   label: string;
+  selectedLabel?: string;
   description?: string;
   keywords?: readonly string[];
   disabled?: boolean;
@@ -264,6 +265,9 @@ export interface SearchableSelectProps<Value extends string = string> {
   loading?: boolean;
   error?: string;
   searchable?: boolean;
+  /** Sizes the trigger to its selected value instead of filling the available row. */
+  compact?: boolean;
+  leadingIcon?: IconName;
   renderLeading?: (option: SelectOption<Value>) => ReactNode;
   onValueChange(value: Value): void;
 }
@@ -291,6 +295,8 @@ export function SearchableSelect<Value extends string = string>({
   loading = false,
   error,
   searchable = true,
+  compact = false,
+  leadingIcon,
   renderLeading,
   onValueChange,
 }: SearchableSelectProps<Value>) {
@@ -346,17 +352,21 @@ export function SearchableSelect<Value extends string = string>({
         accessibilityRole="combobox"
         accessibilityState={{ disabled, expanded: open, busy: loading }}
         accessibilityHint={error}
-        className={`min-h-control-md bg-surface dark:bg-dark-surface flex-row items-center gap-2 rounded-sm border px-3 ${border} ${disabled ? 'opacity-disabled' : ''}`}
+        className={`min-h-control-md bg-surface dark:bg-dark-surface flex-row items-center gap-2 rounded-sm border px-3 ${compact ? 'self-start' : ''} ${border} ${disabled ? 'opacity-disabled' : ''}`}
         disabled={disabled}
         onPress={() => setOpen(true)}
       >
         {selected && renderLeading ? (
           renderLeading(selected)
-        ) : (
-          <Icon name="list" size="sm" tone="muted" />
-        )}
-        <AppText className="flex-1" tone={selected ? 'default' : 'muted'}>
-          {selected?.label ?? placeholder}
+        ) : leadingIcon ? (
+          <Icon name={leadingIcon} size="sm" tone="muted" />
+        ) : null}
+        <AppText
+          className={compact ? undefined : 'flex-1'}
+          numberOfLines={compact ? 1 : undefined}
+          tone={selected ? 'default' : 'muted'}
+        >
+          {selected?.selectedLabel ?? selected?.label ?? placeholder}
         </AppText>
         <Icon name="chevronDown" size="sm" tone="muted" />
       </Pressable>
