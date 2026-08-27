@@ -10,6 +10,8 @@ import {
   reserveResumeUploadInputSchema,
   resumeIdInputSchema,
   resumeUploadReservationSchema,
+  resumeListSchema,
+  confirmResumeUploadInputSchema,
   saveProfileInputSchema,
   saveSkillsInputSchema,
   saveWorkExperienceInputSchema,
@@ -26,10 +28,16 @@ import {
   applicationListInputSchema,
   applicationPageSchema,
   updateApplicationStatusInputSchema,
+  createApplicationInputSchema,
+  applicationSchema,
   applicationIdSchema,
   type ApplicationListInput,
   type ApplicationPage,
   type UpdateApplicationStatusInput,
+  type CreateApplicationInput,
+  type Application,
+  type Resume,
+  type ConfirmResumeUploadInput,
 } from '@palea/contracts';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -78,8 +86,9 @@ export interface PaleaApiServices {
   }>;
   confirmResumeUpload(
     subject: string,
-    resumeId: string,
+    input: ConfirmResumeUploadInput,
   ): Promise<{ success: true }>;
+  listResumes(subject: string): Promise<Resume[]>;
   cancelResumeUpload(
     subject: string,
     resumeId: string,
@@ -88,6 +97,10 @@ export interface PaleaApiServices {
     subject: string,
     input: ApplicationListInput,
   ): Promise<ApplicationPage>;
+  createApplication(
+    subject: string,
+    input: CreateApplicationInput,
+  ): Promise<Application>;
   updateApplicationStatus(
     subject: string,
     input: UpdateApplicationStatusInput,
@@ -199,6 +212,10 @@ export const onboardingRouter = t.router({
 });
 
 export const resumeRouter = t.router({
+  list: protectedProcedure
+    .input(z.object({}).optional())
+    .output(resumeListSchema)
+    .query(({ ctx }) => ctx.services.listResumes(ctx.identity.subject)),
   reserveUpload: protectedProcedure
     .input(reserveResumeUploadInputSchema)
     .output(resumeUploadReservationSchema)
@@ -206,10 +223,10 @@ export const resumeRouter = t.router({
       ctx.services.reserveResumeUpload(ctx.identity.subject, input),
     ),
   confirmUpload: protectedProcedure
-    .input(resumeIdInputSchema)
+    .input(confirmResumeUploadInputSchema)
     .output(operationResultSchema)
     .mutation(({ ctx, input }) =>
-      ctx.services.confirmResumeUpload(ctx.identity.subject, input.resumeId),
+      ctx.services.confirmResumeUpload(ctx.identity.subject, input),
     ),
   cancelUpload: protectedProcedure
     .input(resumeIdInputSchema)
@@ -220,6 +237,12 @@ export const resumeRouter = t.router({
 });
 
 export const applicationsRouter = t.router({
+  create: protectedProcedure
+    .input(createApplicationInputSchema)
+    .output(applicationSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.createApplication(ctx.identity.subject, input),
+    ),
   list: protectedProcedure
     .input(applicationListInputSchema)
     .output(applicationPageSchema)

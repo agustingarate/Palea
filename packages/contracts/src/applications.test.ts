@@ -1,6 +1,8 @@
 import {
   applicationListInputSchema,
   applicationPageSchema,
+  createApplicationInputSchema,
+  currencyCodes,
   updateApplicationStatusInputSchema,
 } from './applications';
 
@@ -22,7 +24,15 @@ describe('application contracts', () => {
     expect(
       updateApplicationStatusInputSchema.safeParse({
         applicationId: id,
+        status: 'offer',
+        timeZone: 'Not/AZone',
+      }).success,
+    ).toBe(false);
+    expect(
+      updateApplicationStatusInputSchema.safeParse({
+        applicationId: id,
         status: 'archived',
+        timeZone: 'UTC',
       }).success,
     ).toBe(false);
   });
@@ -32,6 +42,7 @@ describe('application contracts', () => {
         applicationId: id,
         status: 'offer',
         targetIndex: 2,
+        timeZone: 'UTC',
       }),
     ).toMatchObject({ targetIndex: 2 });
     expect(
@@ -39,6 +50,7 @@ describe('application contracts', () => {
         applicationId: id,
         status: 'offer',
         targetIndex: -1,
+        timeZone: 'UTC',
       }).success,
     ).toBe(false);
   });
@@ -60,5 +72,91 @@ describe('application contracts', () => {
         total: 1,
       }).total,
     ).toBe(1);
+  });
+
+  it('creates a minimal draft input with safe defaults', () => {
+    expect(
+      createApplicationInputSchema.parse({
+        companyName: ' Palea ',
+        role: ' Engineer ',
+        timeZone: 'UTC',
+      }),
+    ).toMatchObject({
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      workMode: 'unspecified',
+      commitment: 'unspecified',
+      contractType: 'unspecified',
+      durationType: 'unspecified',
+      resumeId: null,
+    });
+  });
+
+  it('accepts one-sided ISO compensation ranges and rejects reversed bounds', () => {
+    expect(currencyCodes).toContain('ARS');
+    expect(
+      createApplicationInputSchema.safeParse({
+        companyName: 'Palea',
+        role: 'Engineer',
+        timeZone: 'UTC',
+        expectedCompensation: {
+          minimumMinor: '100000',
+          currency: 'ARS',
+          period: 'month',
+        },
+      }).success,
+    ).toBe(true);
+    expect(
+      createApplicationInputSchema.safeParse({
+        companyName: 'Palea',
+        role: 'Engineer',
+        timeZone: 'UTC',
+        offeredCompensation: {
+          minimumMinor: '200',
+          maximumMinor: '100',
+          currency: 'USD',
+          period: 'hour',
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  it('bounds minor amounts to signed PostgreSQL bigint', () => {
+    const base = { companyName: 'Palea', role: 'Engineer', timeZone: 'UTC' };
+    expect(
+      createApplicationInputSchema.safeParse({
+        ...base,
+        expectedCompensation: {
+          minimumMinor: '9223372036854775807',
+          maximumMinor: '9223372036854775807',
+          currency: 'USD',
+          period: 'month',
+        },
+      }).success,
+    ).toBe(true);
+    for (const field of ['minimumMinor', 'maximumMinor'] as const) {
+      expect(
+        createApplicationInputSchema.safeParse({
+          ...base,
+          offeredCompensation: {
+            [field]: '9223372036854775808',
+            currency: 'USD',
+            period: 'month',
+          },
+        }).success,
+      ).toBe(false);
+    }
+  });
+
+  it('keeps URL and image capture out of the executable create contract', () => {
+    expect(
+      createApplicationInputSchema.safeParse({
+        companyName: 'Palea',
+        role: 'Engineer',
+        timeZone: 'UTC',
+        jobDescription: { source: 'url', url: 'https://example.com/job' },
+      }).success,
+    ).toBe(false);
   });
 });

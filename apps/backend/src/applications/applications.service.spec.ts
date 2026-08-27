@@ -44,7 +44,10 @@ describe('ApplicationsService', () => {
   it('does not update an application that is not owned by the candidate', async () => {
     const service = new ApplicationsService({
       $transaction: (run: (transaction: unknown) => Promise<unknown>) =>
-        run({ application: { findFirst: jest.fn().mockResolvedValue(null) } }),
+        run({
+          $executeRaw: jest.fn(),
+          application: { findFirst: jest.fn().mockResolvedValue(null) },
+        }),
     } as never);
     await expect(
       service.updateStatus(subject, rows[0]!.id, 'offer'),
@@ -54,6 +57,7 @@ describe('ApplicationsService', () => {
   it('persists insertion between destination cards', async () => {
     const update = jest.fn().mockResolvedValue({});
     const transaction = {
+      $executeRaw: jest.fn(),
       application: {
         findFirst: jest.fn().mockResolvedValue(rows[1]),
         findMany: jest.fn().mockResolvedValue([
@@ -88,5 +92,164 @@ describe('ApplicationsService', () => {
         data: expect.objectContaining({ status: 'offer', position: 1 }),
       }),
     );
+  });
+
+  it('creates an owner-scoped draft atomically and sanitizes the description', async () => {
+    const create = jest.fn().mockResolvedValue({
+      ...rows[0],
+      appliedOn: null,
+      position: 2,
+    });
+    const createNote = jest.fn().mockResolvedValue({});
+    const createCompensations = jest.fn().mockResolvedValue({ count: 1 });
+    const transaction = {
+      $executeRaw: jest.fn(),
+      resume: { findFirst: jest.fn().mockResolvedValue({ id: 'resume-id' }) },
+      application: {
+        aggregate: jest.fn().mockResolvedValue({ _max: { position: 1 } }),
+        create,
+      },
+      applicationNote: { create: createNote },
+      applicationCompensation: { createMany: createCompensations },
+    };
+    const service = new ApplicationsService({
+      $transaction: (run: (client: typeof transaction) => Promise<unknown>) =>
+        run(transaction),
+    } as never);
+
+    const result = await service.create(subject, {
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      workMode: 'remote',
+      commitment: 'full_time',
+      contractType: 'employment',
+      durationType: 'indefinite',
+      resumeId: 'resume-id',
+      jobDescription: {
+        source: 'manual',
+        html: '<h1>Title</h1><h2>Role</h2><script>alert(1)</script><a href="javascript:alert(2)">Apply</a>',
+      },
+      expectedCompensation: {
+        minimumMinor: '100000',
+        maximumMinor: null,
+        currency: 'USD',
+        period: 'month',
+      },
+      offeredCompensation: null,
+      privateNotes: ' Follow up Friday ',
+      timeZone: 'UTC',
+    });
+
+    expect(transaction.$executeRaw).toHaveBeenCalledTimes(1);
+    expect(create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        profileId: subject,
+        status: 'draft',
+        position: 2,
+        appliedOn: null,
+        descriptionHtml: '<h1>Title</h1><h2>Role</h2><a>Apply</a>',
+        description: 'TITLE\n\nROLE\n\nApply',
+        descriptionCaptureStatus: 'completed',
+      }),
+    });
+    expect(createNote).toHaveBeenCalledWith({
+      data: { applicationId: rows[0]!.id, body: 'Follow up Friday' },
+    });
+    expect(createCompensations).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({
+          applicationId: rows[0]!.id,
+          kind: 'expected',
+          minimumMinor: 100000n,
+        }),
+      ],
+    });
+    expect(result.status).toBe('draft');
+  });
+
+  it('rejects leaving draft without an application date', async () => {
+    const transaction = {
+      $executeRaw: jest.fn(),
+      application: {
+        findFirst: jest.fn().mockResolvedValue({ ...rows[0], appliedOn: null }),
+      },
+    };
+    const service = new ApplicationsService({
+      $transaction: (run: (client: typeof transaction) => Promise<unknown>) =>
+        run(transaction),
+    } as never);
+
+    await expect(
+      service.updateStatus(subject, rows[0]!.id, 'applied'),
+    ).rejects.toMatchObject({ appCode: 'applications.date_required' });
+  });
+
+  it('rejects future application dates before opening a transaction', async () => {
+    const transaction = jest.fn();
+    const service = new ApplicationsService({
+      $transaction: transaction,
+    } as never);
+
+    await expect(
+      service.create(subject, {
+        companyName: 'Palea',
+        role: 'Engineer',
+        appliedOn: '2999-01-01',
+        workMode: 'unspecified',
+        commitment: 'unspecified',
+        contractType: 'unspecified',
+        durationType: 'unspecified',
+        resumeId: null,
+        jobDescription: null,
+        expectedCompensation: null,
+        offeredCompensation: null,
+        privateNotes: '',
+        timeZone: 'UTC',
+      }),
+    ).rejects.toMatchObject({ appCode: 'applications.future_date' });
+    expect(transaction).not.toHaveBeenCalled();
+  });
+
+  it('validates application dates against the candidate device timezone', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-08-28T00:30:00.000Z'));
+    const transaction = jest.fn().mockImplementation(async (run) =>
+      run({
+        $executeRaw: jest.fn(),
+        application: {
+          aggregate: jest.fn().mockResolvedValue({ _max: { position: -1 } }),
+          create: jest.fn().mockResolvedValue({ ...rows[0], appliedOn: new Date('2026-08-28') }),
+        },
+      }),
+    );
+    const service = new ApplicationsService({ $transaction: transaction } as never);
+    const input = {
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: '2026-08-28',
+      workMode: 'unspecified' as const,
+      commitment: 'unspecified' as const,
+      contractType: 'unspecified' as const,
+      durationType: 'unspecified' as const,
+      resumeId: null,
+      jobDescription: null,
+      expectedCompensation: null,
+      offeredCompensation: null,
+      privateNotes: '',
+      timeZone: 'Asia/Tokyo',
+    };
+    await expect(service.create(subject, input)).resolves.toMatchObject({ status: 'draft' });
+    await expect(service.create(subject, { ...input, timeZone: 'America/Los_Angeles' })).rejects.toMatchObject({ appCode: 'applications.future_date' });
+    await expect(
+      service.updateStatus(
+        subject,
+        rows[0]!.id,
+        'applied',
+        undefined,
+        '2026-08-28',
+        'America/Los_Angeles',
+      ),
+    ).rejects.toMatchObject({ appCode: 'applications.future_date' });
+    jest.useRealTimers();
   });
 });

@@ -37,4 +37,44 @@ describe('appRouter', () => {
       appRouter.createCaller(context).projects.list({ limit: 101 }),
     ).rejects.toBeDefined();
   });
+
+  it('protects and delegates application creation with the authenticated subject', async () => {
+    await expect(
+      appRouter.createCaller(context).applications.create({
+        companyName: 'Palea',
+        role: 'Engineer',
+        timeZone: 'UTC',
+      }),
+    ).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+
+    const createApplication = jest.fn().mockResolvedValue({
+      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      status: 'draft',
+      workMode: 'unspecified',
+      position: 0,
+    });
+    const authenticated = {
+      ...context,
+      identity: { subject: 'user-1', email: null, roles: [] },
+      services: { ...context.services, createApplication },
+    };
+
+    await appRouter.createCaller(authenticated).applications.create({
+      companyName: 'Palea',
+      role: 'Engineer',
+      timeZone: 'UTC',
+    });
+
+    expect(createApplication).toHaveBeenCalledWith(
+      'user-1',
+      expect.objectContaining({
+        companyName: 'Palea',
+        appliedOn: null,
+        workMode: 'unspecified',
+      }),
+    );
+  });
 });

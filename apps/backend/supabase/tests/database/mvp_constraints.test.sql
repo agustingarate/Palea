@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(9);
+select plan(16);
 
 select ok(
   not (select public from storage.buckets where id = 'resumes'),
@@ -81,6 +81,80 @@ select throws_ok(
   $$insert into public.resumes (profile_id, storage_path, display_name, mime_type, size_bytes) values ('11000000-0000-0000-0000-000000000001', 'large.pdf', 'Large', 'application/pdf', 10485761)$$,
   'new row for relation "resumes" violates check constraint "resumes_size_check"',
   'SPEC-DATA-001 rejects resume metadata above 10 MiB'
+);
+
+insert into public.applications (
+  id, profile_id, company_name, role, status, position
+) values (
+  '14000000-0000-0000-0000-000000000001',
+  '11000000-0000-0000-0000-000000000001',
+  'Palea', 'Engineer', 'draft', 0
+);
+
+select is(
+  (select applied_on from public.applications where id = '14000000-0000-0000-0000-000000000001'),
+  null::date,
+  'SPEC-APPLICATIONS-002 allows draft applications without a date'
+);
+
+select throws_ok(
+  $$insert into public.application_compensations (application_id, kind, currency, period) values ('14000000-0000-0000-0000-000000000001', 'expected', 'USD', 'month')$$,
+  '23514',
+  null,
+  'SPEC-APPLICATIONS-002 requires at least one compensation bound'
+);
+
+insert into public.application_compensations (
+  application_id, kind, minimum_minor, currency, period
+) values (
+  '14000000-0000-0000-0000-000000000001',
+  'expected', 100000, 'USD', 'month'
+);
+
+select is(
+  (select minimum_minor from public.application_compensations where application_id = '14000000-0000-0000-0000-000000000001'),
+  100000::bigint,
+  'SPEC-APPLICATIONS-002 persists exact minor units with a partial range'
+);
+
+insert into public.resumes (
+  id, profile_id, storage_path, display_name, mime_type, size_bytes,
+  upload_status, uploaded_at
+) values (
+  '15000000-0000-0000-0000-000000000001',
+  '11000000-0000-0000-0000-000000000001',
+  '11000000-0000-0000-0000-000000000001/resume.pdf',
+  'Resume.pdf', 'application/pdf', 100, 'ready', now()
+);
+
+insert into public.resume_skills (resume_id, skill_id, confidence)
+select '15000000-0000-0000-0000-000000000001', id, 0.9000
+from public.skills where slug = 'skill-1';
+
+insert into public.application_required_skills (
+  application_id, skill_id, confidence
+)
+select '14000000-0000-0000-0000-000000000001', id, 0.8000
+from public.skills where slug = 'skill-1';
+
+select ok(
+  exists(select 1 from public.resume_skills where resume_id = '15000000-0000-0000-0000-000000000001'),
+  'SPEC-APPLICATIONS-002 prepares resume skill persistence'
+);
+
+select ok(
+  exists(select 1 from public.application_required_skills where application_id = '14000000-0000-0000-0000-000000000001'),
+  'SPEC-APPLICATIONS-002 prepares required skill persistence'
+);
+
+select ok(
+  not has_table_privilege('authenticated', 'public.application_compensations', 'SELECT'),
+  'SPEC-APPLICATIONS-002 keeps compensation reads behind Nest'
+);
+
+select ok(
+  not has_table_privilege('authenticated', 'public.resume_skills', 'INSERT'),
+  'SPEC-APPLICATIONS-002 keeps skill writes behind Nest'
 );
 
 select * from finish();

@@ -170,6 +170,10 @@ export const appErrorCodeSchema = z.enum([
   'resume.too_many_pending',
   'resume.cleanup_failed',
   'applications.not_found',
+  'applications.date_required',
+  'applications.future_date',
+  'applications.invalid_resume',
+  'applications.description_too_long',
 ]);
 export const operationResultSchema = z.object({ success: z.literal(true) });
 
