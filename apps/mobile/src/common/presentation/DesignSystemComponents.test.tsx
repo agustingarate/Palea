@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   Button,
   BottomNavigation,
+  Badge,
   Checkbox,
   CollectionFeedback,
   SegmentedControl,
@@ -39,6 +40,14 @@ function SnackbarTrigger() {
 }
 
 describe('mobile design system', () => {
+  it('renders an outlined asset-type badge with an interaction border', () => {
+    const view = render(<Badge label="Resume" tone="interaction" outlined />);
+
+    expect(view.toJSON()).toMatchObject({
+      props: { className: expect.stringContaining('border-interaction') },
+    });
+  });
+
   it('blocks disabled and loading button callbacks', () => {
     const onPress = jest.fn();
     const view = render(

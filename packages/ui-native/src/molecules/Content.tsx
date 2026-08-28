@@ -9,6 +9,7 @@ import { Surface } from '../atoms/Surface';
 export interface ResourceRowProps {
   title: string;
   subtitle?: string;
+  typeLabel?: string;
   icon?: IconName;
   actionIcon?: IconName;
   actionLabel?: string;
@@ -79,6 +80,7 @@ export function Breadcrumbs({
 export function ResourceRow({
   title,
   subtitle,
+  typeLabel,
   icon = 'fileText',
   actionIcon = 'chevronRight',
   actionLabel,
@@ -87,7 +89,7 @@ export function ResourceRow({
   const content = (
     <>
       <Icon name={icon} size="md" tone="muted" />
-      <View className="flex-1">
+      <View className="flex-1 gap-1">
         <AppText variant="bodySmall">{title}</AppText>
         {subtitle ? (
           <AppText variant="label" tone="muted">
@@ -95,6 +97,9 @@ export function ResourceRow({
           </AppText>
         ) : null}
       </View>
+      {typeLabel ? (
+        <Badge label={typeLabel} tone="interaction" outlined />
+      ) : null}
       {onPress ? (
         <Icon
           name={actionIcon}
