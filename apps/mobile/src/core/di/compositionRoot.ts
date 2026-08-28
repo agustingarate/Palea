@@ -29,9 +29,19 @@ import {
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import { ResumeRepositoryImpl } from '@/features/resumes/data/repositories/ResumeRepositoryImpl';
 import { TrpcResumesDataSource } from '@/features/resumes/data/datasources/TrpcResumesDataSource';
+import { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
+import { useOnboardingDraftStore } from '@/features/auth/presentation/onboarding/stores/useOnboardingDraftStore';
 
 export function createAppContainer(): Container {
   const container = new Container();
+  const sessionCleanupRegistry = new SessionCleanupRegistry();
+  sessionCleanupRegistry.register(() =>
+    useOnboardingDraftStore.getState().clear(),
+  );
+  container.register(
+    dependencyTokens.sessionCleanupRegistry,
+    sessionCleanupRegistry,
+  );
   const authRepository = new AuthRepositoryImpl(
     new SupabaseAuthDataSource(
       environment.supabaseUrl,

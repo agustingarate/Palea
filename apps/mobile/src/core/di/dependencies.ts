@@ -16,6 +16,7 @@ import type {
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import type { ResumeRepository } from '@/features/resumes/domain/repositories/ResumeRepository';
 import { createToken } from './container';
+import type { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
 
 export interface AppDependencies {
   getProjects: GetProjects;
@@ -33,6 +34,7 @@ export interface AppDependencies {
   getApplicationNote: GetApplicationNote;
   listApplicationResources: ListApplicationResources;
   updateApplicationResume: UpdateApplicationResume;
+  sessionCleanupRegistry: SessionCleanupRegistry;
 }
 
 export const dependencyTokens = {
@@ -64,5 +66,8 @@ export const dependencyTokens = {
   ),
   updateApplicationResume: createToken<UpdateApplicationResume>(
     'UpdateApplicationResume',
+  ),
+  sessionCleanupRegistry: createToken<SessionCleanupRegistry>(
+    'SessionCleanupRegistry',
   ),
 } as const;
