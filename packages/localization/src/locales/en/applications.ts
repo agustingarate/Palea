@@ -103,6 +103,8 @@ const applications = {
   'detail.downloadError': 'We could not download the resume.',
   'detail.chooseResume': 'Choose associated resume',
   'detail.primaryResume': 'Primary resume',
+  'detail.resumeResourceType': 'Resume',
+  'detail.resourceTypeLink': 'Link',
   'detail.resumeUpdated': 'Associated resume updated.',
   'detail.resumeError': 'We could not update the associated resume.',
   'detail.openResource': 'Open resource',

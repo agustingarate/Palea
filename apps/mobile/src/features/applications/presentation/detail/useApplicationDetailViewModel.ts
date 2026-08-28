@@ -15,6 +15,7 @@ export function useApplicationDetailViewModel(applicationId: string) {
   );
   const updateResume = useDependency(dependencyTokens.updateApplicationResume);
   const updateStatus = useDependency(dependencyTokens.updateApplicationStatus);
+  const deleteApplication = useDependency(dependencyTokens.deleteApplication);
   const resumeRepository = useDependency(dependencyTokens.resumeRepository);
   const queryClient = useQueryClient();
   const invalidate = () =>
@@ -70,6 +71,10 @@ export function useApplicationDetailViewModel(applicationId: string) {
   const download = useMutation({
     mutationFn: (resumeId: string) => resumeRepository.createDownload(resumeId),
   });
+  const remove = useMutation({
+    mutationFn: () => deleteApplication.execute(applicationId),
+    onSuccess: invalidate,
+  });
   return {
     detail,
     stages,
@@ -80,5 +85,6 @@ export function useApplicationDetailViewModel(applicationId: string) {
     resume,
     upload,
     download,
+    remove,
   };
 }

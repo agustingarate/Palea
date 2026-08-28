@@ -104,6 +104,8 @@ const applications = {
   'detail.downloadError': 'No pudimos descargar el CV.',
   'detail.chooseResume': 'Elegir CV asociado',
   'detail.primaryResume': 'CV principal',
+  'detail.resumeResourceType': 'CV',
+  'detail.resourceTypeLink': 'Enlace',
   'detail.resumeUpdated': 'Se actualizó el CV asociado.',
   'detail.resumeError': 'No pudimos actualizar el CV asociado.',
   'detail.openResource': 'Abrir recurso',
