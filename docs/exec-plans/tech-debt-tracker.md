@@ -1,13 +1,14 @@
 # Technical debt tracker
 
-| ID     | Item                                                 | Trigger                                              |
-| ------ | ---------------------------------------------------- | ---------------------------------------------------- |
-| TD-001 | Select PostgreSQL ORM                                | Domain model and deployment target are known         |
-| TD-002 | Configure auth and secure credential storage         | Authentication story is approved                     |
-| TD-003 | Add EAS ownership and native identifiers             | First distributable build is planned                 |
-| TD-004 | Execute Maestro in hosted emulator CI                | Stable mobile flow and runner budget exist           |
-| TD-005 | Run durable CV reservation cleanup job               | Deploy scheduled worker with Storage retry semantics |
-| TD-006 | Add timeout and cancellation to tRPC client requests | Any mobile flow depends on a remote API              |
+| ID     | Item                                                 | Trigger                                                                                    |
+| ------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| TD-001 | Select PostgreSQL ORM                                | Domain model and deployment target are known                                               |
+| TD-002 | Configure auth and secure credential storage         | Authentication story is approved                                                           |
+| TD-003 | Add EAS ownership and native identifiers             | First distributable build is planned                                                       |
+| TD-004 | Execute Maestro in hosted emulator CI                | Stable mobile flow and runner budget exist                                                 |
+| TD-005 | Run durable CV reservation cleanup job               | Deploy scheduled worker with Storage retry semantics                                       |
+| TD-006 | Add timeout and cancellation to tRPC client requests | Any mobile flow depends on a remote API                                                    |
+| TD-007 | Review graceful degradation for account verification | Define UX, retry policy, and session behavior when `account.me` is temporarily unavailable |
 
 ## Sincronización con ClickUp
 

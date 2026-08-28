@@ -27,6 +27,11 @@ manual.
 - Keep mobile views as composition and interaction adapters. Extract reusable
   feature components and non-rendering interaction coordination into dedicated
   components and hooks before a view becomes a mixed orchestration module.
+- After changing localized resources, run `pnpm --filter @palea/localization build`
+  before considering the change validated.
+- For local development and QA, use each application's supported development
+  workflow (for Expo Web, `expo start --web`). Do not replace it with static
+  servers or other alternative tooling unless the user explicitly requests it.
 
 - Do not preserve backward compatibility. Remove obsolete paths instead of adding compatibility layers, fallbacks, or migrations.
 - Choose the simplest implementation that fully meets the current requirements. Avoid speculative abstractions, configuration, and indirection.
