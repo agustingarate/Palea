@@ -142,16 +142,15 @@ describe('ApplicationsService', () => {
     });
 
     expect(transaction.$executeRaw).toHaveBeenCalledTimes(1);
-    expect(create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        profileId: subject,
-        status: 'draft',
-        position: 2,
-        appliedOn: null,
-        descriptionHtml: '<h1>Title</h1><h2>Role</h2><a>Apply</a>',
-        description: 'TITLE\n\nROLE\n\nApply',
-        descriptionCaptureStatus: 'completed',
-      }),
+    const createdApplication = create.mock.calls[0]?.[0]?.data;
+    expect(createdApplication).toMatchObject({
+      profileId: subject,
+      status: 'draft',
+      position: 2,
+      appliedOn: null,
+      descriptionHtml: '<h1>Title</h1><h2>Role</h2><a>Apply</a>',
+      description: 'TITLE\n\n\nROLE\n\nApply',
+      descriptionCaptureStatus: 'completed',
     });
     expect(createNote).toHaveBeenCalledWith({
       data: { applicationId: rows[0]!.id, body: 'Follow up Friday' },
