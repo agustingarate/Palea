@@ -1,6 +1,7 @@
 import { render, fireEvent } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import type { ReactNode } from 'react';
+import type * as ReactNative from 'react-native';
 import { PostAuthRouteGuard } from './PostAuthRouteGuard';
 
 const mockUseAuthSession = jest.fn();
@@ -24,7 +25,7 @@ jest.mock('@/core/di/dependencies', () => ({
 }));
 jest.mock('expo-router', () => {
   const { Text: MockText } =
-    jest.requireActual<typeof import('react-native')>('react-native');
+    jest.requireActual<typeof ReactNative>('react-native');
   return {
     Redirect: ({ href }: { href: string }) => (
       <MockText>{`redirect:${href}`}</MockText>
@@ -33,7 +34,7 @@ jest.mock('expo-router', () => {
 });
 jest.mock('@palea/ui-native', () => {
   const { Text: MockText } =
-    jest.requireActual<typeof import('react-native')>('react-native');
+    jest.requireActual<typeof ReactNative>('react-native');
   return {
     AppText: ({ children }: { children: ReactNode }) => (
       <MockText>{children}</MockText>
