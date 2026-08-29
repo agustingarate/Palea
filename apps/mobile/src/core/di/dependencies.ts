@@ -7,8 +7,16 @@ import type { ListApplications } from '@/features/applications/domain/usecases/L
 import type { UpdateApplicationStatus } from '@/features/applications/domain/usecases/UpdateApplicationStatus';
 import type { DeleteApplication } from '@/features/applications/domain/usecases/DeleteApplication';
 import type { CreateApplication } from '@/features/applications/domain/usecases/CreateApplication';
+import type {
+  GetApplicationDetail,
+  GetApplicationNote,
+  ListApplicationResources,
+  ListApplicationStages,
+  UpdateApplicationResume,
+} from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import type { ResumeRepository } from '@/features/resumes/domain/repositories/ResumeRepository';
 import { createToken } from './container';
+import type { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
 
 export interface AppDependencies {
   getProjects: GetProjects;
@@ -21,6 +29,12 @@ export interface AppDependencies {
   listApplications: ListApplications;
   updateApplicationStatus: UpdateApplicationStatus;
   deleteApplication: DeleteApplication;
+  getApplicationDetail: GetApplicationDetail;
+  listApplicationStages: ListApplicationStages;
+  getApplicationNote: GetApplicationNote;
+  listApplicationResources: ListApplicationResources;
+  updateApplicationResume: UpdateApplicationResume;
+  sessionCleanupRegistry: SessionCleanupRegistry;
 }
 
 export const dependencyTokens = {
@@ -40,4 +54,20 @@ export const dependencyTokens = {
     'UpdateApplicationStatus',
   ),
   deleteApplication: createToken<DeleteApplication>('DeleteApplication'),
+  getApplicationDetail: createToken<GetApplicationDetail>(
+    'GetApplicationDetail',
+  ),
+  listApplicationStages: createToken<ListApplicationStages>(
+    'ListApplicationStages',
+  ),
+  getApplicationNote: createToken<GetApplicationNote>('GetApplicationNote'),
+  listApplicationResources: createToken<ListApplicationResources>(
+    'ListApplicationResources',
+  ),
+  updateApplicationResume: createToken<UpdateApplicationResume>(
+    'UpdateApplicationResume',
+  ),
+  sessionCleanupRegistry: createToken<SessionCleanupRegistry>(
+    'SessionCleanupRegistry',
+  ),
 } as const;

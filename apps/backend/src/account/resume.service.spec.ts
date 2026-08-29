@@ -93,4 +93,35 @@ describe('ResumeService', () => {
       data: expect.objectContaining({ isPrimary: true }),
     });
   });
+
+  it('creates a short-lived forced-download URL only for an owned ready CV', async () => {
+    const createSignedUrl = jest.fn().mockResolvedValue({
+      data: { signedUrl: 'https://storage.example.com/signed' },
+      error: null,
+    });
+    const service = new ResumeService({
+      resume: {
+        findFirst: jest.fn().mockResolvedValue({
+          storagePath: `${subject}/${resumeId}.pdf`,
+          displayName: 'My CV.pdf',
+        }),
+      },
+    } as never);
+    Object.assign(service, {
+      storage: { storage: { from: () => ({ createSignedUrl }) } },
+    });
+
+    await expect(
+      service.createDownload(subject, resumeId),
+    ).resolves.toMatchObject({
+      signedUrl: 'https://storage.example.com/signed',
+    });
+    expect(createSignedUrl).toHaveBeenCalledWith(
+      `${subject}/${resumeId}.pdf`,
+      60,
+      {
+        download: 'My CV.pdf',
+      },
+    );
+  });
 });

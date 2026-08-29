@@ -19,6 +19,8 @@ export interface TopAppBarProps {
   subtitle?: string;
   leading?: ReactNode;
   trailing?: ReactNode;
+  /** Use only when the trailing area needs more than the standard touch target. */
+  trailingClassName?: string;
 }
 
 export function TopAppBar({
@@ -26,6 +28,7 @@ export function TopAppBar({
   subtitle,
   leading,
   trailing,
+  trailingClassName,
 }: TopAppBarProps) {
   const layout = useResponsiveLayout();
   return (
@@ -51,7 +54,9 @@ export function TopAppBar({
             </AppText>
           ) : null}
         </View>
-        <View className="w-touch-target items-end">{trailing}</View>
+        <View className={trailingClassName ?? 'w-touch-target items-end'}>
+          {trailing}
+        </View>
       </View>
     </View>
   );

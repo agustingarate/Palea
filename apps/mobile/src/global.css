@@ -12,3 +12,31 @@ input:-webkit-autofill:active {
   caret-color: #171717;
   transition: background-color 9999s ease-out 0s;
 }
+
+@layer components {
+  .palea-description {
+    @apply text-body text-text;
+  }
+
+  .palea-description h1 {
+    @apply mb-3 font-bold text-screen-title;
+  }
+
+  .palea-description h2 {
+    @apply mb-2 font-semibold text-section-title;
+  }
+
+  .palea-description h3 {
+    @apply mb-2 font-semibold text-body;
+  }
+
+  .palea-description p,
+  .palea-description ul,
+  .palea-description ol {
+    @apply mb-2;
+  }
+
+  .palea-description a {
+    @apply text-interaction underline;
+  }
+}

@@ -6,6 +6,7 @@
 
 - [Applications home](applications-home.md) — approved candidate application list and board behavior.
 - [Application creation](application-create.md) — approved responsive draft creation flow.
+- [Application detail](application-detail.md) — approved owner-scoped application detail.
 
 - [Environment configuration](environment-configuration.md) — approved runtime and build environment contract.
 

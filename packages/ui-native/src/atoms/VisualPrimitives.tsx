@@ -52,6 +52,15 @@ const badgeClasses: Record<StatusTone, string> = {
   info: 'bg-info-subtle dark:bg-dark-info-subtle',
 };
 
+const badgeBorderClasses: Record<StatusTone, string> = {
+  neutral: 'border-border dark:border-dark-border',
+  interaction: 'border-interaction dark:border-dark-interaction',
+  success: 'border-success dark:border-dark-success',
+  warning: 'border-warning dark:border-dark-warning',
+  danger: 'border-danger dark:border-dark-danger',
+  info: 'border-info dark:border-dark-info',
+};
+
 const toneMap = {
   neutral: 'muted',
   interaction: 'interaction',
@@ -65,14 +74,16 @@ export function Badge({
   label,
   tone = 'neutral',
   leadingIcon,
+  outlined = false,
 }: {
   label: string;
   tone?: StatusTone;
   leadingIcon?: IconName;
+  outlined?: boolean;
 }) {
   return (
     <View
-      className={`w-min flex-row items-center gap-1 rounded-sm px-2 py-1 ${badgeClasses[tone]}`}
+      className={`w-min flex-row items-center gap-1 rounded-sm px-2 py-1 ${outlined ? 'bg-transparent' : badgeClasses[tone]} ${outlined ? `border ${badgeBorderClasses[tone]}` : ''}`}
     >
       {leadingIcon ? (
         <Icon name={leadingIcon} size={12} tone={toneMap[tone]} />

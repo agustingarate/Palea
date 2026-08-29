@@ -111,6 +111,30 @@ export class ResumeService {
     }));
   }
 
+  async createDownload(subject: string, resumeId: string) {
+    const resume = await this.prisma.resume.findFirst({
+      where: { id: resumeId, profileId: subject, uploadStatus: 'ready' },
+      select: { storagePath: true, displayName: true },
+    });
+    if (!resume)
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resume not found' });
+    const expiresIn = 60;
+    const { data, error } = await this.storage.storage
+      .from(BUCKET)
+      .createSignedUrl(resume.storagePath, expiresIn, {
+        download: resume.displayName,
+      });
+    if (error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'resume.download_failed',
+      });
+    return {
+      signedUrl: data.signedUrl,
+      expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString(),
+    };
+  }
+
   async cancel(subject: string, resumeId: string) {
     const resume = await this.ownedPending(subject, resumeId);
     const { error } = await this.storage.storage

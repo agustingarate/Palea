@@ -2,6 +2,8 @@ import {
   confirmResumeUploadInputSchema,
   reserveResumeUploadInputSchema,
   resumeListSchema,
+  resumeDownloadSchema,
+  resumeIdInputSchema,
   type ConfirmResumeUploadInput,
   type ReserveResumeUploadInput,
 } from '@palea/contracts';
@@ -33,5 +35,14 @@ export class TrpcResumesDataSource implements ResumesDataSource {
 
   async cancel(resumeId: string) {
     await this.client.resume.cancelUpload.mutate({ resumeId });
+  }
+
+  async createDownload(resumeId: string) {
+    const result = resumeDownloadSchema.parse(
+      await this.client.resume.createDownload.mutate(
+        resumeIdInputSchema.parse({ resumeId }),
+      ),
+    );
+    return { signedUrl: result.signedUrl };
   }
 }

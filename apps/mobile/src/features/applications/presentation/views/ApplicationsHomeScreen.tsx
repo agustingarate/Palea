@@ -25,8 +25,7 @@ import type {
   ApplicationStatus,
 } from '../../domain/entities/Application';
 import { useLocale } from '@/core/localization/LocaleProvider';
-import { useDependency } from '@/core/di/DependenciesProvider';
-import { dependencyTokens } from '@/core/di/dependencies';
+import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationActionMenu } from '../components/ApplicationActionMenu';
 import { BoardColumn, ListGroup } from '../components/ApplicationsCollections';
@@ -52,7 +51,7 @@ function ApplicationsHomeContent() {
   const layout = useResponsiveLayout();
   const { showSnackbar } = useSnackbar();
   const router = useRouter();
-  const auth = useDependency(dependencyTokens.authRepository);
+  const signOutMutation = useSignOut();
   const { height: viewportHeight } = useWindowDimensions();
   const [view, setView] = useState<'board' | 'list'>('board');
   const [expanded, setExpanded] = useState<Record<ApplicationStatus, boolean>>(
@@ -66,7 +65,6 @@ function ApplicationsHomeContent() {
     anchor: { x: number; y: number };
   } | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [isSigningOut, setSigningOut] = useState(false);
   const [pendingMove, setPendingMove] = useState<{
     application: Application;
     status: ApplicationStatus;
@@ -127,14 +125,11 @@ function ApplicationsHomeContent() {
       },
     ]);
   const signOut = async () => {
-    setSigningOut(true);
     try {
-      await auth.signOut();
+      await signOutMutation.mutateAsync();
       router.replace('/auth/login');
     } catch {
       showSnackbar({ variant: 'error', message: t('nav.logoutError') });
-    } finally {
-      setSigningOut(false);
     }
   };
   const notifyPending = (destination: string) => {
@@ -163,7 +158,7 @@ function ApplicationsHomeContent() {
             onAdd={addApplication}
             onPending={notifyPending}
             onSignOut={() => void signOut()}
-            signingOut={isSigningOut}
+            signingOut={signOutMutation.isPending}
           />
         ) : null}
         <View className="flex-1">
@@ -183,7 +178,7 @@ function ApplicationsHomeContent() {
                     accessibilityLabel={t('nav.logout')}
                     variant="ghost"
                     size="sm"
-                    loading={isSigningOut}
+                    loading={signOutMutation.isPending}
                     onPress={() => void signOut()}
                   />
                 </View>
@@ -251,6 +246,9 @@ function ApplicationsHomeContent() {
                         loadMoreLabel={t('list.loadMore')}
                         onAction={(application, anchor) =>
                           setActionFor({ application, anchor })
+                        }
+                        onOpen={(application) =>
+                          router.push(`/applications/${application.id}`)
                         }
                         onDrop={dragAndDrop.onBoardDrop}
                         onDragMove={dragAndDrop.onBoardDragMove}
@@ -335,6 +333,9 @@ function ApplicationsHomeContent() {
                     layoutVersion={dragAndDrop.listScrollOffset}
                     onAction={(application, anchor) =>
                       setActionFor({ application, anchor })
+                    }
+                    onOpen={(application) =>
+                      router.push(`/applications/${application.id}`)
                     }
                     onMore={() => void vm.collections[status].loadMore()}
                     more={vm.collections[status].hasNextPage}

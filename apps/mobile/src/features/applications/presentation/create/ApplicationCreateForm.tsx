@@ -27,9 +27,9 @@ import {
 } from '@palea/ui-native';
 import { useNavigation, useRouter } from 'expo-router';
 import { useLocale } from '@/core/localization/LocaleProvider';
-import { useDependency } from '@/core/di/DependenciesProvider';
-import { dependencyTokens } from '@/core/di/dependencies';
+import { useSignOut } from '@/core/session/useSignOut';
 import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
+import { navigateToApplicationsHome } from '../navigation/applicationsHomeNavigation';
 import {
   applicationCreateDefaults,
   applicationCreateFormSchema,
@@ -78,13 +78,12 @@ export function ApplicationCreateForm() {
   const navigation = useNavigation();
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
-  const auth = useDependency(dependencyTokens.authRepository);
+  const signOutMutation = useSignOut();
   const vm = useApplicationCreateViewModel();
   const [step, setStep] = useState<1 | 2>(1);
   const [descriptionSource, setDescriptionSource] = useState<
     'manual' | 'url' | 'image'
   >('manual');
-  const [isSigningOut, setSigningOut] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadedResume, setUploadedResume] = useState(false);
@@ -101,7 +100,7 @@ export function ApplicationCreateForm() {
         await vm.create.mutateAsync(toCreateApplicationInput(value));
         allowLeaveRef.current = true;
         showSnackbar({ variant: 'success', message: t('create.success') });
-        router.replace('/');
+        navigateToApplicationsHome(router);
       } catch {
         setSubmissionError(t('create.error'));
       }
@@ -234,25 +233,22 @@ export function ApplicationCreateForm() {
   const cancel = () => {
     if (!dirtyRef.current) {
       allowLeaveRef.current = true;
-      router.replace('/');
+      navigateToApplicationsHome(router);
       return;
     }
     requestDiscard(() => {
       allowLeaveRef.current = true;
-      router.replace('/');
+      navigateToApplicationsHome(router);
     });
   };
   const signOut = async () => {
-    setSigningOut(true);
     try {
       allowLeaveRef.current = true;
-      await auth.signOut();
+      await signOutMutation.mutateAsync();
       router.replace('/auth/login');
     } catch {
       allowLeaveRef.current = false;
       showSnackbar({ variant: 'error', message: t('nav.logoutError') });
-    } finally {
-      setSigningOut(false);
     }
   };
   const requestSignOut = () => {
@@ -644,7 +640,7 @@ export function ApplicationCreateForm() {
             onAdd={() => undefined}
             onPending={notifyPending}
             onSignOut={requestSignOut}
-            signingOut={isSigningOut}
+            signingOut={signOutMutation.isPending}
           />
         ) : null}
         <View className="flex-1">

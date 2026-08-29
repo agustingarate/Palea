@@ -6,6 +6,11 @@ const dataSource = {
   create: jest.fn(),
   updateStatus: jest.fn(),
   remove: jest.fn(),
+  get: jest.fn(),
+  listStages: jest.fn(),
+  getNote: jest.fn(),
+  listResources: jest.fn(),
+  updateResume: jest.fn(),
 };
 
 describe('ApplicationRepositoryImpl', () => {

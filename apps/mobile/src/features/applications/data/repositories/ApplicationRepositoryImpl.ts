@@ -4,6 +4,10 @@ import type {
   ApplicationPage,
   ApplicationStatus,
   CreateApplicationInput,
+  ApplicationDetail,
+  ApplicationStage,
+  ApplicationNote,
+  ApplicationResource,
 } from '../../domain/entities/Application';
 import type { ApplicationsDataSource } from '../datasources/ApplicationsDataSource';
 
@@ -17,6 +21,21 @@ export class ApplicationRepositoryImpl implements ApplicationRepository {
   }
   async create(input: CreateApplicationInput): Promise<Application> {
     return this.dataSource.create(input);
+  }
+  get(applicationId: string): Promise<ApplicationDetail> {
+    return this.dataSource.get(applicationId);
+  }
+  listStages(applicationId: string): Promise<ApplicationStage[]> {
+    return this.dataSource.listStages(applicationId);
+  }
+  getNote(applicationId: string): Promise<ApplicationNote | null> {
+    return this.dataSource.getNote(applicationId);
+  }
+  listResources(applicationId: string): Promise<ApplicationResource[]> {
+    return this.dataSource.listResources(applicationId);
+  }
+  async updateResume(applicationId: string, resumeId: string | null) {
+    await this.dataSource.updateResume(applicationId, resumeId);
   }
   async updateStatus(
     applicationId: string,
