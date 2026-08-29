@@ -63,6 +63,10 @@ Present:
   branch is needed.
 - Atomic commit groups and Conventional Commit messages in English, with a
   first line no longer than 72 characters.
+- The user problem, business outcome, and capability delivered before the
+  implementation details. Name who benefits and what they can do after this
+  change; do not lead with contracts, infrastructure, libraries, or file
+  changes.
 - Scope, spec path, requirement IDs, acceptance IDs, and ClickUp URL.
 - Validation evidence, risks, migrations, rollout/rollback, and deferred work.
 - Full PR title and body preview.
@@ -126,17 +130,27 @@ because it touches the same file.
 
 ## Pull request contract
 
-The PR title identifies the actual type, scope when useful, and ClickUp task.
+The PR title identifies the delivered capability in product language, plus the
+actual type, scope when useful, and ClickUp task. Avoid titles that describe
+only the implementation layer.
+
+The body opens with the user problem and the value delivered. Describe
+product-visible behavior before technical implementation. Technical details are
+useful only insofar as they explain reliability, scope, risk, or validation.
 The body contains:
 
 ```markdown
 ## Context
 
-<business reason and user value>
+<who has the problem, why it matters, and the intended product outcome>
+
+## Value delivered
+
+<what the person can now accomplish in the product>
 
 ## What changed
 
-<functional and technical summary>
+<product behavior first; supporting technical summary second>
 
 ## Acceptance criteria
 
@@ -156,6 +170,11 @@ The body contains:
 
 - <risk, migration, rollout/rollback, or deferred work>
 ```
+
+Before creating or editing a PR, check that a non-technical reader can answer
+all three questions from its title and first two sections: “who benefits?”,
+“what can they do now?”, and “why does it matter?”. Rewrite the summary when
+any answer depends on implementation terminology.
 
 ## Completion report
 
