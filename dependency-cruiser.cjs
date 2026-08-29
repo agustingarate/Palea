@@ -9,6 +9,14 @@ module.exports = {
       },
     },
     {
+      name: 'web-domain-is-pure',
+      severity: 'error',
+      from: { path: 'apps/web/src/core/.*/domain' },
+      to: {
+        path: '^apps/web/src/(?:components|hooks|providers|infrastructure|app)|^node_modules/',
+      },
+    },
+    {
       name: 'presentation-does-not-use-data',
       severity: 'error',
       from: { path: 'apps/mobile/src/features/[^/]+/presentation' },
