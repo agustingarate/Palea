@@ -20,9 +20,9 @@ const developmentSourceEntries = {
 };
 const config = getDefaultConfig(projectRoot);
 
-// Expo SDK 54's Metro version needs the workspace roots declared explicitly
-// when resolving pnpm's linked dependency tree.
-config.watchFolders = [workspaceRoot];
+// Preserve Expo's defaults while adding the workspace root needed to resolve
+// pnpm's linked dependency tree.
+config.watchFolders = [...new Set([...config.watchFolders, workspaceRoot])];
 config.resolver.nodeModulesPaths = [
   path.join(projectRoot, 'node_modules'),
   path.join(workspaceRoot, 'node_modules'),

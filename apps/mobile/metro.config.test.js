@@ -14,7 +14,7 @@ function resolveDevelopmentModule(moduleName) {
 
 function resolveConfig() {
   const url = pathToFileURL(path.resolve(__dirname, 'metro.config.mjs')).href;
-  const script = `process.env.NODE_ENV = 'development'; const { default: config } = await import(${JSON.stringify(url)}); console.log(JSON.stringify({ watchFolders: config.watchFolders, nodeModulesPaths: config.resolver.nodeModulesPaths }));`;
+  const script = `process.env.NODE_ENV = 'development'; const { createRequire } = await import('node:module'); const require = createRequire(import.meta.url); const { getDefaultConfig } = require('expo/metro-config'); const { default: config } = await import(${JSON.stringify(url)}); const defaults = getDefaultConfig(${JSON.stringify(path.resolve(__dirname))}); console.log(JSON.stringify({ watchFolders: config.watchFolders, defaultWatchFolders: defaults.watchFolders, nodeModulesPaths: config.resolver.nodeModulesPaths }));`;
   return JSON.parse(
     execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
       cwd: __dirname,
@@ -57,7 +57,12 @@ describe('mobile Metro development resolution', () => {
 
   it('uses the workspace roots to resolve pnpm dependencies', () => {
     const config = resolveConfig();
-    expect(config.watchFolders).toEqual([path.resolve(__dirname, '../..')]);
+    expect(config.watchFolders).toEqual(
+      expect.arrayContaining([
+        ...config.defaultWatchFolders,
+        path.resolve(__dirname, '../..'),
+      ]),
+    );
     expect(config.nodeModulesPaths).toEqual([
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, '../../node_modules'),
