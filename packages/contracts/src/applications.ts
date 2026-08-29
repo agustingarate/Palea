@@ -75,7 +75,10 @@ const POSTGRES_BIGINT_MAX = 9223372036854775807n;
 const minorAmountSchema = z
   .string()
   .regex(/^[1-9]\d*$/, 'validation.salary.positive')
-  .refine((value) => BigInt(value) <= POSTGRES_BIGINT_MAX, 'validation.salary.range');
+  .refine(
+    (value) => BigInt(value) <= POSTGRES_BIGINT_MAX,
+    'validation.salary.range',
+  );
 export const compensationRangeSchema = z
   .object({
     minimumMinor: minorAmountSchema.nullable().default(null),
@@ -85,7 +88,10 @@ export const compensationRangeSchema = z
   })
   .superRefine((value, context) => {
     if (!value.minimumMinor && !value.maximumMinor) {
-      context.addIssue({ code: 'custom', message: 'validation.salary.boundRequired' });
+      context.addIssue({
+        code: 'custom',
+        message: 'validation.salary.boundRequired',
+      });
     }
     if (
       value.minimumMinor &&

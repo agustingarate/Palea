@@ -12,80 +12,78 @@ const optionalAmount = z
   .regex(/^\d+(?:[.,]\d+)?$/, 'validation.salary.format')
   .or(z.literal(''));
 
-export const applicationCreateFormSchema = z.object({
-  companyName: z
-    .string()
-    .trim()
-    .min(1, 'validation.company.required')
-    .max(120, 'validation.company.max'),
-  role: z
-    .string()
-    .trim()
-    .min(1, 'validation.role.required')
-    .max(120, 'validation.role.max'),
-  appliedOn: z.iso.date('validation.date.invalid').nullable(),
-  jobDescriptionHtml: z
-    .string()
-    .max(100_000, 'validation.description.max'),
-  workMode: z.enum(['remote', 'hybrid', 'onsite', 'unspecified']),
-  commitment: z.enum(['full_time', 'part_time', 'unspecified']),
-  contractType: z.enum([
-    'employment',
-    'freelance',
-    'services',
-    'internship',
-    'other',
-    'unspecified',
-  ]),
-  durationType: z.enum(['indefinite', 'temporary', 'unspecified']),
-  resumeId: z.uuid().nullable(),
-  expectedMinimum: optionalAmount,
-  expectedMaximum: optionalAmount,
-  expectedCurrency: z.string().length(3),
-  expectedPeriod: z.enum(['hour', 'day', 'week', 'month', 'year']),
-  offeredMinimum: optionalAmount,
-  offeredMaximum: optionalAmount,
-  offeredCurrency: z.string().length(3),
-  offeredPeriod: z.enum(['hour', 'day', 'week', 'month', 'year']),
-  privateNotes: z
-    .string()
-    .max(10_000, 'validation.notes.max'),
-}).superRefine((values, context) => {
-  const record = values as Record<string, string>;
-  for (const kind of ['expected', 'offered'] as const) {
-    const exponent = currencyExponent.get(record[`${kind}Currency`] ?? '');
-    if (exponent === undefined) continue;
-    const parsed: Partial<Record<'minimum' | 'maximum', string>> = {};
-    for (const bound of ['minimum', 'maximum'] as const) {
-      const field = `${kind}${bound.charAt(0).toUpperCase()}${bound.slice(1)}`;
-      const value = record[field] ?? '';
-      if (!value.trim()) continue;
-      try {
-        parsed[bound] = majorToMinor(value, exponent);
-      } catch (error) {
+export const applicationCreateFormSchema = z
+  .object({
+    companyName: z
+      .string()
+      .trim()
+      .min(1, 'validation.company.required')
+      .max(120, 'validation.company.max'),
+    role: z
+      .string()
+      .trim()
+      .min(1, 'validation.role.required')
+      .max(120, 'validation.role.max'),
+    appliedOn: z.iso.date('validation.date.invalid').nullable(),
+    jobDescriptionHtml: z.string().max(100_000, 'validation.description.max'),
+    workMode: z.enum(['remote', 'hybrid', 'onsite', 'unspecified']),
+    commitment: z.enum(['full_time', 'part_time', 'unspecified']),
+    contractType: z.enum([
+      'employment',
+      'freelance',
+      'services',
+      'internship',
+      'other',
+      'unspecified',
+    ]),
+    durationType: z.enum(['indefinite', 'temporary', 'unspecified']),
+    resumeId: z.uuid().nullable(),
+    expectedMinimum: optionalAmount,
+    expectedMaximum: optionalAmount,
+    expectedCurrency: z.string().length(3),
+    expectedPeriod: z.enum(['hour', 'day', 'week', 'month', 'year']),
+    offeredMinimum: optionalAmount,
+    offeredMaximum: optionalAmount,
+    offeredCurrency: z.string().length(3),
+    offeredPeriod: z.enum(['hour', 'day', 'week', 'month', 'year']),
+    privateNotes: z.string().max(10_000, 'validation.notes.max'),
+  })
+  .superRefine((values, context) => {
+    const record = values as Record<string, string>;
+    for (const kind of ['expected', 'offered'] as const) {
+      const exponent = currencyExponent.get(record[`${kind}Currency`] ?? '');
+      if (exponent === undefined) continue;
+      const parsed: Partial<Record<'minimum' | 'maximum', string>> = {};
+      for (const bound of ['minimum', 'maximum'] as const) {
+        const field = `${kind}${bound.charAt(0).toUpperCase()}${bound.slice(1)}`;
+        const value = record[field] ?? '';
+        if (!value.trim()) continue;
+        try {
+          parsed[bound] = majorToMinor(value, exponent);
+        } catch (error) {
+          context.addIssue({
+            code: 'custom',
+            path: [field],
+            message:
+              error instanceof Error
+                ? error.message
+                : 'validation.salary.format',
+          });
+        }
+      }
+      if (
+        parsed.minimum &&
+        parsed.maximum &&
+        BigInt(parsed.minimum) > BigInt(parsed.maximum)
+      ) {
         context.addIssue({
           code: 'custom',
-          path: [field],
-          message:
-            error instanceof Error
-              ? error.message
-              : 'validation.salary.format',
+          path: [`${kind}Maximum`],
+          message: 'validation.salary.maximumBeforeMinimum',
         });
       }
     }
-    if (
-      parsed.minimum &&
-      parsed.maximum &&
-      BigInt(parsed.minimum) > BigInt(parsed.maximum)
-    ) {
-      context.addIssue({
-        code: 'custom',
-        path: [`${kind}Maximum`],
-        message: 'validation.salary.maximumBeforeMinimum',
-      });
-    }
-  }
-});
+  });
 
 export type ApplicationCreateFormValues = z.infer<
   typeof applicationCreateFormSchema

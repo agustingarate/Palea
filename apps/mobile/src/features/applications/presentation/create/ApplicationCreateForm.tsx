@@ -40,9 +40,21 @@ import { useApplicationCreateViewModel } from './useApplicationCreateViewModel';
 
 const NONE_RESUME = 'none';
 const currencyCountries: Record<string, string> = {
-  ARS: 'AR', AUD: 'AU', BRL: 'BR', CAD: 'CA', CHF: 'CH', CLP: 'CL',
-  COP: 'CO', EUR: 'EU', GBP: 'GB', JPY: 'JP', MXN: 'MX', NZD: 'NZ',
-  PEN: 'PE', USD: 'US', UYU: 'UY',
+  ARS: 'AR',
+  AUD: 'AU',
+  BRL: 'BR',
+  CAD: 'CA',
+  CHF: 'CH',
+  CLP: 'CL',
+  COP: 'CO',
+  EUR: 'EU',
+  GBP: 'GB',
+  JPY: 'JP',
+  MXN: 'MX',
+  NZD: 'NZ',
+  PEN: 'PE',
+  USD: 'US',
+  UYU: 'UY',
 };
 
 function currencySymbol(currency: string, locale: string) {
@@ -55,7 +67,8 @@ function currencySymbol(currency: string, locale: string) {
 
 function currencyName(currency: string, locale: string) {
   return (
-    new Intl.DisplayNames([locale], { type: 'currency' }).of(currency) ?? currency
+    new Intl.DisplayNames([locale], { type: 'currency' }).of(currency) ??
+    currency
   );
 }
 
@@ -130,24 +143,21 @@ export function ApplicationCreateForm() {
     return () => window.removeEventListener('beforeunload', preventUnload);
   }, []);
 
-  const currencyOptions = useMemo(
-    () => {
-      const regionNames = new Intl.DisplayNames([i18n.language], {
-        type: 'region',
-      });
-      return currencyCatalog.map((currency) => {
-        const countryCode = currencyCountries[currency.code];
-        const region = countryCode ? regionNames.of(countryCode) : undefined;
-        return {
-          value: currency.code,
-          label: `${currencySymbol(currency.code, i18n.language)} · ${region ?? currencyName(currency.code, i18n.language)} (${currency.code})`,
-          selectedLabel: `${currencySymbol(currency.code, i18n.language)} (${currency.code})`,
-          description: currencyName(currency.code, i18n.language),
-        };
-      });
-    },
-    [i18n.language],
-  );
+  const currencyOptions = useMemo(() => {
+    const regionNames = new Intl.DisplayNames([i18n.language], {
+      type: 'region',
+    });
+    return currencyCatalog.map((currency) => {
+      const countryCode = currencyCountries[currency.code];
+      const region = countryCode ? regionNames.of(countryCode) : undefined;
+      return {
+        value: currency.code,
+        label: `${currencySymbol(currency.code, i18n.language)} · ${region ?? currencyName(currency.code, i18n.language)} (${currency.code})`,
+        selectedLabel: `${currencySymbol(currency.code, i18n.language)} (${currency.code})`,
+        description: currencyName(currency.code, i18n.language),
+      };
+    });
+  }, [i18n.language]);
   const periodOptions = useMemo(
     () =>
       (['hour', 'day', 'week', 'month', 'year'] as const).map((value) => ({
@@ -798,10 +808,7 @@ export function ApplicationCreateForm() {
   );
 }
 
-function fieldError(
-  errors: readonly unknown[],
-  t: (key: string) => string,
-) {
+function fieldError(errors: readonly unknown[], t: (key: string) => string) {
   if (!errors.length) return undefined;
   const first = errors[0];
   const message =

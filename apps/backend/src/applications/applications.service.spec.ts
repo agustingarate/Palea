@@ -218,11 +218,16 @@ describe('ApplicationsService', () => {
         $executeRaw: jest.fn(),
         application: {
           aggregate: jest.fn().mockResolvedValue({ _max: { position: -1 } }),
-          create: jest.fn().mockResolvedValue({ ...rows[0], appliedOn: new Date('2026-08-28') }),
+          create: jest.fn().mockResolvedValue({
+            ...rows[0],
+            appliedOn: new Date('2026-08-28'),
+          }),
         },
       }),
     );
-    const service = new ApplicationsService({ $transaction: transaction } as never);
+    const service = new ApplicationsService({
+      $transaction: transaction,
+    } as never);
     const input = {
       companyName: 'Palea',
       role: 'Engineer',
@@ -238,8 +243,12 @@ describe('ApplicationsService', () => {
       privateNotes: '',
       timeZone: 'Asia/Tokyo',
     };
-    await expect(service.create(subject, input)).resolves.toMatchObject({ status: 'draft' });
-    await expect(service.create(subject, { ...input, timeZone: 'America/Los_Angeles' })).rejects.toMatchObject({ appCode: 'applications.future_date' });
+    await expect(service.create(subject, input)).resolves.toMatchObject({
+      status: 'draft',
+    });
+    await expect(
+      service.create(subject, { ...input, timeZone: 'America/Los_Angeles' }),
+    ).rejects.toMatchObject({ appCode: 'applications.future_date' });
     await expect(
       service.updateStatus(
         subject,

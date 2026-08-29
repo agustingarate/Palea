@@ -95,14 +95,18 @@ const applications = {
   'validation.role.required': 'Ingresá el rol.',
   'validation.role.max': 'El rol no puede superar 120 caracteres.',
   'validation.date.invalid': 'Ingresá una fecha válida.',
-  'validation.description.max': 'La descripción no puede superar 100.000 caracteres.',
-  'validation.notes.max': 'La información adicional no puede superar 10.000 caracteres.',
+  'validation.description.max':
+    'La descripción no puede superar 100.000 caracteres.',
+  'validation.notes.max':
+    'La información adicional no puede superar 10.000 caracteres.',
   'validation.salary.format': 'Ingresá un importe válido.',
   'validation.salary.positive': 'El importe debe ser mayor que cero.',
-  'validation.salary.precision': 'El importe tiene más decimales que los permitidos.',
+  'validation.salary.precision':
+    'El importe tiene más decimales que los permitidos.',
   'validation.salary.range': 'El importe supera el máximo permitido.',
   'validation.salary.boundRequired': 'Ingresá al menos un extremo del importe.',
-  'validation.salary.maximumBeforeMinimum': 'El máximo debe ser mayor o igual al mínimo.',
+  'validation.salary.maximumBeforeMinimum':
+    'El máximo debe ser mayor o igual al mínimo.',
   'validation.currency.invalid': 'Seleccioná una moneda válida.',
   'validation.generic': 'El valor ingresado no es válido.',
   'search.label': 'Buscar postulaciones',

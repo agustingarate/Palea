@@ -38,7 +38,13 @@ describe('TrpcApplicationsDataSource', () => {
     client.applications.delete.mutate.mockResolvedValue(undefined);
 
     await dataSource.list('applied', { search: 'Palea' });
-    await dataSource.updateStatus(applicationId, 'offer', 2, '2026-08-20', 'UTC');
+    await dataSource.updateStatus(
+      applicationId,
+      'offer',
+      2,
+      '2026-08-20',
+      'UTC',
+    );
     await dataSource.remove(applicationId);
 
     expect(client.applications.list.query).toHaveBeenCalledWith({

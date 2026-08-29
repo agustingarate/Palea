@@ -95,13 +95,16 @@ const applications = {
   'validation.role.max': 'Role cannot exceed 120 characters.',
   'validation.date.invalid': 'Enter a valid date.',
   'validation.description.max': 'Description cannot exceed 100,000 characters.',
-  'validation.notes.max': 'Additional information cannot exceed 10,000 characters.',
+  'validation.notes.max':
+    'Additional information cannot exceed 10,000 characters.',
   'validation.salary.format': 'Enter a valid amount.',
   'validation.salary.positive': 'The amount must be greater than zero.',
-  'validation.salary.precision': 'The amount has more decimal places than allowed.',
+  'validation.salary.precision':
+    'The amount has more decimal places than allowed.',
   'validation.salary.range': 'The amount exceeds the allowed maximum.',
   'validation.salary.boundRequired': 'Enter at least one amount bound.',
-  'validation.salary.maximumBeforeMinimum': 'Maximum must be greater than or equal to minimum.',
+  'validation.salary.maximumBeforeMinimum':
+    'Maximum must be greater than or equal to minimum.',
   'validation.currency.invalid': 'Select a valid currency.',
   'validation.generic': 'The entered value is not valid.',
   'search.label': 'Search applications',

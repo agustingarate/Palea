@@ -22,17 +22,29 @@ jest.mock('@/core/localization/LocaleProvider', () => ({
 jest.mock('@/core/di/dependencies', () => ({
   dependencyTokens: { onboardingRepository: 'onboardingRepository' },
 }));
-jest.mock('expo-router', () => ({
-  Redirect: ({ href }: { href: string }) => <Text>{`redirect:${href}`}</Text>,
-}));
-jest.mock('@palea/ui-native', () => ({
-  AppText: ({ children }: { children: ReactNode }) => <Text>{children}</Text>,
-  Button: ({ label, onPress }: { label: string; onPress: () => void }) => (
-    <Text onPress={onPress}>{label}</Text>
-  ),
-  Screen: ({ children }: { children: ReactNode }) => <>{children}</>,
-  Spinner: ({ label }: { label: string }) => <Text>{label}</Text>,
-}));
+jest.mock('expo-router', () => {
+  const { Text: MockText } =
+    jest.requireActual<typeof import('react-native')>('react-native');
+  return {
+    Redirect: ({ href }: { href: string }) => (
+      <MockText>{`redirect:${href}`}</MockText>
+    ),
+  };
+});
+jest.mock('@palea/ui-native', () => {
+  const { Text: MockText } =
+    jest.requireActual<typeof import('react-native')>('react-native');
+  return {
+    AppText: ({ children }: { children: ReactNode }) => (
+      <MockText>{children}</MockText>
+    ),
+    Button: ({ label, onPress }: { label: string; onPress: () => void }) => (
+      <MockText onPress={onPress}>{label}</MockText>
+    ),
+    Screen: ({ children }: { children: ReactNode }) => <>{children}</>,
+    Spinner: ({ label }: { label: string }) => <MockText>{label}</MockText>,
+  };
+});
 
 describe('PostAuthRouteGuard', () => {
   beforeEach(() => {
@@ -46,26 +58,63 @@ describe('PostAuthRouteGuard', () => {
 
   it('does not render protected content while session restores', () => {
     mockUseAuthSession.mockReturnValue({ session: null, isRestoring: true });
-    const view = render(<PostAuthRouteGuard><Text>Protected</Text></PostAuthRouteGuard>);
+    const view = render(
+      <PostAuthRouteGuard>
+        <Text>Protected</Text>
+      </PostAuthRouteGuard>,
+    );
     expect(view.queryByText('Protected')).toBeNull();
   });
 
   it('redirects guests and incomplete accounts', () => {
     mockUseAuthSession.mockReturnValue({ session: null, isRestoring: false });
-    expect(render(<PostAuthRouteGuard><Text>Protected</Text></PostAuthRouteGuard>).getByText('redirect:/auth/login')).toBeTruthy();
+    expect(
+      render(
+        <PostAuthRouteGuard>
+          <Text>Protected</Text>
+        </PostAuthRouteGuard>,
+      ).getByText('redirect:/auth/login'),
+    ).toBeTruthy();
 
-    mockUseAuthSession.mockReturnValue({ session: { userId: 'user-1' }, isRestoring: false });
-    mockUseQuery.mockReturnValue({ isPending: false, isError: false, data: { missing: ['personal'], onboardingCompletedAt: null } });
-    expect(render(<PostAuthRouteGuard><Text>Protected</Text></PostAuthRouteGuard>).getByText('redirect:/auth/personal-data')).toBeTruthy();
+    mockUseAuthSession.mockReturnValue({
+      session: { userId: 'user-1' },
+      isRestoring: false,
+    });
+    mockUseQuery.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { missing: ['personal'], onboardingCompletedAt: null },
+    });
+    expect(
+      render(
+        <PostAuthRouteGuard>
+          <Text>Protected</Text>
+        </PostAuthRouteGuard>,
+      ).getByText('redirect:/auth/personal-data'),
+    ).toBeTruthy();
   });
 
   it('renders complete accounts and exposes retry on lookup failure', () => {
-    mockUseQuery.mockReturnValue({ isPending: false, isError: false, data: { missing: [], onboardingCompletedAt: '2026-08-01' } });
-    expect(render(<PostAuthRouteGuard><Text>Protected</Text></PostAuthRouteGuard>).getByText('Protected')).toBeTruthy();
+    mockUseQuery.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { missing: [], onboardingCompletedAt: '2026-08-01' },
+    });
+    expect(
+      render(
+        <PostAuthRouteGuard>
+          <Text>Protected</Text>
+        </PostAuthRouteGuard>,
+      ).getByText('Protected'),
+    ).toBeTruthy();
 
     const refetch = jest.fn();
     mockUseQuery.mockReturnValue({ isPending: false, isError: true, refetch });
-    const view = render(<PostAuthRouteGuard><Text>Protected</Text></PostAuthRouteGuard>);
+    const view = render(
+      <PostAuthRouteGuard>
+        <Text>Protected</Text>
+      </PostAuthRouteGuard>,
+    );
     expect(view.queryByText('Protected')).toBeNull();
     fireEvent.press(view.getByText('route.retry'));
     expect(refetch).toHaveBeenCalledTimes(1);

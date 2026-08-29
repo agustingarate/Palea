@@ -8,7 +8,9 @@ describe('application create form mapping', () => {
   it('converts major amounts without floating point arithmetic', () => {
     expect(majorToMinor('1234.56', 2)).toBe('123456');
     expect(majorToMinor('10,5', 2)).toBe('1050');
-    expect(() => majorToMinor('1.001', 2)).toThrow('validation.salary.precision');
+    expect(() => majorToMinor('1.001', 2)).toThrow(
+      'validation.salary.precision',
+    );
     expect(() => majorToMinor('0', 2)).toThrow('validation.salary.positive');
     expect(() => majorToMinor('92233720368547758.08', 2)).toThrow(
       'validation.salary.range',
