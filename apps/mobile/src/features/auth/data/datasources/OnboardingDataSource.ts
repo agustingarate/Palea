@@ -3,7 +3,6 @@ import type {
   CompleteRegistrationInput,
   Locale,
   OnboardingCatalog,
-  ReserveResumeUploadInput,
   SaveProfileInput,
   SaveSkillsInput,
   SaveWorkExperienceInput,
@@ -17,9 +16,4 @@ export interface OnboardingDataSource {
   saveWorkExperience(input: SaveWorkExperienceInput): Promise<void>;
   saveSkills(input: SaveSkillsInput): Promise<void>;
   completeOnboarding(): Promise<void>;
-  reserveResume(
-    input: ReserveResumeUploadInput,
-  ): Promise<{ resumeId: string; signedUrl: string }>;
-  confirmResume(resumeId: string): Promise<void>;
-  cancelResume(resumeId: string): Promise<void>;
 }

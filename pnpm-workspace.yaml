@@ -19,7 +19,7 @@ packageExtensions:
       '@babel/traverse': 7.29.7
 
 overrides:
-  '@types/react-dom': 19.2.4
+  '@10play/tentap-editor>react-dom': 19.1.0
 
 catalog:
   zod: ^4.0.15

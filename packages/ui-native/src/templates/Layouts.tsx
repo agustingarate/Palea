@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { AppText } from '../atoms/AppText';
+import { Icon, type IconName } from '../atoms/Icon';
 import { Divider } from '../atoms/VisualPrimitives';
 import { useResponsiveLayout } from '../internal/useResponsiveLayout';
 
@@ -131,7 +132,7 @@ export function FocusedFormLayout({
 
 export interface ResponsiveGridProps extends ViewProps {
   children: ReactNode;
-  columns?: Partial<Record<'compact' | 'medium' | 'expanded', 1 | 2 | 3>>;
+  columns?: Partial<Record<'compact' | 'medium' | 'expanded', 1 | 2 | 3 | 4>>;
   gap?: number;
 }
 
@@ -179,15 +180,32 @@ export function FormSection({
   title,
   description,
   children,
+  contained = false,
+  leadingIcon,
 }: {
   title: string;
   description?: string;
   children: ReactNode;
+  /** Opt-in surface treatment for dense, desktop-oriented forms. */
+  contained?: boolean;
+  leadingIcon?: IconName;
 }) {
   return (
-    <View className="gap-4">
+    <View
+      className={`gap-4 ${contained ? 'border-border bg-surface dark:border-dark-border dark:bg-dark-surface rounded-lg border p-5' : ''}`}
+    >
       <View className="gap-1">
-        <AppText variant="sectionTitle">{title}</AppText>
+        <View className="flex-row items-center gap-2">
+          {leadingIcon ? (
+            <Icon name={leadingIcon} size="md" tone="interaction" />
+          ) : null}
+          <AppText
+            variant={contained ? 'body' : 'sectionTitle'}
+            className={contained ? 'font-semibold' : undefined}
+          >
+            {title}
+          </AppText>
+        </View>
         {description ? (
           <AppText variant="bodySmall" tone="muted">
             {description}

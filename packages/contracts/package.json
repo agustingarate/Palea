@@ -14,13 +14,14 @@
     }
   },
   "scripts": {
-    "build": "tsup ./src/index.ts --format esm,cjs --dts --clean",
-    "dev": "tsup ./src/index.ts --format esm,cjs --dts --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint src",
     "test": "jest --config ../jest-config/node.cjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "dinero.js": "^2.0.2",
     "i18n-iso-countries": "^7.14.0",
     "zod": "catalog:"
   },

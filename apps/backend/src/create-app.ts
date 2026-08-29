@@ -83,16 +83,21 @@ async function createContext(
       completeOnboarding: (subject) => account.completeOnboarding(subject),
       reserveResumeUpload: (subject, input) => resumes.reserve(subject, input),
       confirmResumeUpload: (subject, resumeId) =>
-        resumes.confirm(subject, resumeId),
+        resumes.confirm(subject, resumeId.resumeId, resumeId.makePrimary),
+      listResumes: (subject) => resumes.list(subject),
       cancelResumeUpload: (subject, resumeId) =>
         resumes.cancel(subject, resumeId),
       listApplications: (subject, input) => applications.list(subject, input),
+      createApplication: (subject, input) =>
+        applications.create(subject, input),
       updateApplicationStatus: (subject, input) =>
         applications.updateStatus(
           subject,
           input.applicationId,
           input.status,
           input.targetIndex,
+          input.appliedOn,
+          input.timeZone,
         ),
       deleteApplication: (subject, applicationId) =>
         applications.remove(subject, applicationId),

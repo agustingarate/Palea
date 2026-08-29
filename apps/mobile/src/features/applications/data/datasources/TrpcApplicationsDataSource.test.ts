@@ -4,6 +4,7 @@ const applicationId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 const client = {
   applications: {
     list: { query: jest.fn() },
+    create: { mutate: jest.fn() },
     updateStatus: { mutate: jest.fn() },
     delete: { mutate: jest.fn() },
   },
@@ -37,7 +38,13 @@ describe('TrpcApplicationsDataSource', () => {
     client.applications.delete.mutate.mockResolvedValue(undefined);
 
     await dataSource.list('applied', { search: 'Palea' });
-    await dataSource.updateStatus(applicationId, 'offer', 2);
+    await dataSource.updateStatus(
+      applicationId,
+      'offer',
+      2,
+      '2026-08-20',
+      'UTC',
+    );
     await dataSource.remove(applicationId);
 
     expect(client.applications.list.query).toHaveBeenCalledWith({
@@ -49,9 +56,40 @@ describe('TrpcApplicationsDataSource', () => {
       applicationId,
       status: 'offer',
       targetIndex: 2,
+      appliedOn: '2026-08-20',
+      timeZone: 'UTC',
     });
     expect(client.applications.delete.mutate).toHaveBeenCalledWith({
       applicationId,
     });
+  });
+
+  it('creates only contract-valid drafts', async () => {
+    client.applications.create.mutate.mockResolvedValue({
+      id: applicationId,
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      status: 'draft',
+      workMode: 'unspecified',
+      position: 0,
+    });
+    await expect(
+      dataSource.create({
+        companyName: 'Palea',
+        role: 'Engineer',
+        appliedOn: null,
+        workMode: 'unspecified',
+        commitment: 'unspecified',
+        contractType: 'unspecified',
+        durationType: 'unspecified',
+        resumeId: null,
+        jobDescription: null,
+        privateNotes: '',
+        expectedCompensation: null,
+        offeredCompensation: null,
+        timeZone: 'UTC',
+      }),
+    ).resolves.toMatchObject({ status: 'draft', appliedOn: null });
   });
 });

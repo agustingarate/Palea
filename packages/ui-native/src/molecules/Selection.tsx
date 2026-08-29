@@ -122,64 +122,67 @@ export function SegmentedControl({
   }, [activeIndex, indicatorWidth, indicatorX]);
 
   return (
-    <View
-      accessibilityLabel={label}
-      accessibilityRole="radiogroup"
-      className={`bg-surface-subtle dark:bg-dark-surface-subtle flex-row overflow-hidden rounded-md p-1 ${compact ? 'self-end' : 'm-2'} ${disabled ? 'opacity-disabled' : ''}`}
-      onLayout={(event) => setContainerWidth(event.nativeEvent.layout.width)}
-    >
-      {indicatorWidth > 0 ? (
-        <AnimatedView
-          pointerEvents="none"
-          style={[
-            indicatorStyle,
-            {
-              backgroundColor: theme.background,
-              borderColor: theme.skeleton,
-              borderRadius: 6,
-              borderWidth: 1,
-              bottom: 4,
-              left: 4,
-              position: 'absolute',
-              top: 4,
-              width: indicatorWidth,
-            },
-          ]}
-        />
-      ) : null}
-      {items.map((item) => {
-        const selected = item.value === value;
-        return (
-          <Pressable
-            key={item.value}
-            accessibilityRole="radio"
-            accessibilityState={{
-              checked: selected,
-              disabled: disabled || item.disabled,
-            }}
-            className={`min-h-control-sm relative z-10 items-center justify-center overflow-hidden rounded-sm ${compact ? 'w-control-sm' : 'flex-1 px-2'}`}
-            disabled={disabled || item.disabled}
-            onPress={() => onValueChange(item.value)}
-          >
-            {item.icon ? (
-              <Icon
-                name={item.icon}
-                size="md"
-                tone={selected ? 'interaction' : 'muted'}
-              />
-            ) : (
-              <AppText
-                className="z-10"
-                variant="label"
-                tone={selected ? 'interaction' : 'muted'}
-                style={selected ? { color: theme.text } : undefined}
-              >
-                {item.label}
-              </AppText>
-            )}
-          </Pressable>
-        );
-      })}
+    <View className="gap-1">
+      <AppText variant="label">{label}</AppText>
+      <View
+        accessibilityLabel={label}
+        accessibilityRole="radiogroup"
+        className={`bg-surface-subtle dark:bg-dark-surface-subtle flex-row overflow-hidden rounded-md p-1 ${compact ? 'self-end' : ''} ${disabled ? 'opacity-disabled' : ''}`}
+        onLayout={(event) => setContainerWidth(event.nativeEvent.layout.width)}
+      >
+        {indicatorWidth > 0 ? (
+          <AnimatedView
+            pointerEvents="none"
+            style={[
+              indicatorStyle,
+              {
+                backgroundColor: theme.background,
+                borderColor: theme.skeleton,
+                borderRadius: 6,
+                borderWidth: 1,
+                bottom: 4,
+                left: 4,
+                position: 'absolute',
+                top: 4,
+                width: indicatorWidth,
+              },
+            ]}
+          />
+        ) : null}
+        {items.map((item) => {
+          const selected = item.value === value;
+          return (
+            <Pressable
+              key={item.value}
+              accessibilityRole="radio"
+              accessibilityState={{
+                checked: selected,
+                disabled: disabled || item.disabled,
+              }}
+              className={`min-h-control-sm relative z-10 items-center justify-center overflow-hidden rounded-sm ${compact ? 'w-control-sm' : 'flex-1 px-2'}`}
+              disabled={disabled || item.disabled}
+              onPress={() => onValueChange(item.value)}
+            >
+              {item.icon ? (
+                <Icon
+                  name={item.icon}
+                  size="md"
+                  tone={selected ? 'interaction' : 'muted'}
+                />
+              ) : (
+                <AppText
+                  className="z-10"
+                  variant="label"
+                  tone={selected ? 'interaction' : 'muted'}
+                  style={selected ? { color: theme.text } : undefined}
+                >
+                  {item.label}
+                </AppText>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }

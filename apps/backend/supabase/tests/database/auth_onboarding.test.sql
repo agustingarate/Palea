@@ -12,7 +12,7 @@ select is(
 
 select throws_ok(
   $$update public.profiles set nationality = 'Argentina' where id = '21000000-0000-0000-0000-000000000001'$$,
-  'new row for relation "profiles" violates check constraint "profiles_nationality_iso_check"',
+  'insert or update on table "profiles" violates foreign key constraint "profiles_nationality_country_code_fkey"',
   'SPEC-AUTH-001 rejects free-form nationality'
 );
 

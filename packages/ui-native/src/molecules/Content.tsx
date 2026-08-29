@@ -15,6 +15,67 @@ export interface ResourceRowProps {
   onPress?: () => void;
 }
 
+/** Compact reusable navigation trail for hierarchy-aware screens. */
+export interface BreadcrumbItem {
+  label: string;
+  onPress?: () => void;
+}
+
+export function Breadcrumbs({
+  items,
+  homeLabel,
+  onHomePress,
+}: {
+  items: readonly BreadcrumbItem[];
+  homeLabel: string;
+  onHomePress?: () => void;
+}) {
+  return (
+    <View
+      accessibilityRole="summary"
+      className="flex-row flex-wrap items-center gap-1"
+    >
+      <Pressable
+        accessibilityLabel={homeLabel}
+        accessibilityRole="link"
+        disabled={!onHomePress}
+        onPress={onHomePress}
+        className="min-h-touch-target flex-row items-center gap-2 rounded-sm px-1"
+      >
+        <Icon name="home" size="sm" tone="muted" />
+        <AppText variant="label" tone="muted">
+          {homeLabel}
+        </AppText>
+      </Pressable>
+      {items.map((item, index) => {
+        const isCurrent = index === items.length - 1;
+        return (
+          <View
+            key={`${item.label}-${index}`}
+            className="flex-row items-center gap-1"
+          >
+            <Icon name="chevronRight" size="sm" tone="muted" />
+            <Pressable
+              accessibilityRole={item.onPress ? 'link' : undefined}
+              disabled={!item.onPress || isCurrent}
+              onPress={item.onPress}
+              className="min-h-touch-target justify-center rounded-sm px-1"
+            >
+              <AppText
+                variant="label"
+                tone={isCurrent ? 'interaction' : 'muted'}
+                className={isCurrent ? 'font-semibold' : undefined}
+              >
+                {item.label}
+              </AppText>
+            </Pressable>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
 export function ResourceRow({
   title,
   subtitle,
@@ -118,8 +179,8 @@ export function Notice({
     >
       <Icon name={tone === 'danger' ? 'error' : 'info'} size="sm" tone={tone} />
       <View className="flex-1 gap-1">
-        <AppText variant="label">{title}</AppText>
-        <AppText variant="bodySmall" tone="muted">
+        <AppText variant="caption">{title}</AppText>
+        <AppText variant="caption" tone="muted">
           {message}
         </AppText>
       </View>

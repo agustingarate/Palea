@@ -20,3 +20,4 @@ export type Health = z.infer<typeof healthSchema>;
 export * from './auth';
 export * from './countries';
 export * from './applications';
+export * from './resumes';

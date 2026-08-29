@@ -9,6 +9,13 @@ and this application uses [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
+- Protected, transactional application creation with sanitized job
+  descriptions, optional dates, notes, exact compensation ranges, and
+  owner-validated ready resumes.
+- Ready-resume listing and explicit primary-selection semantics for upload
+  confirmation.
+- Persistence for compensation ranges and deferred job-description and skill
+  analysis states.
 - Protected tRPC procedures to list, reorder, and delete a candidate's
   applications.
 - Owner-scoped application persistence, status ordering, cursor pagination,

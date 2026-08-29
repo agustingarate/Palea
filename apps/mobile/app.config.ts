@@ -52,6 +52,7 @@ export function createAppConfig(input: {
       'expo-router',
       'expo-font',
       'expo-document-picker',
+      '@react-native-community/datetimepicker',
       ['expo-dev-client', { addGeneratedScheme: appVariant === 'development' }],
     ],
     experiments: { typedRoutes: true, autolinkingModuleResolution: true },

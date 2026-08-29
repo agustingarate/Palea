@@ -44,16 +44,77 @@ enum WorkMode {
   @@map("work_mode")
 }
 
+enum Commitment {
+  full_time
+  part_time
+  unspecified
+
+  @@map("commitment")
+}
+
+enum ContractType {
+  employment
+  freelance
+  services
+  internship
+  other
+  unspecified
+
+  @@map("contract_type")
+}
+
+enum DurationType {
+  indefinite
+  temporary
+  unspecified
+
+  @@map("duration_type")
+}
+
+enum CompensationKind {
+  expected
+  offered
+
+  @@map("compensation_kind")
+}
+
+enum CompensationPeriod {
+  hour
+  day
+  week
+  month
+  year
+
+  @@map("compensation_period")
+}
+
+enum DescriptionSource {
+  manual
+  url
+  image
+
+  @@map("description_source")
+}
+
+enum AnalysisStatus {
+  not_requested
+  pending
+  completed
+  failed
+
+  @@map("analysis_status")
+}
+
 model Profile {
-  id                    String          @id @db.Uuid
-  fullName              String?         @map("full_name")
-  birthDate             DateTime?       @map("birth_date") @db.Date
+  id                    String           @id @db.Uuid
+  fullName              String?          @map("full_name")
+  birthDate             DateTime?        @map("birth_date") @db.Date
   nationality           String?
-  roleDescription       String?         @map("role_description")
-  experienceBand        ExperienceBand? @map("experience_band")
-  onboardingCompletedAt DateTime?       @map("onboarding_completed_at") @db.Timestamptz(6)
-  createdAt             DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt             DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  roleDescription       String?          @map("role_description")
+  experienceBand        ExperienceBand?  @map("experience_band")
+  onboardingCompletedAt DateTime?        @map("onboarding_completed_at") @db.Timestamptz(6)
+  createdAt             DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
   interests             UserInterest[]
   skills                UserSkill[]
   workExperiences       WorkExperience[]
@@ -64,17 +125,36 @@ model Profile {
 }
 
 model Application {
-  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profileId   String            @map("profile_id") @db.Uuid
-  companyName String            @map("company_name")
-  role        String
-  appliedOn   DateTime          @map("applied_on") @db.Date
-  status      ApplicationStatus @default(draft)
-  position    Int               @default(0)
-  workMode    WorkMode          @default(unspecified) @map("work_mode")
-  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
-  profile     Profile           @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId                String                     @map("profile_id") @db.Uuid
+  companyName              String                     @map("company_name")
+  role                     String
+  appliedOn                DateTime?                  @map("applied_on") @db.Date
+  status                   ApplicationStatus          @default(draft)
+  position                 Int                        @default(0)
+  workMode                 WorkMode                   @default(unspecified) @map("work_mode")
+  commitment               Commitment                 @default(unspecified)
+  contractType             ContractType               @default(unspecified) @map("contract_type")
+  durationType             DurationType               @default(unspecified) @map("duration_type")
+  url                      String?
+  location                 String?
+  description              String?
+  descriptionHtml          String?                    @map("description_html")
+  descriptionSource        DescriptionSource?         @map("description_source")
+  descriptionAssetPath     String?                    @map("description_asset_path")
+  descriptionCaptureStatus AnalysisStatus             @default(not_requested) @map("description_capture_status")
+  skillAnalysisStatus      AnalysisStatus             @default(not_requested) @map("skill_analysis_status")
+  schedule                 String?
+  resumeId                 String?                    @map("resume_id") @db.Uuid
+  createdAt                DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  profile                  Profile                    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  resume                   Resume?                    @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  stages                   ApplicationStage[]
+  note                     ApplicationNote?
+  resources                ApplicationResource[]
+  compensations            ApplicationCompensation[]
+  requiredSkills           ApplicationRequiredSkill[]
 
   @@index([profileId, status, position])
   @@map("applications")
@@ -106,15 +186,17 @@ model UserInterest {
 }
 
 model SkillCatalog {
-  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  slug      String      @unique
-  labelEs   String      @map("label_es")
-  labelEn   String      @map("label_en")
-  isActive  Boolean     @default(true) @map("is_active")
-  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
-  users     UserSkill[]
+  id                String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  slug              String                     @unique
+  labelEs           String                     @map("label_es")
+  labelEn           String                     @map("label_en")
+  isActive          Boolean                    @default(true) @map("is_active")
+  createdAt         DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  users             UserSkill[]
+  resumeSkills      ResumeSkill[]
+  applicationSkills ApplicationRequiredSkill[]
 
   @@map("skills")
 }
@@ -146,20 +228,105 @@ model WorkExperience {
 }
 
 model Resume {
-  id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profileId       String             @map("profile_id") @db.Uuid
-  storagePath     String             @unique @map("storage_path")
-  displayName     String             @map("display_name")
-  mimeType        String             @map("mime_type")
-  sizeBytes       BigInt             @map("size_bytes")
-  isPrimary       Boolean            @default(false) @map("is_primary")
-  uploadStatus    ResumeUploadStatus @map("upload_status")
-  uploadExpiresAt DateTime?          @map("upload_expires_at") @db.Timestamptz(6)
-  uploadedAt      DateTime?          @map("uploaded_at") @db.Timestamptz(6)
-  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime           @default(now()) @map("updated_at") @db.Timestamptz(6)
-  profile         Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId           String             @map("profile_id") @db.Uuid
+  storagePath         String             @unique @map("storage_path")
+  displayName         String             @map("display_name")
+  mimeType            String             @map("mime_type")
+  sizeBytes           BigInt             @map("size_bytes")
+  isPrimary           Boolean            @default(false) @map("is_primary")
+  uploadStatus        ResumeUploadStatus @map("upload_status")
+  uploadExpiresAt     DateTime?          @map("upload_expires_at") @db.Timestamptz(6)
+  uploadedAt          DateTime?          @map("uploaded_at") @db.Timestamptz(6)
+  skillAnalysisStatus AnalysisStatus     @default(not_requested) @map("skill_analysis_status")
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime           @default(now()) @map("updated_at") @db.Timestamptz(6)
+  profile             Profile            @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  applications        Application[]
+  skills              ResumeSkill[]
 
   @@index([uploadExpiresAt])
   @@map("resumes")
+}
+
+model ApplicationStage {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationId String      @map("application_id") @db.Uuid
+  name          String
+  details       String?
+  eventOn       DateTime?   @map("event_on") @db.Date
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, eventOn, createdAt])
+  @@map("application_stages")
+}
+
+model ApplicationNote {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationId String      @unique @map("application_id") @db.Uuid
+  body          String      @default("")
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("application_notes")
+}
+
+model ApplicationResource {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationId String      @map("application_id") @db.Uuid
+  name          String
+  url           String
+  resourceType  String?     @map("resource_type")
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("application_resources")
+}
+
+model ApplicationCompensation {
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationId String             @map("application_id") @db.Uuid
+  kind          CompensationKind
+  minimumMinor  BigInt?            @map("minimum_minor")
+  maximumMinor  BigInt?            @map("maximum_minor")
+  currency      String             @db.Char(3)
+  period        CompensationPeriod
+  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime           @default(now()) @map("updated_at") @db.Timestamptz(6)
+  application   Application        @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, kind])
+  @@index([applicationId])
+  @@map("application_compensations")
+}
+
+model ResumeSkill {
+  resumeId    String       @map("resume_id") @db.Uuid
+  skillId     String       @map("skill_id") @db.Uuid
+  confidence  Decimal      @db.Decimal(5, 4)
+  extractedAt DateTime     @default(now()) @map("extracted_at") @db.Timestamptz(6)
+  resume      Resume       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  skill       SkillCatalog @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([resumeId, skillId])
+  @@index([skillId])
+  @@map("resume_skills")
+}
+
+model ApplicationRequiredSkill {
+  applicationId String       @map("application_id") @db.Uuid
+  skillId       String       @map("skill_id") @db.Uuid
+  confidence    Decimal      @db.Decimal(5, 4)
+  extractedAt   DateTime     @default(now()) @map("extracted_at") @db.Timestamptz(6)
+  application   Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  skill         SkillCatalog @relation(fields: [skillId], references: [id], onDelete: Restrict)
+
+  @@id([applicationId, skillId])
+  @@index([skillId])
+  @@map("application_required_skills")
 }

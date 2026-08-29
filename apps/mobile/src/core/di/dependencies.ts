@@ -6,6 +6,8 @@ import type { ApplicationRepository } from '@/features/applications/domain/repos
 import type { ListApplications } from '@/features/applications/domain/usecases/ListApplications';
 import type { UpdateApplicationStatus } from '@/features/applications/domain/usecases/UpdateApplicationStatus';
 import type { DeleteApplication } from '@/features/applications/domain/usecases/DeleteApplication';
+import type { CreateApplication } from '@/features/applications/domain/usecases/CreateApplication';
+import type { ResumeRepository } from '@/features/resumes/domain/repositories/ResumeRepository';
 import { createToken } from './container';
 
 export interface AppDependencies {
@@ -13,7 +15,9 @@ export interface AppDependencies {
   aiService: AiService;
   authRepository: AuthRepository;
   onboardingRepository: OnboardingRepository;
+  resumeRepository: ResumeRepository;
   applicationRepository: ApplicationRepository;
+  createApplication: CreateApplication;
   listApplications: ListApplications;
   updateApplicationStatus: UpdateApplicationStatus;
   deleteApplication: DeleteApplication;
@@ -26,9 +30,11 @@ export const dependencyTokens = {
   onboardingRepository: createToken<OnboardingRepository>(
     'OnboardingRepository',
   ),
+  resumeRepository: createToken<ResumeRepository>('ResumeRepository'),
   applicationRepository: createToken<ApplicationRepository>(
     'ApplicationRepository',
   ),
+  createApplication: createToken<CreateApplication>('CreateApplication'),
   listApplications: createToken<ListApplications>('ListApplications'),
   updateApplicationStatus: createToken<UpdateApplicationStatus>(
     'UpdateApplicationStatus',

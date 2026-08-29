@@ -60,7 +60,7 @@ export class ResumeService {
     };
   }
 
-  async confirm(subject: string, resumeId: string) {
+  async confirm(subject: string, resumeId: string, makePrimary: boolean) {
     const resume = await this.ownedPending(subject, resumeId);
     const { data, error } = await this.storage.storage
       .from(BUCKET)
@@ -79,21 +79,36 @@ export class ResumeService {
       return this.fail(resumeId, resume.storagePath, 'Invalid PDF upload');
     }
     await this.prisma.$transaction(async (tx) => {
-      await tx.resume.updateMany({
-        where: { profileId: subject, isPrimary: true },
-        data: { isPrimary: false },
-      });
+      if (makePrimary)
+        await tx.resume.updateMany({
+          where: { profileId: subject, isPrimary: true },
+          data: { isPrimary: false },
+        });
       await tx.resume.update({
         where: { id: resumeId },
         data: {
           uploadStatus: 'ready',
           uploadExpiresAt: null,
           uploadedAt: new Date(),
-          isPrimary: true,
+          isPrimary: makePrimary,
         },
       });
     });
     return { success: true as const };
+  }
+
+  async list(subject: string) {
+    const resumes = await this.prisma.resume.findMany({
+      where: { profileId: subject, uploadStatus: 'ready' },
+      orderBy: [{ isPrimary: 'desc' }, { uploadedAt: 'desc' }, { id: 'asc' }],
+    });
+    return resumes.map((resume) => ({
+      id: resume.id,
+      displayName: resume.displayName,
+      sizeBytes: Number(resume.sizeBytes),
+      isPrimary: resume.isPrimary,
+      uploadedAt: resume.uploadedAt?.toISOString() ?? null,
+    }));
   }
 
   async cancel(subject: string, resumeId: string) {

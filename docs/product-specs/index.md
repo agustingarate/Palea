@@ -4,6 +4,9 @@
 
 - [MVP data model](mvp-data-model.md) — draft model derived from ClickUp and Stitch.
 
+- [Applications home](applications-home.md) — approved candidate application list and board behavior.
+- [Application creation](application-create.md) — approved responsive draft creation flow.
+
 - [Environment configuration](environment-configuration.md) — approved runtime and build environment contract.
 
 - [Dependency maintenance](dependency-maintenance.md) — approved compatibility policy.

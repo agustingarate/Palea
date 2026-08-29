@@ -8,9 +8,15 @@ export class UpdateApplicationStatus {
     applicationId: string,
     status: ApplicationStatus,
     targetIndex?: number,
+    appliedOn?: string,
+    timeZone?: string,
   ): Promise<void> {
-    return targetIndex === undefined
-      ? this.repository.updateStatus(applicationId, status)
-      : this.repository.updateStatus(applicationId, status, targetIndex);
+    return this.repository.updateStatus(
+      applicationId,
+      status,
+      targetIndex,
+      appliedOn,
+      timeZone,
+    );
   }
 }

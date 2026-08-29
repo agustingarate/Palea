@@ -13,7 +13,6 @@ const developmentSourceEntries = {
     'packages/ui-native/src/index.ts',
   ),
 };
-
 const config = getDefaultConfig(projectRoot);
 
 // Expo SDK 54 watches pnpm workspaces automatically. In development, resolve

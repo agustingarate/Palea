@@ -15,6 +15,9 @@ const auth = {
   'field.nationalityEmpty': 'No encontramos nacionalidades.',
   'loggedIn.title': 'Estas logueado',
   logout: 'Cerrar sesión',
+  'route.loading': 'Verificando tu cuenta…',
+  'route.error': 'No pudimos verificar los datos de tu cuenta.',
+  'route.retry': 'Reintentar',
   'onboarding.skills.description':
     'Subí tu CV base y seleccioná tus habilidades principales para completar la configuración de tu perfil.',
   'onboarding.resumeNotice.title': 'Tu CV principal',

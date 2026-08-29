@@ -2,6 +2,9 @@ import {
   applicationIdSchema,
   applicationListInputSchema,
   applicationPageSchema,
+  applicationSchema,
+  createApplicationInputSchema,
+  type CreateApplicationInput,
   type ApplicationStatus,
   updateApplicationStatusInputSchema,
 } from '@palea/contracts';
@@ -22,15 +25,27 @@ export class TrpcApplicationsDataSource implements ApplicationsDataSource {
     );
   }
 
+  async create(input: CreateApplicationInput) {
+    return applicationSchema.parse(
+      await this.client.applications.create.mutate(
+        createApplicationInputSchema.parse(input),
+      ),
+    );
+  }
+
   async updateStatus(
     applicationId: string,
     status: ApplicationStatus,
     targetIndex?: number,
+    appliedOn?: string,
+    timeZone?: string,
   ) {
     const input = updateApplicationStatusInputSchema.parse({
       applicationId,
       status,
       ...(targetIndex === undefined ? {} : { targetIndex }),
+      ...(appliedOn === undefined ? {} : { appliedOn }),
+      timeZone: timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     await this.client.applications.updateStatus.mutate(input);
   }
