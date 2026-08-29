@@ -1,0 +1,118 @@
+.siteHeader {
+  position: fixed;
+  z-index: 50;
+  inset: 0 0 auto;
+  border-bottom: 1px solid transparent;
+  color: #fff;
+  transition:
+    background-color 500ms ease,
+    border-color 500ms ease,
+    backdrop-filter 500ms ease;
+}
+
+.scrolled {
+  border-color: var(--web-border);
+  background: color-mix(in srgb, var(--web-bg) 82%, transparent);
+  backdrop-filter: blur(18px);
+  color: var(--web-text);
+}
+
+.headerInner {
+  width: min(1280px, calc(100% - 40px));
+  height: 64px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.desktopNav {
+  display: flex;
+  gap: 24px;
+  margin-left: 130px;
+}
+
+.desktopNav a {
+  color: color-mix(in srgb, #fff 72%, transparent);
+  font-size: 0.78rem;
+  transition:
+    color 180ms ease,
+    transform 500ms ease;
+  transform: translateY(calc(var(--parallax-target) * var(--scroll-ratio, 0)));
+}
+
+.scrolled .desktopNav a,
+.scrolled .loginLink {
+  color: var(--web-muted);
+}
+
+.desktopNav a:hover {
+  color: var(--web-text);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loginLink {
+  color: color-mix(in srgb, #fff 72%, transparent);
+  font-size: 0.8rem;
+}
+
+.menuButton {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--web-border);
+  border-radius: 999px;
+  background: transparent;
+  color: currentColor;
+}
+
+.mobileNav {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .headerInner {
+    width: calc(100% - 32px);
+  }
+
+  .desktopNav,
+  .loginLink {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .mobileNav {
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 16px;
+    background: color-mix(in srgb, var(--web-bg) 95%, transparent);
+    transition:
+      max-height 250ms ease,
+      padding 250ms ease;
+  }
+
+  .mobileNavOpen {
+    max-height: 400px;
+    padding-top: 10px;
+    padding-bottom: 14px;
+    border-top: 1px solid var(--web-border);
+  }
+
+  .mobileNav a {
+    min-height: 44px;
+    padding: 12px;
+    color: var(--web-muted);
+    font-size: 0.9rem;
+  }
+}
