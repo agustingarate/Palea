@@ -1,0 +1,21 @@
+:root {
+  --web-bg: var(--color-background);
+  --web-surface: var(--color-surface);
+  --web-subtle: var(--color-surface-subtle);
+  --web-text: var(--color-text);
+  --web-muted: var(--color-text-muted);
+  --web-border: var(--color-border);
+  --web-ink: var(--color-primary);
+  --web-on-ink: var(--color-on-primary);
+  --web-accent: var(--color-interaction);
+  --web-accent-subtle: var(--color-interaction-subtle);
+  --web-glow-blue: #718cff;
+  --web-glow-pink: #e596bc;
+  --web-glow-sky: #63d5f2;
+  --web-data-blue: #65a5ff;
+  --web-data-green: #63e6a5;
+  --web-data-yellow: #ffd166;
+  --web-data-indigo: #8996ff;
+  --web-data-pink: #ff8fbd;
+  --web-radius: 20px;
+}

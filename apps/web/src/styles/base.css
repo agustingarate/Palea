@@ -1,0 +1,46 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  background: var(--web-bg);
+  color: var(--web-text);
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--web-bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+h1,
+h2,
+h3,
+.header-logo,
+.wordmark,
+.step-card h3,
+.browser-heading strong {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--web-accent);
+  outline-offset: 3px;
+}
+.institutional-site {
+  overflow: clip;
+}
+.icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
