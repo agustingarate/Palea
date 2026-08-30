@@ -2,9 +2,9 @@
 id: SPEC-APPLICATIONS-003
 title: Detalle de postulación del candidato
 status: approved
-version: 1.6
+version: 1.7
 stories: [CU-86ajvbvd3]
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-29
 ---
 
 # Detalle de postulación
@@ -17,8 +17,9 @@ compensaciones, descripción, habilidades, etapas, nota, recursos y CV; cambiar
 el estado y asociar, reemplazar, quitar, cargar o descargar un CV. Aplica a
 Expo nativo y Expo Web; `apps/web` queda fuera de alcance.
 
-La edición general pertenece a CU-86ajvbve7. El CRUD de etapas, notas y
-recursos pertenece a sus tareas respectivas: esta entrega sólo los consulta. La
+La edición general pertenece a CU-86ajvbve7. El CRUD de etapas está definido en
+[SPEC-APPLICATIONS-004](application-stages.md); notas y recursos pertenecen a
+sus tareas respectivas. La
 eliminación de una postulación se expone desde la cabecera Web de este detalle
 mediante la mutación owner-scoped existente y confirmación destructiva.
 
@@ -40,8 +41,9 @@ referencia web es `Application Detail - Web (Unified)` del proyecto Stitch
   aceptables si preservan jerarquía, espaciado, densidad, accesibilidad y
   claridad de acciones.
 - No se presentan controles de archivo, edición general, edición de notas ni
-  CRUD de etapas/recursos: son no-objetivos de esta historia aunque aparezcan en
-  la referencia visual. La acción de archivo de Stitch se representa como
+  CRUD de recursos: son no-objetivos de esta historia aunque aparezcan en la
+  referencia visual. El CRUD de etapas se habilita mediante
+  `SPEC-APPLICATIONS-004`. La acción de archivo de Stitch se representa como
   eliminación confirmada porque el producto todavía no define un estado
   `archived`.
 
@@ -50,7 +52,8 @@ referencia web es `Application Detail - Web (Unified)` del proyecto Stitch
 - **BR-01:** Todas las lecturas y mutaciones son owner-scoped. Una postulación
   inexistente o ajena devuelve `applications.not_found`, sin revelar cuál de
   ambas condiciones ocurrió.
-- **BR-02:** Las etapas se muestran completas, de más reciente a más antigua.
+- **BR-02:** Las etapas se muestran completas, en el orden determinista de
+  `SPEC-APPLICATIONS-004`, con CTA para agregar y navegación a detalle/edición.
   El estado del tablero no es una etapa del proceso.
 - **BR-03:** Nota y recursos son privados y de sólo lectura. Sólo recursos
   HTTP(S) pueden abrirse, siempre mediante el navegador externo del sistema.
