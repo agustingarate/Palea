@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import { ApplicationCard } from './ApplicationCard';
 
 describe('ApplicationCard', () => {
@@ -55,5 +55,32 @@ describe('ApplicationCard', () => {
     expect(view.getByText('Product designer')).toBeTruthy();
     expect(view.getByText('Remote')).toBeTruthy();
     expect(view.queryByText('Invalid Date')).toBeNull();
+  });
+
+  it('opens the detail only for a press that was not a drag gesture', () => {
+    const onOpen = jest.fn();
+    const view = render(
+      <ApplicationCard
+        application={{
+          id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+          companyName: 'Palea',
+          role: 'Product designer',
+          appliedOn: null,
+          status: 'draft',
+          workMode: 'remote',
+          position: 0,
+        }}
+        actionsLabel="Application actions"
+        dateLocale="en-US"
+        workModeLabel="Remote"
+        onAction={jest.fn()}
+        onOpen={onOpen}
+      />,
+    );
+
+    fireEvent.press(
+      view.getByRole('button', { name: 'Product designer, Palea' }),
+    );
+    expect(onOpen).toHaveBeenCalledTimes(1);
   });
 });

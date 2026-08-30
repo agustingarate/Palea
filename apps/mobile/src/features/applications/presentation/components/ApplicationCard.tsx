@@ -72,6 +72,7 @@ export function ApplicationCard({
   const dragScrollStart = useRef(0);
   const currentScrollOffset = useRef(scrollOffset);
   const isDragging = useRef(false);
+  const suppressNextOpen = useRef(false);
   useEffect(() => {
     callbacks.current = { application, onDrag, onDrop, onDragMove };
   }, [application, onDrag, onDrop, onDragMove]);
@@ -117,6 +118,8 @@ export function ApplicationCard({
           callbacks.current.onDrag?.(callbacks.current.application);
         },
         onPanResponderMove: (_, g) => {
+          if (Math.abs(g.dx) > 4 || Math.abs(g.dy) > 4)
+            suppressNextOpen.current = true;
           x.value = g.dx;
           y.value = g.dy;
           callbacks.current.onDragMove?.({ x: g.moveX, y: g.moveY });
@@ -182,7 +185,13 @@ export function ApplicationCard({
             className="flex-1 gap-1"
             accessibilityRole="button"
             accessibilityLabel={`${application.role}, ${application.companyName}`}
-            onPress={() => onOpen?.(application)}
+            onPress={() => {
+              if (suppressNextOpen.current) {
+                suppressNextOpen.current = false;
+                return;
+              }
+              onOpen?.(application);
+            }}
             onLongPress={() => {
               armed.current = true;
               onDrag?.(application);
