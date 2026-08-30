@@ -9,6 +9,7 @@ import {
   CollectionFeedback,
   SegmentedControl,
   SnackbarProvider,
+  StageTimeline,
   TextField,
   useSnackbar,
 } from '@palea/ui-native';
@@ -128,6 +129,46 @@ describe('mobile design system', () => {
     expect(view.getByLabelText('Loading content')).toBeTruthy();
     expect(view.getByText('Nothing here')).toBeTruthy();
     expect(view.getByText('Unable to load')).toBeTruthy();
+  });
+
+  it('gives current and completed timeline stages distinct, high-contrast markers', () => {
+    const view = render(
+      <StageTimeline
+        items={[
+          {
+            id: 'current',
+            title: 'Technical interview',
+            completed: true,
+            current: true,
+            currentLabel: 'Current stage',
+            statusLabel: 'Waiting for results',
+            tone: 'warning',
+          },
+          {
+            id: 'completed',
+            title: 'Initial screening',
+            completed: true,
+            statusLabel: 'Successful',
+            tone: 'success',
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      view.getByTestId('stage-marker-current', {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
+    expect(
+      view.getByTestId('stage-marker-completed', {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
+    expect(
+      view.getAllByTestId('icon-Check', { includeHiddenElements: true }),
+    ).toHaveLength(1);
+    expect(view.getByText('Current stage')).toBeTruthy();
   });
 
   it('announces unread navigation counts through their destination item', () => {

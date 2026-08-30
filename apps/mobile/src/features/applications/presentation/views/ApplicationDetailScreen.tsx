@@ -166,6 +166,13 @@ function ApplicationDetailLoadedContent({
         error: stagesQuery.error,
         onRetry: stagesQuery.refetch,
       }}
+      onAdd={() => router.push(`/applications/${applicationId}/stages/new`)}
+      onOpen={(stageId) =>
+        router.push(`/applications/${applicationId}/stages/${stageId}`)
+      }
+      onEdit={(stageId) =>
+        router.push(`/applications/${applicationId}/stages/${stageId}/edit`)
+      }
     />
   );
   const signOut = async () => {
