@@ -7,6 +7,7 @@ import { DateTrigger } from './Fields';
 import {
   dateFromLocalIso,
   localIsoFromDate,
+  todayDateValue,
   type DatePickerFieldProps,
 } from './DatePickerField.types';
 import { DatePickerField as WebDatePickerField } from './DatePickerField.web';
@@ -82,13 +83,13 @@ export function DatePickerField({
         onPress={show}
       />
       <View className="flex-row items-center gap-3">
-        {todayLabel && maximum ? (
+        {todayLabel ? (
           <Button
             label={todayLabel}
             size="sm"
             variant="secondary"
             disabled={disabled}
-            onPress={() => onChange(maximum)}
+            onPress={() => onChange(todayDateValue(maximum))}
           />
         ) : null}
         {value ? (

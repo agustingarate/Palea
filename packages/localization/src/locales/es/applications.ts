@@ -162,6 +162,13 @@ const applications = {
   'stages.error.save':
     'No pudimos guardar la etapa. Revisá los campos e intentá de nuevo.',
   'stages.error.delete': 'No pudimos eliminar la etapa. Intentá de nuevo.',
+  'stages.validation.nameRequired': 'Ingresá el nombre de la etapa.',
+  'stages.validation.dateRequired': 'Seleccioná una fecha para este resultado.',
+  'stages.validation.pendingDifficulty':
+    'Una etapa pendiente no puede tener dificultad.',
+  'stages.validation.difficultyRequired':
+    'Seleccioná la dificultad de la etapa.',
+  'stages.validation.tooLong': 'El valor supera el máximo permitido.',
   'detail.noStagesMessage':
     'Esta postulación no tiene etapas de proceso registradas.',
   'detail.noNote': 'No hay nota privada',

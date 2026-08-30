@@ -25,3 +25,7 @@ export function localIsoFromDate(value: Date) {
   const day = String(value.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+export function todayDateValue(maximum?: string, now = new Date()) {
+  return maximum ?? localIsoFromDate(now);
+}

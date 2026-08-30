@@ -1,5 +1,6 @@
 import {
   emptyApplicationStageForm,
+  applicationStageFormSchema,
   isPendingStageDue,
   stageValuesForResult,
   toCreateStageInput,
@@ -29,6 +30,23 @@ describe('application stage model', () => {
         difficulty: 'hard',
       }),
     ).toThrow();
+  });
+
+  it('exposes contract validation to the form before submission', () => {
+    const result = applicationStageFormSchema.safeParse({
+      ...emptyApplicationStageForm,
+      result: 'successful',
+      difficulty: 'easy',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success)
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ path: ['name'] }),
+          expect.objectContaining({ path: ['eventOn'] }),
+        ]),
+      );
   });
 
   it('detects a persistent warning using local calendar dates', () => {

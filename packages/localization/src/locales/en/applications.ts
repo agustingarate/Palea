@@ -162,6 +162,12 @@ const applications = {
   'stages.error.save':
     'We could not save the stage. Review the fields and try again.',
   'stages.error.delete': 'We could not delete the stage. Try again.',
+  'stages.validation.nameRequired': 'Enter the stage name.',
+  'stages.validation.dateRequired': 'Select a date for this result.',
+  'stages.validation.pendingDifficulty':
+    'A pending stage cannot have a difficulty.',
+  'stages.validation.difficultyRequired': 'Select the stage difficulty.',
+  'stages.validation.tooLong': 'The value exceeds the allowed maximum.',
   'detail.noStagesMessage': 'This application has no recorded process stages.',
   'detail.noNote': 'No private note',
   'detail.noNoteMessage': 'Add notes when the notes feature is available.',

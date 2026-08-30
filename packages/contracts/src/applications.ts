@@ -196,7 +196,7 @@ const nullableStageTextSchema = z
     const normalized = value?.trim() ?? '';
     return normalized ? normalized : null;
   });
-const applicationStageFieldsSchema = z
+export const applicationStageFieldsSchema = z
   .object({
     name: z.string().trim().min(1).max(120),
     eventOn: z.iso.date().nullable().default(null),

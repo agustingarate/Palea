@@ -1,4 +1,5 @@
 import {
+  applicationStageFieldsSchema,
   createApplicationStageInputSchema,
   updateApplicationStageInputSchema,
   type ApplicationStage,
@@ -23,6 +24,27 @@ export const emptyApplicationStageForm: ApplicationStageFormValues = {
   questions: '',
   comments: '',
 };
+
+/** Shared contract rules used by TanStack Form before any mutation is sent. */
+export const applicationStageFormSchema = applicationStageFieldsSchema;
+
+export function validateApplicationStageForm(
+  values: ApplicationStageFormValues,
+) {
+  const result = applicationStageFormSchema.safeParse(values);
+  if (result.success) return undefined;
+  const fields: Partial<Record<keyof ApplicationStageFormValues, unknown>> = {};
+  for (const issue of result.error.issues) {
+    const field = issue.path[0];
+    if (
+      typeof field === 'string' &&
+      field in values &&
+      !fields[field as keyof ApplicationStageFormValues]
+    )
+      fields[field as keyof ApplicationStageFormValues] = issue;
+  }
+  return { fields };
+}
 
 export function applicationStageFormFromStage(
   stage: ApplicationStage,
