@@ -3,7 +3,10 @@ import { View } from 'react-native';
 import { AppText } from '../atoms/AppText';
 import { Button } from '../atoms/Button';
 import { useThemeColors } from '../internal/useThemeColors';
-import type { DatePickerFieldProps } from './DatePickerField.types';
+import {
+  todayDateValue,
+  type DatePickerFieldProps,
+} from './DatePickerField.types';
 
 export type { DatePickerFieldProps } from './DatePickerField.types';
 
@@ -57,7 +60,7 @@ export function DatePickerField({
               size="sm"
               variant="secondary"
               disabled={disabled}
-              onPress={() => onChange(maximum ?? null)}
+              onPress={() => onChange(todayDateValue(maximum))}
             />
           ) : null}
           {value ? (

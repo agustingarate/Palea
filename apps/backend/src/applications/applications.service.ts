@@ -423,11 +423,19 @@ function toApplicationStage(stage: StageRow) {
 }
 
 function compareStagesDescending(left: StageRow, right: StageRow) {
-  const leftOrder = (left.eventOn ?? left.createdAt).getTime();
-  const rightOrder = (right.eventOn ?? right.createdAt).getTime();
-  if (leftOrder !== rightOrder) return rightOrder - leftOrder;
+  const leftDay = stageCalendarDay(left.eventOn ?? left.createdAt);
+  const rightDay = stageCalendarDay(right.eventOn ?? right.createdAt);
+  if (leftDay !== rightDay) return rightDay - leftDay;
   const createdOrder = right.createdAt.getTime() - left.createdAt.getTime();
   return createdOrder || right.id.localeCompare(left.id);
+}
+
+function stageCalendarDay(value: Date) {
+  return Date.UTC(
+    value.getUTCFullYear(),
+    value.getUTCMonth(),
+    value.getUTCDate(),
+  );
 }
 
 async function assertOwned(

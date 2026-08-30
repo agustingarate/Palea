@@ -26,7 +26,10 @@ import { useLocale } from '@/core/localization/LocaleProvider';
 import { useSignOut } from '@/core/session/useSignOut';
 import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
 import type { ApplicationStageFormValues } from './applicationStageModel';
-import { stageValuesForResult } from './applicationStageModel';
+import {
+  stageValuesForResult,
+  validateApplicationStageForm,
+} from './applicationStageModel';
 
 export function ApplicationStageForm({
   mode,
@@ -60,6 +63,9 @@ export function ApplicationStageForm({
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const form = useForm({
     defaultValues: initialValues,
+    validators: {
+      onSubmit: ({ value }) => validateApplicationStageForm(value),
+    },
     onSubmit: async ({ value }) => {
       setSubmissionError(null);
       try {
@@ -122,6 +128,7 @@ export function ApplicationStageForm({
             value={field.state.value}
             onBlur={field.handleBlur}
             onChangeText={field.handleChange}
+            error={stageFieldError(field.state.meta.errors, t)}
           />
         )}
       </form.Field>
@@ -137,6 +144,7 @@ export function ApplicationStageForm({
             cancelLabel={t('actions.cancel')}
             confirmLabel={t('actions.confirm')}
             onChange={field.handleChange}
+            error={stageFieldError(field.state.meta.errors, t)}
           />
         )}
       </form.Field>
@@ -199,6 +207,7 @@ export function ApplicationStageForm({
             value={field.state.value}
             onBlur={field.handleBlur}
             onChangeText={field.handleChange}
+            error={stageFieldError(field.state.meta.errors, t)}
           />
         )}
       </form.Field>
@@ -211,6 +220,7 @@ export function ApplicationStageForm({
             value={field.state.value}
             onBlur={field.handleBlur}
             onChangeText={field.handleChange}
+            error={stageFieldError(field.state.meta.errors, t)}
           />
         )}
       </form.Field>
@@ -378,6 +388,33 @@ export function ApplicationStageForm({
       />
     </Screen>
   );
+}
+
+function stageFieldError(
+  errors: readonly unknown[],
+  t: (key: string) => string,
+) {
+  if (!errors.length) return undefined;
+  const error = errors[0];
+  const message =
+    typeof error === 'string'
+      ? error
+      : error instanceof Error
+        ? error.message
+        : error && typeof error === 'object' && 'message' in error
+          ? String(error.message)
+          : undefined;
+  if (message === 'applications.stage.date_required')
+    return t('stages.validation.dateRequired');
+  if (message === 'applications.stage.pending_difficulty')
+    return t('stages.validation.pendingDifficulty');
+  if (message === 'applications.stage.difficulty_required')
+    return t('stages.validation.difficultyRequired');
+  if (error && typeof error === 'object' && 'code' in error) {
+    if (error.code === 'too_small') return t('stages.validation.nameRequired');
+    if (error.code === 'too_big') return t('stages.validation.tooLong');
+  }
+  return t('validation.generic');
 }
 
 function ConfirmDialog({

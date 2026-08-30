@@ -2,19 +2,26 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useDependency } from '@/core/di/DependenciesProvider';
 import { dependencyTokens } from '@/core/di/dependencies';
+import { useAuthSession } from '../../providers/AuthProvider';
 import { useOnboardingDraftStore } from '../stores/useOnboardingDraftStore';
 
 export function useOnboardingViewModel() {
   const repository = useDependency(dependencyTokens.onboardingRepository);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { session } = useAuthSession();
   const draft = useOnboardingDraftStore();
   const catalog = useQuery({
     queryKey: ['auth', 'onboarding-catalog', 'es'],
     queryFn: () => repository.getCatalog('es'),
   });
-  const invalidateAccount = () =>
-    queryClient.invalidateQueries({ queryKey: ['auth', 'account'] });
+  const refreshAccount = async () => {
+    if (!session) return;
+    await queryClient.fetchQuery({
+      queryKey: ['account', 'me', session.userId],
+      queryFn: () => repository.getAccount(),
+    });
+  };
   return {
     ...draft,
     catalog,
@@ -38,7 +45,7 @@ export function useOnboardingViewModel() {
     async finish() {
       await repository.completeOnboarding();
       draft.clear();
-      invalidateAccount();
+      await refreshAccount();
       router.replace('/');
     },
     repository,

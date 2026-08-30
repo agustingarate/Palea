@@ -56,8 +56,9 @@ La referencia visual obligatoria es el proyecto Stitch
 - **BR-04:** En `pending`, `difficulty` está deshabilitada y es `null`. Al salir
   de `pending` toma `easy` por defecto y puede ser `easy`, `medium` o `hard`. Al
   volver a `pending` se limpia.
-- **BR-05:** El orden es descendente por `eventOn` o, si falta, `createdAt`;
-  desempata por `createdAt` e ID, también descendentes. La primera es la actual.
+- **BR-05:** El orden es descendente por el día calendario de `eventOn` o, si
+  falta, de `createdAt`; dentro del mismo día desempata por la hora de
+  `createdAt` e ID, también descendentes. La primera es la actual.
 - **BR-06:** No se crean etapas iniciales automática o implícitamente.
 - **BR-07:** Eliminar la actual recalcula naturalmente la anterior por el orden;
   eliminar la única deja el timeline vacío.

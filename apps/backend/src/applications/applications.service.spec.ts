@@ -373,6 +373,46 @@ describe('ApplicationsService', () => {
     });
   });
 
+  it('uses creation time to order stages that share the same calendar day', async () => {
+    const stages = [
+      {
+        id: '00000000-0000-4000-8000-000000000043',
+        applicationId: rows[0]!.id,
+        name: 'Pending without date',
+        eventOn: null,
+        result: 'pending' as const,
+        difficulty: null,
+        questions: null,
+        comments: null,
+        createdAt: new Date('2026-08-30T14:00:00Z'),
+        updatedAt: new Date('2026-08-30T14:00:00Z'),
+      },
+      {
+        id: '00000000-0000-4000-8000-000000000044',
+        applicationId: rows[0]!.id,
+        name: 'Completed later today',
+        eventOn: new Date('2026-08-30T00:00:00Z'),
+        result: 'successful' as const,
+        difficulty: 'easy' as const,
+        questions: null,
+        comments: null,
+        createdAt: new Date('2026-08-30T14:05:00Z'),
+        updatedAt: new Date('2026-08-30T14:05:00Z'),
+      },
+    ];
+    const service = new ApplicationsService({
+      application: {
+        findFirst: jest.fn().mockResolvedValue({ id: rows[0]!.id }),
+      },
+      applicationStage: { findMany: jest.fn().mockResolvedValue(stages) },
+    } as never);
+
+    await expect(service.listStages(subject, rows[0]!.id)).resolves.toEqual([
+      expect.objectContaining({ name: 'Completed later today' }),
+      expect.objectContaining({ name: 'Pending without date' }),
+    ]);
+  });
+
   it('creates, updates and deletes owner-scoped stages without touching the board', async () => {
     const stage = {
       id: '00000000-0000-4000-8000-000000000041',
