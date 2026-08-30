@@ -4,9 +4,12 @@ import {
   applicationResourceSchema,
   applicationResumeInputSchema,
   applicationPageSchema,
+  applicationStageSchema,
+  createApplicationStageInputSchema,
   createApplicationInputSchema,
   currencyCodes,
   updateApplicationStatusInputSchema,
+  updateApplicationStageInputSchema,
 } from './applications';
 
 const id = '00000000-0000-4000-8000-000000000001';
@@ -209,5 +212,79 @@ describe('application contracts', () => {
         ],
       }).compensations,
     ).toHaveLength(1);
+  });
+
+  it('normalizes a pending stage and bounds its persisted fields', () => {
+    expect(
+      createApplicationStageInputSchema.parse({
+        applicationId: id,
+        name: '  Technical interview  ',
+        questions: '  ',
+        comments: ' Prepared system design ',
+      }),
+    ).toMatchObject({
+      name: 'Technical interview',
+      eventOn: null,
+      result: 'pending',
+      difficulty: null,
+      questions: null,
+      comments: 'Prepared system design',
+    });
+    expect(
+      createApplicationStageInputSchema.safeParse({
+        applicationId: id,
+        name: 'x'.repeat(121),
+      }).success,
+    ).toBe(false);
+  });
+
+  it('requires date and difficulty outside pending and clears both invariants', () => {
+    const base = { applicationId: id, name: 'Interview' };
+    expect(
+      createApplicationStageInputSchema.safeParse({
+        ...base,
+        result: 'waiting',
+      }).success,
+    ).toBe(false);
+    expect(
+      createApplicationStageInputSchema.safeParse({
+        ...base,
+        eventOn: '2026-08-29',
+        result: 'successful',
+        difficulty: 'easy',
+      }).success,
+    ).toBe(true);
+    expect(
+      createApplicationStageInputSchema.safeParse({
+        ...base,
+        result: 'pending',
+        difficulty: 'easy',
+      }).success,
+    ).toBe(false);
+  });
+
+  it('validates stage identity and the complete output contract', () => {
+    expect(
+      updateApplicationStageInputSchema.safeParse({
+        applicationId: id,
+        stageId: 'invalid',
+        name: 'Interview',
+      }).success,
+    ).toBe(false);
+    expect(
+      'details' in
+        applicationStageSchema.parse({
+          id,
+          applicationId: id,
+          name: 'Interview',
+          eventOn: null,
+          result: 'pending',
+          difficulty: null,
+          questions: null,
+          comments: null,
+          createdAt: '2026-08-29T12:00:00.000Z',
+          updatedAt: '2026-08-29T12:00:00.000Z',
+        }),
+    ).toBe(false);
   });
 });

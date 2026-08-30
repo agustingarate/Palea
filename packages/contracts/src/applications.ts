@@ -48,6 +48,17 @@ export const captureStatusSchema = z.enum([
   'failed',
 ]);
 export const skillAnalysisStatusSchema = captureStatusSchema;
+export const applicationStageResultSchema = z.enum([
+  'pending',
+  'waiting',
+  'successful',
+  'failed',
+]);
+export const applicationStageDifficultySchema = z.enum([
+  'easy',
+  'medium',
+  'hard',
+]);
 export const currencyCodes = Object.keys(isoCurrencies).sort();
 export const currencyCatalog = currencyCodes.map((code) => {
   const currency = isoCurrencies[code as keyof typeof isoCurrencies];
@@ -167,12 +178,65 @@ export const applicationDetailSchema = applicationSchema.extend({
 });
 export const applicationStageSchema = z.object({
   id: z.uuid(),
-  name: z.string().min(1),
-  details: z.string().nullable(),
+  applicationId: z.uuid(),
+  name: z.string().min(1).max(120),
   eventOn: z.iso.date().nullable(),
+  result: applicationStageResultSchema,
+  difficulty: applicationStageDifficultySchema.nullable(),
+  questions: z.string().max(10_000).nullable(),
+  comments: z.string().max(10_000).nullable(),
   createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 export const applicationStagesSchema = z.array(applicationStageSchema);
+const nullableStageTextSchema = z
+  .union([z.string().max(10_000), z.null()])
+  .default(null)
+  .transform((value) => {
+    const normalized = value?.trim() ?? '';
+    return normalized ? normalized : null;
+  });
+const applicationStageFieldsSchema = z
+  .object({
+    name: z.string().trim().min(1).max(120),
+    eventOn: z.iso.date().nullable().default(null),
+    result: applicationStageResultSchema.default('pending'),
+    difficulty: applicationStageDifficultySchema.nullable().default(null),
+    questions: nullableStageTextSchema,
+    comments: nullableStageTextSchema,
+  })
+  .superRefine((value, context) => {
+    if (value.result !== 'pending' && !value.eventOn) {
+      context.addIssue({
+        code: 'custom',
+        path: ['eventOn'],
+        message: 'applications.stage.date_required',
+      });
+    }
+    if (value.result === 'pending' && value.difficulty !== null) {
+      context.addIssue({
+        code: 'custom',
+        path: ['difficulty'],
+        message: 'applications.stage.pending_difficulty',
+      });
+    }
+    if (value.result !== 'pending' && value.difficulty === null) {
+      context.addIssue({
+        code: 'custom',
+        path: ['difficulty'],
+        message: 'applications.stage.difficulty_required',
+      });
+    }
+  });
+export const applicationStageIdSchema = applicationIdSchema.extend({
+  stageId: z.uuid(),
+});
+export const createApplicationStageInputSchema = applicationIdSchema.and(
+  applicationStageFieldsSchema,
+);
+export const updateApplicationStageInputSchema = applicationStageIdSchema.and(
+  applicationStageFieldsSchema,
+);
 export const applicationNoteSchema = z.object({
   body: z.string(),
   updatedAt: z.iso.datetime(),
@@ -210,6 +274,18 @@ export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
 export type ApplicationPage = z.infer<typeof applicationPageSchema>;
 export type ApplicationDetail = z.infer<typeof applicationDetailSchema>;
 export type ApplicationStage = z.infer<typeof applicationStageSchema>;
+export type ApplicationStageResult = z.infer<
+  typeof applicationStageResultSchema
+>;
+export type ApplicationStageDifficulty = z.infer<
+  typeof applicationStageDifficultySchema
+>;
+export type CreateApplicationStageInput = z.infer<
+  typeof createApplicationStageInputSchema
+>;
+export type UpdateApplicationStageInput = z.infer<
+  typeof updateApplicationStageInputSchema
+>;
 export type ApplicationNote = z.infer<typeof applicationNoteSchema>;
 export type ApplicationResource = z.infer<typeof applicationResourceSchema>;
 export type ApplicationResumeInput = z.infer<
