@@ -329,7 +329,33 @@ describe('ApplicationsService', () => {
   });
 
   it('orders stages descending and permits a null note', async () => {
-    const findMany = jest.fn().mockResolvedValue([]);
+    const stages = [
+      {
+        id: '00000000-0000-4000-8000-000000000041',
+        applicationId: rows[0]!.id,
+        name: 'Dated',
+        eventOn: new Date('2026-08-20'),
+        result: 'successful',
+        difficulty: 'easy',
+        questions: null,
+        comments: null,
+        createdAt: new Date('2026-08-20T10:00:00Z'),
+        updatedAt: new Date('2026-08-20T10:00:00Z'),
+      },
+      {
+        id: '00000000-0000-4000-8000-000000000042',
+        applicationId: rows[0]!.id,
+        name: 'Undated but newer',
+        eventOn: null,
+        result: 'pending',
+        difficulty: null,
+        questions: null,
+        comments: null,
+        createdAt: new Date('2026-08-25T10:00:00Z'),
+        updatedAt: new Date('2026-08-25T10:00:00Z'),
+      },
+    ];
+    const findMany = jest.fn().mockResolvedValue(stages);
     const service = new ApplicationsService({
       application: {
         findFirst: jest.fn().mockResolvedValue({ id: rows[0]!.id }),
@@ -337,13 +363,104 @@ describe('ApplicationsService', () => {
       applicationStage: { findMany },
       applicationNote: { findUnique: jest.fn().mockResolvedValue(null) },
     } as never);
-    await expect(service.listStages(subject, rows[0]!.id)).resolves.toEqual([]);
+    await expect(service.listStages(subject, rows[0]!.id)).resolves.toEqual([
+      expect.objectContaining({ name: 'Undated but newer' }),
+      expect.objectContaining({ name: 'Dated' }),
+    ]);
     await expect(service.getNote(subject, rows[0]!.id)).resolves.toBeNull();
-    expect(findMany).toHaveBeenCalledWith(
+    expect(findMany).toHaveBeenCalledWith({
+      where: { applicationId: rows[0]!.id },
+    });
+  });
+
+  it('creates, updates and deletes owner-scoped stages without touching the board', async () => {
+    const stage = {
+      id: '00000000-0000-4000-8000-000000000041',
+      applicationId: rows[0]!.id,
+      name: 'Interview',
+      eventOn: new Date('2026-08-29'),
+      result: 'waiting' as const,
+      difficulty: 'easy' as const,
+      questions: null,
+      comments: null,
+      createdAt: new Date('2026-08-29T10:00:00Z'),
+      updatedAt: new Date('2026-08-29T10:00:00Z'),
+    };
+    const create = jest.fn().mockResolvedValue(stage);
+    const update = jest.fn().mockResolvedValue({
+      ...stage,
+      result: 'successful',
+      comments: 'Passed',
+    });
+    const remove = jest.fn().mockResolvedValue(stage);
+    const transaction = {
+      application: {
+        findFirst: jest.fn().mockResolvedValue({ id: rows[0]!.id }),
+      },
+      applicationStage: {
+        create,
+        findFirst: jest.fn().mockResolvedValue(stage),
+        update,
+        delete: remove,
+      },
+    };
+    const service = new ApplicationsService({
+      $transaction: (run: (tx: typeof transaction) => Promise<unknown>) =>
+        run(transaction),
+    } as never);
+
+    await expect(
+      service.createStage(subject, {
+        applicationId: rows[0]!.id,
+        name: 'Interview',
+        eventOn: '2026-08-29',
+        result: 'waiting',
+        difficulty: 'easy',
+        questions: null,
+        comments: null,
+      }),
+    ).resolves.toMatchObject({ result: 'waiting' });
+    await expect(
+      service.updateStage(subject, {
+        applicationId: rows[0]!.id,
+        stageId: stage.id,
+        name: 'Interview',
+        eventOn: '2026-08-29',
+        result: 'successful',
+        difficulty: 'easy',
+        questions: null,
+        comments: 'Passed',
+      }),
+    ).resolves.toMatchObject({ result: 'successful', comments: 'Passed' });
+    await expect(
+      service.deleteStage(subject, rows[0]!.id, stage.id),
+    ).resolves.toEqual({ success: true });
+
+    expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
-        orderBy: [{ eventOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+        data: expect.objectContaining({ result: 'waiting' }),
       }),
     );
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ result: 'successful' }),
+      }),
+    );
+    expect(remove).toHaveBeenCalledWith({ where: { id: stage.id } });
+    expect(transaction.application).not.toHaveProperty('update');
+  });
+
+  it('does not reveal an unowned or missing stage', async () => {
+    const service = new ApplicationsService({
+      applicationStage: { findFirst: jest.fn().mockResolvedValue(null) },
+    } as never);
+    await expect(
+      service.getStage(
+        subject,
+        rows[0]!.id,
+        '00000000-0000-4000-8000-000000000099',
+      ),
+    ).rejects.toMatchObject({ appCode: 'applications.not_found' });
   });
 
   it('only associates an owned ready CV', async () => {
