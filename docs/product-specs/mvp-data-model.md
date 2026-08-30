@@ -76,8 +76,9 @@ postulación no elimina el CV y borrar un CV no elimina la postulación.
 - El CV asociado debe pertenecer al mismo usuario.
 - `ended_on >= started_on`, excepto empleo actual sin fecha final.
 - Las etapas cumplen [SPEC-APPLICATIONS-004](application-stages.md): se ordenan
-  descendentemente por `event_on` o `created_at`, con desempates por creación e
-  ID; no se crean etapas iniciales y nunca modifican el estado del tablero.
+  descendentemente por el día de `event_on` o `created_at`; dentro del mismo día
+  desempata la hora de creación y luego el ID. No se crean etapas iniciales ni
+  modifican el estado del tablero.
 - Los límites de intereses y habilidades se serializan por perfil con advisory
   locks transaccionales para impedir que inserts concurrentes los excedan.
 
