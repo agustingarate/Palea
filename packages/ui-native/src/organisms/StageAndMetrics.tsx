@@ -88,57 +88,151 @@ export interface TimelineItem {
   date?: string;
   tone?: StatusTone;
   completed?: boolean;
+  current?: boolean;
+  statusLabel?: string;
+  currentLabel?: string;
+  warningLabel?: string;
+  warningActionLabel?: string;
+  onWarningPress?: () => void;
+  actionLabel?: string;
+  onPress?: () => void;
 }
 
 export function StageTimeline({ items }: { items: readonly TimelineItem[] }) {
   return (
-    <View accessibilityRole="list">
-      {items.map((item, index) => (
-        <View
-          key={item.id}
-          accessible
-          accessibilityLabel={[item.title, item.description, item.date]
-            .filter(Boolean)
-            .join(', ')}
-          className="flex-row gap-3"
-        >
-          <View className="items-center">
-            <View
-              className={`h-6 w-6 items-center justify-center rounded-full ${item.completed ? 'bg-interaction dark:bg-dark-interaction' : 'border-border bg-surface dark:border-dark-border dark:bg-dark-surface border'}`}
-            >
-              {item.completed ? (
-                <Icon name="check" size="sm" tone="inverse" />
+    <View accessibilityRole="list" className="gap-1">
+      {items.map((item, index) => {
+        const completedMarkerClass =
+          item.tone === 'danger'
+            ? 'bg-danger dark:bg-dark-danger'
+            : item.tone === 'warning'
+              ? 'bg-warning dark:bg-dark-warning'
+              : 'bg-success dark:bg-dark-success';
+        const content = (
+          <>
+            <View className="items-center">
+              <View
+                testID={`stage-marker-${item.id}`}
+                accessibilityElementsHidden
+                className={`h-7 w-7 items-center justify-center rounded-full ${item.current ? 'border-text bg-surface dark:border-dark-text dark:bg-dark-surface border-[3px]' : item.completed ? completedMarkerClass : 'border-border bg-surface dark:border-dark-border dark:bg-dark-surface border-2'}`}
+              >
+                {item.current ? (
+                  <View className="bg-text dark:bg-dark-text h-2 w-2 rounded-full" />
+                ) : item.completed ? (
+                  <Icon
+                    name="check"
+                    size="sm"
+                    strokeWidth={2.5}
+                    tone="inverse"
+                  />
+                ) : null}
+              </View>
+              {index < items.length - 1 ? (
+                <View className="bg-border dark:bg-dark-border min-h-10 w-px flex-1" />
               ) : null}
             </View>
-            {index < items.length - 1 ? (
-              <View className="bg-border dark:bg-dark-border min-h-12 w-px flex-1" />
-            ) : null}
-          </View>
-          <View className="flex-1 pb-5">
-            <View className="flex-row items-start gap-2">
-              <AppText className="font-inter-medium flex-1">
-                {item.title}
-              </AppText>
-              {item.tone ? (
-                <Badge
-                  label={item.completed ? 'Done' : 'Pending'}
-                  tone={item.tone}
-                />
-              ) : null}
+            <View className="min-w-0 flex-1 pb-4">
+              <View
+                className={`bg-surface dark:bg-dark-surface gap-3 rounded-md border px-4 py-3 ${item.current ? 'border-text dark:border-dark-text' : 'border-border dark:border-dark-border'}`}
+              >
+                <View className="flex-row items-start justify-between gap-3">
+                  <View className="min-w-0 flex-1 gap-2">
+                    <View className="flex-row flex-wrap items-center gap-2">
+                      <AppText
+                        numberOfLines={2}
+                        className="font-inter-medium min-w-0 flex-shrink"
+                      >
+                        {item.title}
+                      </AppText>
+                      {item.current && item.currentLabel ? (
+                        <View className="bg-text dark:bg-dark-text rounded-full px-2 py-1">
+                          <AppText variant="micro" tone="inverse">
+                            {item.currentLabel}
+                          </AppText>
+                        </View>
+                      ) : null}
+                    </View>
+                    {item.date ? (
+                      <View className="flex-row items-center gap-1.5">
+                        <Icon name="calendar" size={13} tone="muted" />
+                        <AppText variant="caption" tone="muted">
+                          {item.date}
+                        </AppText>
+                      </View>
+                    ) : null}
+                  </View>
+                  {item.statusLabel ? (
+                    <Badge
+                      label={item.statusLabel}
+                      tone={item.tone ?? 'neutral'}
+                    />
+                  ) : null}
+                </View>
+                {item.warningLabel ? (
+                  <View className="border-warning/40 flex-row flex-wrap items-center gap-x-2 gap-y-1 border-t pt-2">
+                    <Icon name="error" size={14} tone="warning" />
+                    <AppText
+                      variant="caption"
+                      tone="default"
+                      className="min-w-0 flex-1"
+                    >
+                      {item.warningLabel}
+                    </AppText>
+                    {item.warningActionLabel && item.onWarningPress ? (
+                      <Pressable
+                        accessibilityRole="button"
+                        className="min-h-touch-target justify-center rounded-sm px-1"
+                        onPress={(event) => {
+                          event.stopPropagation();
+                          item.onWarningPress?.();
+                        }}
+                      >
+                        <AppText
+                          variant="caption"
+                          tone="interaction"
+                          className="font-semibold"
+                        >
+                          {item.warningActionLabel}
+                        </AppText>
+                      </Pressable>
+                    ) : null}
+                  </View>
+                ) : null}
+              </View>
             </View>
-            {item.description ? (
-              <AppText variant="bodySmall" tone="muted">
-                {item.description}
-              </AppText>
-            ) : null}
-            {item.date ? (
-              <AppText variant="label" tone="muted">
-                {item.date}
-              </AppText>
-            ) : null}
+          </>
+        );
+        const accessibilityLabel = [
+          item.title,
+          item.statusLabel,
+          item.description,
+          item.date,
+          item.current ? item.currentLabel : undefined,
+          item.warningLabel,
+        ]
+          .filter(Boolean)
+          .join(', ');
+        return item.onPress ? (
+          <Pressable
+            key={item.id}
+            accessibilityLabel={item.actionLabel ?? accessibilityLabel}
+            accessibilityRole="button"
+            className="min-h-touch-target flex-row gap-3 rounded-md"
+            onPress={item.onPress}
+          >
+            {content}
+          </Pressable>
+        ) : (
+          <View
+            key={item.id}
+            accessible
+            accessibilityLabel={accessibilityLabel}
+            className="flex-row gap-3"
+          >
+            {content}
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }

@@ -2,7 +2,7 @@
 id: SPEC-DATA-001
 title: Modelo de datos funcional del MVP
 status: approved
-version: 1.3
+version: 1.4
 stories:
   - CU-86ajvbcd
   - CU-86ajvbvcg
@@ -24,7 +24,7 @@ delivery_tasks:
   validation: https://app.clickup.com/t/86ak0kyxz
   legal_gate: https://app.clickup.com/t/86ak0kyy4
 stitch: projects/16272299109015713935
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-29
 ---
 
 # Modelo de datos funcional del MVP
@@ -48,7 +48,7 @@ esta entrega.
 | `application_compensations`            | Rangos esperado/ofrecido en unidades menores, moneda ISO 4217 y periodicidad.                                           |
 | `resume_skills`                        | Skills extraídas por CV, confianza y fecha de extracción.                                                               |
 | `application_required_skills`          | Skills requeridas por la JD de una postulación, confianza y fecha de extracción.                                        |
-| `application_stages`                   | Nombre, detalles, fecha opcional e historial independiente del estado actual.                                           |
+| `application_stages`                   | Nombre, fecha, resultado, dificultad, preguntas y comentarios; historial privado independiente del tablero.             |
 | `application_notes`                    | Una nota privada editable por postulación.                                                                              |
 | `application_resources`                | Nombre, URL y tipo opcional por postulación.                                                                            |
 
@@ -75,8 +75,9 @@ postulación no elimina el CV y borrar un CV no elimina la postulación.
   exige al salir de borrador si todavía no existe. Tiene cero o un CV asociado.
 - El CV asociado debe pertenecer al mismo usuario.
 - `ended_on >= started_on`, excepto empleo actual sin fecha final.
-- Las etapas se ordenan por `event_on` y luego `created_at`; no se crean etapas
-  iniciales automáticamente.
+- Las etapas cumplen [SPEC-APPLICATIONS-004](application-stages.md): se ordenan
+  descendentemente por `event_on` o `created_at`, con desempates por creación e
+  ID; no se crean etapas iniciales y nunca modifican el estado del tablero.
 - Los límites de intereses y habilidades se serializan por perfil con advisory
   locks transaccionales para impedir que inserts concurrentes los excedan.
 
@@ -167,3 +168,9 @@ para contratos, migraciones y pruebas de la story.
 La versión 1.3 incorpora `SPEC-APPLICATIONS-002`: fecha nullable para borradores,
 compensaciones normalizadas y relaciones por CV/postulación preparadas para el
 análisis futuro de skills. La automatización permanece fuera de alcance.
+
+## Revisión 1.4
+
+La versión 1.4 incorpora `SPEC-APPLICATIONS-004`: reemplaza `details` por
+`comments` y define resultado, dificultad, preguntas, restricciones y orden
+determinista para el CRUD completo de etapas.

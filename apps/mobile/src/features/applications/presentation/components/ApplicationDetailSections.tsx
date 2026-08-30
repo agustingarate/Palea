@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import {
   AppText,
   Badge,
+  Button,
   CollectionFeedback,
   Icon,
   IconButton,
@@ -19,6 +20,7 @@ import type {
 } from '../../domain/entities/Application';
 import { useLocale } from '@/core/localization/LocaleProvider';
 import { ReadOnlyHtml } from '../detail/ReadOnlyHtml';
+import { isPendingStageDue } from '../stages/applicationStageModel';
 
 type Loadable<T> = {
   data: T | undefined;
@@ -144,8 +146,14 @@ export function ApplicationDetailSummary({
 
 export function ApplicationStagesSection({
   state,
+  onAdd,
+  onOpen,
+  onEdit,
 }: {
   state: Loadable<ApplicationStage[]>;
+  onAdd: () => void;
+  onOpen: (stageId: string) => void;
+  onEdit: (stageId: string) => void;
 }) {
   const { t, i18n } = useLocale('applications');
   if (state.isLoading) return <CollectionFeedback status="loading" rows={3} />;
@@ -160,19 +168,49 @@ export function ApplicationStagesSection({
       />
     );
   return (
-    <Section title={t('detail.stages')} icon="circleDashed">
+    <Section
+      title={t('detail.stages')}
+      icon="circleDashed"
+      action={
+        <Button
+          label={t('stages.add')}
+          leadingIcon="add"
+          variant="secondary"
+          size="sm"
+          style={{ minHeight: 48 }}
+          onPress={onAdd}
+        />
+      }
+    >
       {state.data?.length ? (
         <StageTimeline
-          items={state.data.map((stage) => ({
+          items={state.data.map((stage, index) => ({
             id: stage.id,
             title: stage.name,
-            description: stage.details ?? undefined,
             date: stage.eventOn
               ? new Intl.DateTimeFormat(i18n.language, {
                   dateStyle: 'medium',
                 }).format(new Date(`${stage.eventOn}T12:00:00`))
               : t('detail.unspecified'),
-            completed: true,
+            completed: stage.result !== 'pending',
+            current: index === 0,
+            currentLabel: index === 0 ? t('stages.current') : undefined,
+            statusLabel: t(`stages.result.${stage.result}`),
+            tone:
+              stage.result === 'successful'
+                ? 'success'
+                : stage.result === 'failed'
+                  ? 'danger'
+                  : 'warning',
+            warningLabel: isPendingStageDue(stage)
+              ? t('stages.warning.short')
+              : undefined,
+            warningActionLabel: isPendingStageDue(stage)
+              ? t('stages.warning.action')
+              : undefined,
+            onWarningPress: () => onEdit(stage.id),
+            actionLabel: t('stages.open', { name: stage.name }),
+            onPress: () => onOpen(stage.id),
           }))}
         />
       ) : (
@@ -429,19 +467,24 @@ function formatCompensation(
 function Section({
   title,
   icon,
+  action,
   children,
 }: {
   title: string;
   icon: Parameters<typeof Icon>[0]['name'];
+  action?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <Surface padding="lg" className="gap-4">
-      <View className="flex-row items-center gap-2">
-        <Icon name={icon} size="md" tone="muted" />
-        <AppText accessibilityRole="header" variant="sectionTitle">
-          {title}
-        </AppText>
+      <View className="flex-row items-center justify-between gap-3">
+        <View className="min-w-0 flex-1 flex-row items-center gap-2">
+          <Icon name={icon} size="md" tone="muted" />
+          <AppText accessibilityRole="header" variant="sectionTitle">
+            {title}
+          </AppText>
+        </View>
+        {action}
       </View>
       {children}
     </Surface>

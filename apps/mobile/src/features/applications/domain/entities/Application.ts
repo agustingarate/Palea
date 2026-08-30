@@ -7,6 +7,10 @@ import type {
   ApplicationStage,
   ApplicationNote,
   ApplicationResource,
+  CreateApplicationStageInput,
+  UpdateApplicationStageInput,
+  ApplicationStageResult,
+  ApplicationStageDifficulty,
 } from '@palea/contracts';
 export type {
   Application,
@@ -17,4 +21,8 @@ export type {
   ApplicationStage,
   ApplicationNote,
   ApplicationResource,
+  CreateApplicationStageInput,
+  UpdateApplicationStageInput,
+  ApplicationStageResult,
+  ApplicationStageDifficulty,
 };

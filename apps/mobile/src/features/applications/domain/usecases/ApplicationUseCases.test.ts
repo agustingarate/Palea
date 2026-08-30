@@ -2,6 +2,12 @@ import { DeleteApplication } from './DeleteApplication';
 import { ListApplications } from './ListApplications';
 import { UpdateApplicationStatus } from './UpdateApplicationStatus';
 import { CreateApplication } from './CreateApplication';
+import {
+  CreateApplicationStage,
+  DeleteApplicationStage,
+  GetApplicationStage,
+  UpdateApplicationStage,
+} from './ApplicationDetailUseCases';
 
 const repository = {
   list: jest.fn().mockResolvedValue({ items: [], nextCursor: null, total: 0 }),
@@ -13,6 +19,10 @@ const repository = {
   getNote: jest.fn().mockResolvedValue(null),
   listResources: jest.fn().mockResolvedValue([]),
   updateResume: jest.fn().mockResolvedValue(undefined),
+  createStage: jest.fn().mockResolvedValue({}),
+  getStage: jest.fn().mockResolvedValue({}),
+  updateStage: jest.fn().mockResolvedValue({}),
+  deleteStage: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('application use cases', () => {
@@ -56,5 +66,30 @@ describe('application use cases', () => {
       undefined,
     );
     expect(repository.remove).toHaveBeenCalledWith('app-1');
+  });
+
+  it('delegates stage CRUD through typed use cases', async () => {
+    const applicationId = 'app-1';
+    const stageId = 'stage-1';
+    const input = {
+      applicationId,
+      name: 'Interview',
+      eventOn: null,
+      result: 'pending' as const,
+      difficulty: null,
+      questions: null,
+      comments: null,
+    };
+    await new CreateApplicationStage(repository).execute(input);
+    await new GetApplicationStage(repository).execute(applicationId, stageId);
+    await new UpdateApplicationStage(repository).execute({ ...input, stageId });
+    await new DeleteApplicationStage(repository).execute(
+      applicationId,
+      stageId,
+    );
+    expect(repository.createStage).toHaveBeenCalledWith(input);
+    expect(repository.getStage).toHaveBeenCalledWith(applicationId, stageId);
+    expect(repository.updateStage).toHaveBeenCalledWith({ ...input, stageId });
+    expect(repository.deleteStage).toHaveBeenCalledWith(applicationId, stageId);
   });
 });

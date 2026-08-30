@@ -26,6 +26,10 @@ import {
   ListApplicationResources,
   ListApplicationStages,
   UpdateApplicationResume,
+  CreateApplicationStage,
+  GetApplicationStage,
+  UpdateApplicationStage,
+  DeleteApplicationStage,
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import { ResumeRepositoryImpl } from '@/features/resumes/data/repositories/ResumeRepositoryImpl';
 import { TrpcResumesDataSource } from '@/features/resumes/data/datasources/TrpcResumesDataSource';
@@ -111,6 +115,22 @@ export function createAppContainer(): Container {
   container.register(
     dependencyTokens.updateApplicationResume,
     new UpdateApplicationResume(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.createApplicationStage,
+    new CreateApplicationStage(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.getApplicationStage,
+    new GetApplicationStage(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.updateApplicationStage,
+    new UpdateApplicationStage(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.deleteApplicationStage,
+    new DeleteApplicationStage(applicationRepository),
   );
   const datasource = createProjectsDataSource();
   container.register(

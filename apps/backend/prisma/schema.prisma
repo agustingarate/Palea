@@ -105,6 +105,23 @@ enum AnalysisStatus {
   @@map("analysis_status")
 }
 
+enum ApplicationStageResult {
+  pending
+  waiting
+  successful
+  failed
+
+  @@map("application_stage_result")
+}
+
+enum ApplicationStageDifficulty {
+  easy
+  medium
+  hard
+
+  @@map("application_stage_difficulty")
+}
+
 model Profile {
   id                    String           @id @db.Uuid
   fullName              String?          @map("full_name")
@@ -250,16 +267,18 @@ model Resume {
 }
 
 model ApplicationStage {
-  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  applicationId String      @map("application_id") @db.Uuid
+  id            String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  applicationId String                      @map("application_id") @db.Uuid
   name          String
-  details       String?
-  eventOn       DateTime?   @map("event_on") @db.Date
-  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  eventOn       DateTime?                   @map("event_on") @db.Date
+  result        ApplicationStageResult      @default(pending)
+  difficulty    ApplicationStageDifficulty?
+  questions     String?
+  comments      String?
+  createdAt     DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime                    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  application   Application                 @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
-  @@index([applicationId, eventOn, createdAt])
   @@map("application_stages")
 }
 

@@ -4,7 +4,9 @@ import type {
   ApplicationListInput,
   ApplicationStatus,
   CompensationRange,
+  CreateApplicationStageInput,
   CreateApplicationInput,
+  UpdateApplicationStageInput,
 } from '@palea/contracts';
 import type { Prisma } from '@prisma/client';
 import sanitizeHtml from 'sanitize-html';
@@ -174,15 +176,74 @@ export class ApplicationsService {
     await this.assertOwned(subject, applicationId);
     const stages = await this.prisma.applicationStage.findMany({
       where: { applicationId },
-      orderBy: [{ eventOn: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
     });
-    return stages.map((stage) => ({
-      id: stage.id,
-      name: stage.name,
-      details: stage.details,
-      eventOn: stage.eventOn?.toISOString().slice(0, 10) ?? null,
-      createdAt: stage.createdAt.toISOString(),
-    }));
+    return stages.sort(compareStagesDescending).map(toApplicationStage);
+  }
+
+  async createStage(subject: string, input: CreateApplicationStageInput) {
+    return this.prisma.$transaction(async (transaction) => {
+      await assertOwned(transaction, subject, input.applicationId);
+      const stage = await transaction.applicationStage.create({
+        data: {
+          applicationId: input.applicationId,
+          name: input.name,
+          eventOn: input.eventOn ? toDatabaseDate(input.eventOn) : null,
+          result: input.result,
+          difficulty: input.difficulty,
+          questions: input.questions,
+          comments: input.comments,
+        },
+      });
+      return toApplicationStage(stage);
+    });
+  }
+
+  async getStage(subject: string, applicationId: string, stageId: string) {
+    const stage = await this.prisma.applicationStage.findFirst({
+      where: {
+        id: stageId,
+        applicationId,
+        application: { profileId: subject },
+      },
+    });
+    if (!stage) throw new AppError('applications.not_found', 'NOT_FOUND');
+    return toApplicationStage(stage);
+  }
+
+  async updateStage(subject: string, input: UpdateApplicationStageInput) {
+    return this.prisma.$transaction(async (transaction) => {
+      const stage = await findOwnedStage(
+        transaction,
+        subject,
+        input.applicationId,
+        input.stageId,
+      );
+      const updated = await transaction.applicationStage.update({
+        where: { id: stage.id },
+        data: {
+          name: input.name,
+          eventOn: input.eventOn ? toDatabaseDate(input.eventOn) : null,
+          result: input.result,
+          difficulty: input.difficulty,
+          questions: input.questions,
+          comments: input.comments,
+        },
+      });
+      return toApplicationStage(updated);
+    });
+  }
+
+  async deleteStage(subject: string, applicationId: string, stageId: string) {
+    await this.prisma.$transaction(async (transaction) => {
+      const stage = await findOwnedStage(
+        transaction,
+        subject,
+        applicationId,
+        stageId,
+      );
+      await transaction.applicationStage.delete({ where: { id: stage.id } });
+    });
+    return { success: true as const };
   }
 
   async getNote(subject: string, applicationId: string) {
@@ -329,12 +390,73 @@ export class ApplicationsService {
   }
 
   private async assertOwned(subject: string, applicationId: string) {
-    const application = await this.prisma.application.findFirst({
-      where: { id: applicationId, profileId: subject },
-      select: { id: true },
-    });
-    if (!application) throw new AppError('applications.not_found', 'NOT_FOUND');
+    await assertOwned(this.prisma, subject, applicationId);
   }
+}
+
+type StageRow = {
+  id: string;
+  applicationId: string;
+  name: string;
+  eventOn: Date | null;
+  result: 'pending' | 'waiting' | 'successful' | 'failed';
+  difficulty: 'easy' | 'medium' | 'hard' | null;
+  questions: string | null;
+  comments: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+function toApplicationStage(stage: StageRow) {
+  return {
+    id: stage.id,
+    applicationId: stage.applicationId,
+    name: stage.name,
+    eventOn: stage.eventOn?.toISOString().slice(0, 10) ?? null,
+    result: stage.result,
+    difficulty: stage.difficulty,
+    questions: stage.questions,
+    comments: stage.comments,
+    createdAt: stage.createdAt.toISOString(),
+    updatedAt: stage.updatedAt.toISOString(),
+  };
+}
+
+function compareStagesDescending(left: StageRow, right: StageRow) {
+  const leftOrder = (left.eventOn ?? left.createdAt).getTime();
+  const rightOrder = (right.eventOn ?? right.createdAt).getTime();
+  if (leftOrder !== rightOrder) return rightOrder - leftOrder;
+  const createdOrder = right.createdAt.getTime() - left.createdAt.getTime();
+  return createdOrder || right.id.localeCompare(left.id);
+}
+
+async function assertOwned(
+  prisma: Pick<Prisma.TransactionClient, 'application'>,
+  subject: string,
+  applicationId: string,
+) {
+  const application = await prisma.application.findFirst({
+    where: { id: applicationId, profileId: subject },
+    select: { id: true },
+  });
+  if (!application) throw new AppError('applications.not_found', 'NOT_FOUND');
+}
+
+async function findOwnedStage(
+  prisma: Pick<Prisma.TransactionClient, 'applicationStage'>,
+  subject: string,
+  applicationId: string,
+  stageId: string,
+) {
+  const stage = await prisma.applicationStage.findFirst({
+    where: {
+      id: stageId,
+      applicationId,
+      application: { profileId: subject },
+    },
+  });
+  if (!stage) throw new AppError('applications.not_found', 'NOT_FOUND');
+  return stage;
 }
 
 function toApplication(application: {

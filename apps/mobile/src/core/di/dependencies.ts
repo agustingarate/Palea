@@ -13,6 +13,10 @@ import type {
   ListApplicationResources,
   ListApplicationStages,
   UpdateApplicationResume,
+  CreateApplicationStage,
+  GetApplicationStage,
+  UpdateApplicationStage,
+  DeleteApplicationStage,
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import type { ResumeRepository } from '@/features/resumes/domain/repositories/ResumeRepository';
 import { createToken } from './container';
@@ -34,6 +38,10 @@ export interface AppDependencies {
   getApplicationNote: GetApplicationNote;
   listApplicationResources: ListApplicationResources;
   updateApplicationResume: UpdateApplicationResume;
+  createApplicationStage: CreateApplicationStage;
+  getApplicationStage: GetApplicationStage;
+  updateApplicationStage: UpdateApplicationStage;
+  deleteApplicationStage: DeleteApplicationStage;
   sessionCleanupRegistry: SessionCleanupRegistry;
 }
 
@@ -66,6 +74,16 @@ export const dependencyTokens = {
   ),
   updateApplicationResume: createToken<UpdateApplicationResume>(
     'UpdateApplicationResume',
+  ),
+  createApplicationStage: createToken<CreateApplicationStage>(
+    'CreateApplicationStage',
+  ),
+  getApplicationStage: createToken<GetApplicationStage>('GetApplicationStage'),
+  updateApplicationStage: createToken<UpdateApplicationStage>(
+    'UpdateApplicationStage',
+  ),
+  deleteApplicationStage: createToken<DeleteApplicationStage>(
+    'DeleteApplicationStage',
   ),
   sessionCleanupRegistry: createToken<SessionCleanupRegistry>(
     'SessionCleanupRegistry',

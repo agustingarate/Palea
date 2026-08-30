@@ -35,6 +35,10 @@ import {
   applicationResumeInputSchema,
   applicationDetailSchema,
   applicationStagesSchema,
+  applicationStageSchema,
+  applicationStageIdSchema,
+  createApplicationStageInputSchema,
+  updateApplicationStageInputSchema,
   applicationNoteSchema,
   applicationResourcesSchema,
   type ApplicationListInput,
@@ -44,6 +48,8 @@ import {
   type Application,
   type ApplicationDetail,
   type ApplicationStage,
+  type CreateApplicationStageInput,
+  type UpdateApplicationStageInput,
   type ApplicationNote,
   type ApplicationResource,
   type Resume,
@@ -123,6 +129,24 @@ export interface PaleaApiServices {
     subject: string,
     applicationId: string,
   ): Promise<ApplicationStage[]>;
+  createApplicationStage(
+    subject: string,
+    input: CreateApplicationStageInput,
+  ): Promise<ApplicationStage>;
+  getApplicationStage(
+    subject: string,
+    applicationId: string,
+    stageId: string,
+  ): Promise<ApplicationStage>;
+  updateApplicationStage(
+    subject: string,
+    input: UpdateApplicationStageInput,
+  ): Promise<ApplicationStage>;
+  deleteApplicationStage(
+    subject: string,
+    applicationId: string,
+    stageId: string,
+  ): Promise<{ success: true }>;
   getApplicationNote(
     subject: string,
     applicationId: string,
@@ -302,6 +326,38 @@ export const applicationsRouter = t.router({
       ctx.services.listApplicationStages(
         ctx.identity.subject,
         input.applicationId,
+      ),
+    ),
+  createStage: protectedProcedure
+    .input(createApplicationStageInputSchema)
+    .output(applicationStageSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.createApplicationStage(ctx.identity.subject, input),
+    ),
+  getStage: protectedProcedure
+    .input(applicationStageIdSchema)
+    .output(applicationStageSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.getApplicationStage(
+        ctx.identity.subject,
+        input.applicationId,
+        input.stageId,
+      ),
+    ),
+  updateStage: protectedProcedure
+    .input(updateApplicationStageInputSchema)
+    .output(applicationStageSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.updateApplicationStage(ctx.identity.subject, input),
+    ),
+  deleteStage: protectedProcedure
+    .input(applicationStageIdSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.deleteApplicationStage(
+        ctx.identity.subject,
+        input.applicationId,
+        input.stageId,
       ),
     ),
   getNote: protectedProcedure

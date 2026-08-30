@@ -5,12 +5,18 @@ import {
   applicationSchema,
   applicationDetailSchema,
   applicationStagesSchema,
+  applicationStageSchema,
+  applicationStageIdSchema,
+  createApplicationStageInputSchema,
+  updateApplicationStageInputSchema,
   applicationNoteSchema,
   applicationResourcesSchema,
   applicationResumeInputSchema,
   createApplicationInputSchema,
   type CreateApplicationInput,
   type ApplicationStatus,
+  type CreateApplicationStageInput,
+  type UpdateApplicationStageInput,
   updateApplicationStatusInputSchema,
 } from '@palea/contracts';
 import type { PaleaApiClient } from '@palea/api-client';
@@ -51,6 +57,36 @@ export class TrpcApplicationsDataSource implements ApplicationsDataSource {
       await this.client.applications.listStages.query(
         applicationIdSchema.parse({ applicationId }),
       ),
+    );
+  }
+
+  async createStage(input: CreateApplicationStageInput) {
+    return applicationStageSchema.parse(
+      await this.client.applications.createStage.mutate(
+        createApplicationStageInputSchema.parse(input),
+      ),
+    );
+  }
+
+  async getStage(applicationId: string, stageId: string) {
+    return applicationStageSchema.parse(
+      await this.client.applications.getStage.query(
+        applicationStageIdSchema.parse({ applicationId, stageId }),
+      ),
+    );
+  }
+
+  async updateStage(input: UpdateApplicationStageInput) {
+    return applicationStageSchema.parse(
+      await this.client.applications.updateStage.mutate(
+        updateApplicationStageInputSchema.parse(input),
+      ),
+    );
+  }
+
+  async deleteStage(applicationId: string, stageId: string) {
+    await this.client.applications.deleteStage.mutate(
+      applicationStageIdSchema.parse({ applicationId, stageId }),
     );
   }
 
