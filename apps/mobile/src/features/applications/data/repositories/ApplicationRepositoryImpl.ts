@@ -8,6 +8,8 @@ import type {
   ApplicationStage,
   ApplicationNote,
   ApplicationResource,
+  CreateApplicationStageInput,
+  UpdateApplicationStageInput,
 } from '../../domain/entities/Application';
 import type { ApplicationsDataSource } from '../datasources/ApplicationsDataSource';
 
@@ -27,6 +29,18 @@ export class ApplicationRepositoryImpl implements ApplicationRepository {
   }
   listStages(applicationId: string): Promise<ApplicationStage[]> {
     return this.dataSource.listStages(applicationId);
+  }
+  createStage(input: CreateApplicationStageInput): Promise<ApplicationStage> {
+    return this.dataSource.createStage(input);
+  }
+  getStage(applicationId: string, stageId: string): Promise<ApplicationStage> {
+    return this.dataSource.getStage(applicationId, stageId);
+  }
+  updateStage(input: UpdateApplicationStageInput): Promise<ApplicationStage> {
+    return this.dataSource.updateStage(input);
+  }
+  async deleteStage(applicationId: string, stageId: string): Promise<void> {
+    await this.dataSource.deleteStage(applicationId, stageId);
   }
   getNote(applicationId: string): Promise<ApplicationNote | null> {
     return this.dataSource.getNote(applicationId);

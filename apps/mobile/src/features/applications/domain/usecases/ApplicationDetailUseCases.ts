@@ -3,6 +3,8 @@ import type {
   ApplicationNote,
   ApplicationResource,
   ApplicationStage,
+  CreateApplicationStageInput,
+  UpdateApplicationStageInput,
 } from '../entities/Application';
 import type { ApplicationRepository } from '../repositories/ApplicationRepository';
 
@@ -17,6 +19,34 @@ export class ListApplicationStages {
   constructor(private readonly repository: ApplicationRepository) {}
   execute(applicationId: string): Promise<ApplicationStage[]> {
     return this.repository.listStages(applicationId);
+  }
+}
+
+export class CreateApplicationStage {
+  constructor(private readonly repository: ApplicationRepository) {}
+  execute(input: CreateApplicationStageInput): Promise<ApplicationStage> {
+    return this.repository.createStage(input);
+  }
+}
+
+export class GetApplicationStage {
+  constructor(private readonly repository: ApplicationRepository) {}
+  execute(applicationId: string, stageId: string): Promise<ApplicationStage> {
+    return this.repository.getStage(applicationId, stageId);
+  }
+}
+
+export class UpdateApplicationStage {
+  constructor(private readonly repository: ApplicationRepository) {}
+  execute(input: UpdateApplicationStageInput): Promise<ApplicationStage> {
+    return this.repository.updateStage(input);
+  }
+}
+
+export class DeleteApplicationStage {
+  constructor(private readonly repository: ApplicationRepository) {}
+  execute(applicationId: string, stageId: string): Promise<void> {
+    return this.repository.deleteStage(applicationId, stageId);
   }
 }
 

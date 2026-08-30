@@ -11,6 +11,10 @@ const dataSource = {
   getNote: jest.fn(),
   listResources: jest.fn(),
   updateResume: jest.fn(),
+  createStage: jest.fn(),
+  getStage: jest.fn(),
+  updateStage: jest.fn(),
+  deleteStage: jest.fn(),
 };
 
 describe('ApplicationRepositoryImpl', () => {
@@ -81,5 +85,26 @@ describe('ApplicationRepositoryImpl', () => {
     };
     await repository.create(input);
     expect(dataSource.create).toHaveBeenCalledWith(input);
+  });
+
+  it('delegates stage CRUD through the datasource port', async () => {
+    const stageId = 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12';
+    const input = {
+      applicationId,
+      name: 'Interview',
+      eventOn: null,
+      result: 'pending' as const,
+      difficulty: null,
+      questions: null,
+      comments: null,
+    };
+    await repository.createStage(input);
+    await repository.getStage(applicationId, stageId);
+    await repository.updateStage({ ...input, stageId });
+    await repository.deleteStage(applicationId, stageId);
+    expect(dataSource.createStage).toHaveBeenCalledWith(input);
+    expect(dataSource.getStage).toHaveBeenCalledWith(applicationId, stageId);
+    expect(dataSource.updateStage).toHaveBeenCalledWith({ ...input, stageId });
+    expect(dataSource.deleteStage).toHaveBeenCalledWith(applicationId, stageId);
   });
 });
