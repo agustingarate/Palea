@@ -134,7 +134,10 @@ function ApplicationsHomeContent() {
   };
   const notifyPending = (destination: string) => {
     if (destination === 'applications') return;
-    // TODO(CU-86ajvbvec): navigate to the complete CV Library.
+    if (destination === 'resumes') {
+      router.push('/resumes' as never);
+      return;
+    }
     // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
     // TODO(CU-86ajvbvfq): navigate to the candidate profile.
     showSnackbar({ variant: 'info', message: t('nav.pending') });
