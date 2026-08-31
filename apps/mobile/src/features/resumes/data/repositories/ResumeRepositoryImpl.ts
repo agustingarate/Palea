@@ -45,6 +45,26 @@ export class ResumeRepositoryImpl implements ResumeRepository {
     const result = await this.dataSource.createDownload(resumeId);
     return result.signedUrl;
   }
+
+  policy() {
+    return this.dataSource.policy();
+  }
+
+  rename(resumeId: string, displayName: string) {
+    return this.dataSource.rename(resumeId, displayName);
+  }
+
+  setPrimary(resumeId: string) {
+    return this.dataSource.setPrimary(resumeId);
+  }
+
+  deleteImpact(resumeId: string) {
+    return this.dataSource.deleteImpact(resumeId);
+  }
+
+  delete(resumeId: string) {
+    return this.dataSource.delete(resumeId);
+  }
 }
 
 function putWithProgress(

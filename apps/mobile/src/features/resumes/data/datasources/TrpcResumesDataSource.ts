@@ -3,6 +3,9 @@ import {
   reserveResumeUploadInputSchema,
   resumeListSchema,
   resumeDownloadSchema,
+  resumeDeleteImpactSchema,
+  resumeLibraryPolicySchema,
+  renameResumeInputSchema,
   resumeIdInputSchema,
   type ConfirmResumeUploadInput,
   type ReserveResumeUploadInput,
@@ -44,5 +47,31 @@ export class TrpcResumesDataSource implements ResumesDataSource {
       ),
     );
     return { signedUrl: result.signedUrl };
+  }
+
+  async policy() {
+    return resumeLibraryPolicySchema.parse(
+      await this.client.resume.policy.query(),
+    );
+  }
+
+  async rename(resumeId: string, displayName: string) {
+    await this.client.resume.rename.mutate(
+      renameResumeInputSchema.parse({ resumeId, displayName }),
+    );
+  }
+
+  async setPrimary(resumeId: string) {
+    await this.client.resume.setPrimary.mutate({ resumeId });
+  }
+
+  async deleteImpact(resumeId: string) {
+    return resumeDeleteImpactSchema.parse(
+      await this.client.resume.deleteImpact.query({ resumeId }),
+    );
+  }
+
+  async delete(resumeId: string) {
+    await this.client.resume.delete.mutate({ resumeId });
   }
 }
