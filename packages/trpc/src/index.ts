@@ -13,6 +13,9 @@ import {
   resumeListSchema,
   resumeDownloadSchema,
   confirmResumeUploadInputSchema,
+  renameResumeInputSchema,
+  resumeDeleteImpactSchema,
+  resumeLibraryPolicySchema,
   saveProfileInputSchema,
   saveSkillsInputSchema,
   saveWorkExperienceInputSchema,
@@ -54,6 +57,7 @@ import {
   type ApplicationResource,
   type Resume,
   type ConfirmResumeUploadInput,
+  type ResumeLibraryPolicy,
 } from '@palea/contracts';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -113,6 +117,24 @@ export interface PaleaApiServices {
     subject: string,
     resumeId: string,
   ): Promise<{ success: true }>;
+  getResumePolicy(subject: string): Promise<ResumeLibraryPolicy>;
+  renameResume(
+    subject: string,
+    input: { resumeId: string; displayName: string },
+  ): Promise<{ success: true }>;
+  setPrimaryResume(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ success: true }>;
+  getResumeDeleteImpact(
+    subject: string,
+    resumeId: string,
+  ): Promise<{
+    resumeId: string;
+    applicationCount: number;
+    isPrimary: boolean;
+  }>;
+  deleteResume(subject: string, resumeId: string): Promise<{ success: true }>;
   listApplications(
     subject: string,
     input: ApplicationListInput,
@@ -297,6 +319,34 @@ export const resumeRouter = t.router({
     .output(resumeDownloadSchema)
     .mutation(({ ctx, input }) =>
       ctx.services.createResumeDownload(ctx.identity.subject, input.resumeId),
+    ),
+  policy: protectedProcedure
+    .input(z.object({}).optional())
+    .output(resumeLibraryPolicySchema)
+    .query(({ ctx }) => ctx.services.getResumePolicy(ctx.identity.subject)),
+  rename: protectedProcedure
+    .input(renameResumeInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.renameResume(ctx.identity.subject, input),
+    ),
+  setPrimary: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.setPrimaryResume(ctx.identity.subject, input.resumeId),
+    ),
+  deleteImpact: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(resumeDeleteImpactSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.getResumeDeleteImpact(ctx.identity.subject, input.resumeId),
+    ),
+  delete: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.deleteResume(ctx.identity.subject, input.resumeId),
     ),
 });
 
