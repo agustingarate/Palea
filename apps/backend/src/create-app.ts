@@ -89,6 +89,14 @@ async function createContext(
         resumes.createDownload(subject, resumeId),
       cancelResumeUpload: (subject, resumeId) =>
         resumes.cancel(subject, resumeId),
+      getResumePolicy: (subject) => resumes.policy(subject),
+      renameResume: (subject, input) =>
+        resumes.rename(subject, input.resumeId, input.displayName),
+      setPrimaryResume: (subject, resumeId) =>
+        resumes.setPrimary(subject, resumeId),
+      getResumeDeleteImpact: (subject, resumeId) =>
+        resumes.deleteImpact(subject, resumeId),
+      deleteResume: (subject, resumeId) => resumes.remove(subject, resumeId),
       listApplications: (subject, input) => applications.list(subject, input),
       createApplication: (subject, input) =>
         applications.create(subject, input),

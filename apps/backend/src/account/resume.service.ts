@@ -7,6 +7,10 @@ import { environment } from '../config/environment';
 import { PrismaService } from '../database/prisma.service';
 
 const BUCKET = 'resumes';
+// The API is the single source of truth for library limits. Keeping this policy
+// behind the service allows a future backoffice to replace it without clients
+// duplicating business constants.
+const LIBRARY_POLICY = { maxSizeBytes: 10 * 1024 * 1024, maxResumes: 10 };
 
 @Injectable()
 export class ResumeService {
@@ -22,6 +26,7 @@ export class ResumeService {
 
   async reserve(subject: string, input: ReserveResumeUploadInput) {
     await this.cleanupExpired(subject);
+    await this.assertLibraryQuota(subject);
     await this.assertReservationQuota(subject);
     const resumeId = randomUUID();
     const path = `${subject}/${resumeId}.pdf`;
@@ -74,7 +79,9 @@ export class ResumeService {
     if (
       !isPdf ||
       bytes.length !== Number(resume.sizeBytes) ||
-      bytes.length > 10 * 1024 * 1024
+      bytes.length > LIBRARY_POLICY.maxSizeBytes ||
+      // Encrypted PDFs cannot be rendered consistently in every product surface.
+      new TextDecoder('latin1').decode(bytes).includes('/Encrypt')
     ) {
       return this.fail(resumeId, resume.storagePath, 'Invalid PDF upload');
     }
@@ -133,6 +140,83 @@ export class ResumeService {
       signedUrl: data.signedUrl,
       expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString(),
     };
+  }
+
+  async policy(subject: string) {
+    const usedResumes = await this.prisma.resume.count({
+      where: {
+        profileId: subject,
+        uploadStatus: { in: ['pending', 'ready'] },
+      },
+    });
+    return { ...LIBRARY_POLICY, usedResumes };
+  }
+
+  async rename(subject: string, resumeId: string, displayName: string) {
+    const updated = await this.prisma.resume.updateMany({
+      where: { id: resumeId, profileId: subject, uploadStatus: 'ready' },
+      data: { displayName },
+    });
+    if (!updated.count)
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resume not found' });
+    return { success: true as const };
+  }
+
+  async setPrimary(subject: string, resumeId: string) {
+    await this.prisma.$transaction(async (tx) => {
+      const resume = await tx.resume.findFirst({
+        where: { id: resumeId, profileId: subject, uploadStatus: 'ready' },
+        select: { id: true },
+      });
+      if (!resume)
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Resume not found' });
+      await tx.resume.updateMany({
+        where: { profileId: subject, isPrimary: true },
+        data: { isPrimary: false },
+      });
+      await tx.resume.update({
+        where: { id: resume.id },
+        data: { isPrimary: true },
+      });
+    });
+    return { success: true as const };
+  }
+
+  async deleteImpact(subject: string, resumeId: string) {
+    const resume = await this.prisma.resume.findFirst({
+      where: { id: resumeId, profileId: subject, uploadStatus: 'ready' },
+      select: { id: true, isPrimary: true },
+    });
+    if (!resume)
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resume not found' });
+    const applicationCount = await this.prisma.application.count({
+      where: { profileId: subject, resumeId },
+    });
+    return {
+      resumeId: resume.id,
+      applicationCount,
+      isPrimary: resume.isPrimary,
+    };
+  }
+
+  async remove(subject: string, resumeId: string) {
+    const resume = await this.prisma.resume.findFirst({
+      where: { id: resumeId, profileId: subject, uploadStatus: 'ready' },
+      select: { id: true, storagePath: true },
+    });
+    if (!resume)
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Resume not found' });
+    const { error } = await this.storage.storage
+      .from(BUCKET)
+      .remove([resume.storagePath]);
+    if (error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'resume.cleanup_failed',
+      });
+    // applications.resume_id is ON DELETE SET NULL by the database contract.
+    await this.prisma.resume.delete({ where: { id: resume.id } });
+    return { success: true as const };
   }
 
   async cancel(subject: string, resumeId: string) {
@@ -238,6 +322,17 @@ export class ResumeService {
       throw new TRPCError({
         code: 'TOO_MANY_REQUESTS',
         message: 'resume.rate_limited',
+      });
+  }
+
+  private async assertLibraryQuota(subject: string) {
+    const count = await this.prisma.resume.count({
+      where: { profileId: subject, uploadStatus: { in: ['pending', 'ready'] } },
+    });
+    if (count >= LIBRARY_POLICY.maxResumes)
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'resume.library_full',
       });
   }
 }
