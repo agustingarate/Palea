@@ -7,6 +7,15 @@ appropriate Expo/React Native smoke test. The branch is ready for remote review
 only after these checks pass locally; incomplete work remains local unless an
 intermediate push is explicitly requested.
 
+For user-facing work, completion begins with a product-quality implementation:
+the approved construction brief has been followed in the actual component tree,
+not merely described in a later review. The feature includes its responsive
+composition, localized content, light and dark themes where supported,
+accessible naming and focus behavior, and all specified states. Temporary
+placeholder layouts, raw controls, hard-coded display text, and technical
+fallbacks that reduce an approved interaction are incomplete unless the spec
+explicitly authorizes them.
+
 Environment changes additionally require Zod boundary tests, updated examples and
 catalog, explicit EAS profile inspection when mobile is affected, and confirmation
 that no public client variable contains a secret.

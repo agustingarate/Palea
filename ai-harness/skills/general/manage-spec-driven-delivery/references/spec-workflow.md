@@ -83,6 +83,24 @@ Terminology:
 
 Include purpose, non-goals, actors/authorization, visible behavior, state transitions, invariants, contracts, failure/retry/concurrency/idempotency, migration/compatibility, telemetry, and test mapping. Avoid incidental implementation detail unless contractual or architecturally approved.
 
+For a user-facing feature with a design source, the approved spec must also
+contain a construction brief before UI implementation begins:
+
+- the exact source screens or references and the viewport each governs;
+- layout regions, visual hierarchy, interaction model, tokens, responsive
+  transitions, and accessible behavior that the implementation must preserve;
+- a state inventory covering idle, loading, empty, error, disabled, pending,
+  success, selection, and domain-specific states where applicable;
+- a reconciliation list for each intentional divergence, including why it is
+  required by approved product behavior; and
+- the reusable component boundaries expected from the source composition.
+
+An implementation plan must order UI work as presentable vertical slices. It
+must not defer the design system, responsive composition, localization,
+accessibility, or state design into an unspecified final "polish" phase.
+Functional equivalence alone is insufficient when the source design is part of
+the requirement.
+
 ## 5. Change control
 
 - Change spec and implementation in the same PR when small and agreed.
