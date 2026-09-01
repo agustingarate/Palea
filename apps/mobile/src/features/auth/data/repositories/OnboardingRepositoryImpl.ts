@@ -40,6 +40,9 @@ export class OnboardingRepositoryImpl implements OnboardingRepository {
     file: ResumeUploadFile,
     onProgress?: (progress: number) => void,
   ) {
-    await this.resumes.upload(input, file, { makePrimary: true, onProgress });
+    await this.resumes.upload(input, file, {
+      primaryMode: 'replace',
+      onProgress,
+    });
   }
 }

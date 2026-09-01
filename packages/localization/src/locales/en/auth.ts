@@ -1,4 +1,12 @@
 const auth = {
+  'onboarding.skills.title': 'Skills and resume',
+  'onboarding.skills.label': 'Skills (up to 10)',
+  'onboarding.skills.resume': 'Resume (optional)',
+  'onboarding.skills.back': 'Back',
+  'onboarding.skills.finish': 'Finish',
+  'onboarding.skills.skip': 'Skip this step',
+  'onboarding.skills.finishError':
+    'We could not finish onboarding. Please try again.',
   'login.title': 'Welcome back',
   'login.description': 'Sign in to continue to Palea.',
   'login.submit': 'Sign in',

@@ -29,7 +29,7 @@ import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationActionMenu } from '../components/ApplicationActionMenu';
 import { BoardColumn, ListGroup } from '../components/ApplicationsCollections';
-import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
+import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import { useApplicationsDragAndDrop } from '../hooks/useApplicationsDragAndDrop';
 import {
   applicationStatuses,
@@ -148,7 +148,7 @@ function ApplicationsHomeContent() {
     <Screen edges={layout.isExpanded ? ['top', 'bottom'] : ['bottom']}>
       <View className="flex-1 flex-row">
         {layout.isExpanded ? (
-          <ApplicationsDesktopNavigation
+          <ProductDesktopNavigation
             labels={{
               applications: t('nav.applications'),
               metrics: t('nav.metrics'),

@@ -13,7 +13,7 @@ import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationDetailHeader } from '../components/ApplicationDetailHeader';
 import { ApplicationDetailModals } from '../components/ApplicationDetailModals';
-import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
+import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import {
   ApplicationDetailSummary,
   ApplicationNote,
@@ -146,6 +146,10 @@ function ApplicationDetailLoadedContent({
       resume={application.resume}
       downloadPending={downloadPending}
       onChooseResume={() => interactions.setResumeOpen(true)}
+      onPreviewResume={() => {
+        if (application.resume)
+          router.push(`/resumes/${application.resume.id}`);
+      }}
       onDownload={() => void interactions.downloadResume()}
       onOpen={interactions.openResource}
     />
@@ -194,7 +198,7 @@ function ApplicationDetailLoadedContent({
     <Screen edges={layout.isExpanded ? ['top', 'bottom'] : ['bottom']}>
       <View className="flex-1 flex-row">
         {layout.isExpanded ? (
-          <ApplicationsDesktopNavigation
+          <ProductDesktopNavigation
             labels={{
               applications: t('nav.applications'),
               metrics: t('nav.metrics'),

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { AppText, Button, DatePickerField } from '@palea/ui-native';
 import type { Resume } from '@palea/contracts';
 import type { ApplicationStatus } from '../../domain/entities/Application';
+import { ResumeSelectionDialog } from '@/features/resumes/presentation/components/ResumeSelectionDialog';
 
 type DateLabels = {
   title: string;
@@ -58,35 +59,16 @@ export function ApplicationDetailModals({
           />
         ))}
       </Overlay>
-      <Overlay visible={resume.visible} onClose={resume.onClose}>
-        <AppText variant="sectionTitle">{resume.labels.title}</AppText>
-        <Button
-          label={resume.labels.none}
-          variant={resume.selected === null ? 'primary' : 'secondary'}
-          disabled={resume.busy}
-          onPress={() => resume.onSelect(null)}
+      {resume.visible ? (
+        <ResumeSelectionDialog
+          resumes={resume.resumes}
+          selected={resume.selected}
+          busy={resume.busy}
+          onSelect={resume.onSelect}
+          onDismiss={resume.onClose}
+          onUpload={() => void resume.onUpload()}
         />
-        {resume.resumes.map((item) => (
-          <Button
-            key={item.id}
-            label={item.displayName}
-            variant={item.id === resume.selected ? 'primary' : 'secondary'}
-            disabled={resume.busy}
-            onPress={() => resume.onSelect(item.id)}
-          />
-        ))}
-        <Button
-          label={resume.labels.upload}
-          variant="secondary"
-          loading={resume.busy}
-          onPress={() => void resume.onUpload()}
-        />
-        <Button
-          label={resume.labels.cancel}
-          variant="ghost"
-          onPress={resume.onClose}
-        />
-      </Overlay>
+      ) : null}
       <Overlay visible={date.visible} onClose={date.onClose}>
         <View className="gap-1">
           <AppText variant="sectionTitle">{date.labels.title}</AppText>

@@ -1,6 +1,6 @@
 import { Alert, Linking } from 'react-native';
 import { useState } from 'react';
-import * as DocumentPicker from 'expo-document-picker';
+import { useResumeFilePicker } from '@/features/resumes/presentation/viewmodels/useResumeFilePicker';
 import type { ApplicationStatus } from '@palea/contracts';
 import { useRouter } from 'expo-router';
 import { useLocale } from '@/core/localization/LocaleProvider';
@@ -9,8 +9,6 @@ import type { ResumeUploadFile } from '@/features/resumes/domain/repositories/Re
 import type { ApplicationDetail } from '../../domain/entities/Application';
 import { todayLocal } from '../create/applicationCreateModel';
 import { navigateToApplicationsHome } from '../navigation/applicationsHomeNavigation';
-
-const MAX_RESUME_SIZE_BYTES = 10 * 1024 * 1024;
 
 export const applicationStatuses: ApplicationStatus[] = [
   'draft',
@@ -40,6 +38,7 @@ export function useApplicationDetailInteractions({
   mutations: DetailMutations;
 }) {
   const router = useRouter();
+  const picker = useResumeFilePicker();
   const { t } = useLocale('applications');
   const { showSnackbar } = useSnackbar();
   const [statusOpen, setStatusOpen] = useState(false);
@@ -98,24 +97,10 @@ export function useApplicationDetailInteractions({
   };
 
   const uploadResume = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: 'application/pdf',
-      copyToCacheDirectory: true,
-    });
-    if (result.canceled || !result.assets[0]) return;
     try {
-      const asset = result.assets[0];
-      const bytes = new Uint8Array(
-        await (await fetch(asset.uri)).arrayBuffer(),
-      );
-      const sizeBytes = asset.size ?? bytes.byteLength;
-      if (sizeBytes > MAX_RESUME_SIZE_BYTES) throw new Error('resume.maxSize');
-      await mutations.uploadResume({
-        name: asset.name,
-        mimeType: 'application/pdf',
-        sizeBytes,
-        readBytes: async () => bytes,
-      });
+      const file = await picker.selection.mutateAsync();
+      if (!file) return;
+      await mutations.uploadResume(file);
       setResumeOpen(false);
       showSnackbar({ variant: 'success', message: t('detail.resumeUpdated') });
     } catch {
