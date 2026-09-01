@@ -1,5 +1,7 @@
 import {
   confirmResumeUploadInputSchema,
+  deleteResumeInputSchema,
+  type DeleteResumeInput,
   reserveResumeUploadInputSchema,
   resumeListSchema,
   resumeDownloadSchema,
@@ -49,6 +51,14 @@ export class TrpcResumesDataSource implements ResumesDataSource {
     return { signedUrl: result.signedUrl };
   }
 
+  async createPreview(resumeId: string) {
+    return resumeDownloadSchema.parse(
+      await this.client.resume.createPreview.query(
+        resumeIdInputSchema.parse({ resumeId }),
+      ),
+    );
+  }
+
   async policy() {
     return resumeLibraryPolicySchema.parse(
       await this.client.resume.policy.query(),
@@ -71,7 +81,9 @@ export class TrpcResumesDataSource implements ResumesDataSource {
     );
   }
 
-  async delete(resumeId: string) {
-    await this.client.resume.delete.mutate({ resumeId });
+  async delete(input: DeleteResumeInput) {
+    await this.client.resume.delete.mutate(
+      deleteResumeInputSchema.parse(input),
+    );
   }
 }

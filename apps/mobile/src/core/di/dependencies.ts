@@ -19,6 +19,7 @@ import type {
   DeleteApplicationStage,
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import type { ResumeRepository } from '@/features/resumes/domain/repositories/ResumeRepository';
+import type { PickResumeFile } from '@/features/resumes/domain/usecases/PickResumeFile';
 import { createToken } from './container';
 import type { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
 
@@ -28,6 +29,7 @@ export interface AppDependencies {
   authRepository: AuthRepository;
   onboardingRepository: OnboardingRepository;
   resumeRepository: ResumeRepository;
+  pickResumeFile: PickResumeFile;
   applicationRepository: ApplicationRepository;
   createApplication: CreateApplication;
   listApplications: ListApplications;
@@ -53,6 +55,7 @@ export const dependencyTokens = {
     'OnboardingRepository',
   ),
   resumeRepository: createToken<ResumeRepository>('ResumeRepository'),
+  pickResumeFile: createToken<PickResumeFile>('PickResumeFile'),
   applicationRepository: createToken<ApplicationRepository>(
     'ApplicationRepository',
   ),

@@ -2,6 +2,8 @@ import type {
   ReserveResumeUploadInput,
   Resume,
   ResumeLibraryPolicy,
+  ConfirmResumeUploadInput,
+  DeleteResumeInput,
 } from '@palea/contracts';
 
 export interface ResumeUploadFile {
@@ -17,11 +19,14 @@ export interface ResumeRepository {
     input: ReserveResumeUploadInput,
     file: ResumeUploadFile,
     options: {
-      makePrimary: boolean;
+      primaryMode: ConfirmResumeUploadInput['primaryMode'];
       onProgress?: (progress: number) => void;
     },
   ): Promise<string>;
   createDownload(resumeId: string): Promise<string>;
+  createPreview(
+    resumeId: string,
+  ): Promise<{ signedUrl: string; expiresAt: string }>;
   policy(): Promise<ResumeLibraryPolicy>;
   rename(resumeId: string, displayName: string): Promise<void>;
   setPrimary(resumeId: string): Promise<void>;
@@ -30,5 +35,5 @@ export interface ResumeRepository {
     applicationCount: number;
     isPrimary: boolean;
   }>;
-  delete(resumeId: string): Promise<void>;
+  delete(input: DeleteResumeInput): Promise<void>;
 }

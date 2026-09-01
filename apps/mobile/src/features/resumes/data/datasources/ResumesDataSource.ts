@@ -3,6 +3,7 @@ import type {
   ReserveResumeUploadInput,
   Resume,
   ResumeLibraryPolicy,
+  DeleteResumeInput,
 } from '@palea/contracts';
 
 export interface ResumesDataSource {
@@ -13,6 +14,9 @@ export interface ResumesDataSource {
   confirm(input: ConfirmResumeUploadInput): Promise<void>;
   cancel(resumeId: string): Promise<void>;
   createDownload(resumeId: string): Promise<{ signedUrl: string }>;
+  createPreview(
+    resumeId: string,
+  ): Promise<{ signedUrl: string; expiresAt: string }>;
   policy(): Promise<ResumeLibraryPolicy>;
   rename(resumeId: string, displayName: string): Promise<void>;
   setPrimary(resumeId: string): Promise<void>;
@@ -21,5 +25,5 @@ export interface ResumesDataSource {
     applicationCount: number;
     isPrimary: boolean;
   }>;
-  delete(resumeId: string): Promise<void>;
+  delete(input: DeleteResumeInput): Promise<void>;
 }

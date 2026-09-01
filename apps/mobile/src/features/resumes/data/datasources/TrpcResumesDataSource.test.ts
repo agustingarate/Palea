@@ -22,10 +22,10 @@ describe('TrpcResumesDataSource', () => {
 
   it('confirms application uploads without replacing the primary', async () => {
     client.resume.confirmUpload.mutate.mockResolvedValue(undefined);
-    await dataSource.confirm({ resumeId, makePrimary: false });
+    await dataSource.confirm({ resumeId, primaryMode: 'preserve' });
     expect(client.resume.confirmUpload.mutate).toHaveBeenCalledWith({
       resumeId,
-      makePrimary: false,
+      primaryMode: 'preserve',
     });
   });
 });
