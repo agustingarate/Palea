@@ -16,7 +16,7 @@ import {
 import { useLocale } from '@/core/localization/LocaleProvider';
 import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
-import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
+import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import { isPendingStageDue } from '../stages/applicationStageModel';
 import { useApplicationStageViewModel } from '../stages/useApplicationStageViewModel';
 
@@ -115,7 +115,7 @@ function ApplicationStageDetailContent() {
     <Screen edges={['top', 'bottom']}>
       <View className="flex-1 flex-row">
         {layout.isExpanded ? (
-          <ApplicationsDesktopNavigation
+          <ProductDesktopNavigation
             labels={{
               applications: t('nav.applications'),
               metrics: t('nav.metrics'),

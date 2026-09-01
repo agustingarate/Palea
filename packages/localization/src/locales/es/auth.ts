@@ -1,4 +1,12 @@
 const auth = {
+  'onboarding.skills.title': 'Habilidades y CV',
+  'onboarding.skills.label': 'Habilidades (máximo 10)',
+  'onboarding.skills.resume': 'CV (opcional)',
+  'onboarding.skills.back': 'Volver',
+  'onboarding.skills.finish': 'Finalizar',
+  'onboarding.skills.skip': 'Omitir este paso',
+  'onboarding.skills.finishError':
+    'No pudimos finalizar el onboarding. Intentá nuevamente.',
   'login.title': 'Bienvenido de nuevo',
   'login.description': 'Ingresá para continuar en Palea.',
   'login.submit': 'Iniciar sesión',

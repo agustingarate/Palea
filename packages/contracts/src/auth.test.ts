@@ -56,12 +56,19 @@ describe('auth contracts', () => {
     ).toBe(false);
   });
 
-  it('limits resume reservations to PDF files of at most 10 MiB', () => {
+  it('leaves size policy enforcement to the backend while rejecting non-PDF reservations', () => {
     expect(
       reserveResumeUploadInputSchema.safeParse({
         displayName: 'cv.pdf',
         mimeType: 'application/pdf',
         sizeBytes: 10 * 1024 * 1024 + 1,
+      }).success,
+    ).toBe(true);
+    expect(
+      reserveResumeUploadInputSchema.safeParse({
+        displayName: 'cv.docx',
+        mimeType: 'application/msword',
+        sizeBytes: 50,
       }).success,
     ).toBe(false);
   });

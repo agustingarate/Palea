@@ -22,11 +22,10 @@ export function useApplicationCreateViewModel() {
           sizeBytes: file.sizeBytes,
         },
         file,
-        { makePrimary: false, onProgress: setUploadProgress },
+        { primaryMode: 'preserve', onProgress: setUploadProgress },
       ),
     onMutate: () => setUploadProgress(0),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['resumes', 'ready'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['resumes'] }),
   });
   const create = useMutation({
     mutationFn: createApplication.execute.bind(createApplication),

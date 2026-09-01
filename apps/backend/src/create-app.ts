@@ -83,12 +83,22 @@ async function createContext(
       completeOnboarding: (subject) => account.completeOnboarding(subject),
       reserveResumeUpload: (subject, input) => resumes.reserve(subject, input),
       confirmResumeUpload: (subject, resumeId) =>
-        resumes.confirm(subject, resumeId.resumeId, resumeId.makePrimary),
+        resumes.confirm(subject, resumeId.resumeId, resumeId.primaryMode),
       listResumes: (subject) => resumes.list(subject),
+      createResumePreview: (subject, resumeId) =>
+        resumes.createPreview(subject, resumeId),
       createResumeDownload: (subject, resumeId) =>
         resumes.createDownload(subject, resumeId),
       cancelResumeUpload: (subject, resumeId) =>
         resumes.cancel(subject, resumeId),
+      getResumePolicy: (subject) => resumes.policy(subject),
+      renameResume: (subject, input) =>
+        resumes.rename(subject, input.resumeId, input.displayName),
+      setPrimaryResume: (subject, resumeId) =>
+        resumes.setPrimary(subject, resumeId),
+      getResumeDeleteImpact: (subject, resumeId) =>
+        resumes.deleteImpact(subject, resumeId),
+      deleteResume: (subject, resumeId) => resumes.remove(subject, resumeId),
       listApplications: (subject, input) => applications.list(subject, input),
       createApplication: (subject, input) =>
         applications.create(subject, input),

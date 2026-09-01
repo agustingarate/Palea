@@ -33,6 +33,10 @@ import {
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import { ResumeRepositoryImpl } from '@/features/resumes/data/repositories/ResumeRepositoryImpl';
 import { TrpcResumesDataSource } from '@/features/resumes/data/datasources/TrpcResumesDataSource';
+import { HttpResumeUploadDataSource } from '@/features/resumes/data/datasources/HttpResumeUploadDataSource';
+import { ExpoResumeFilePicker } from '@/features/resumes/data/datasources/ExpoResumeFilePicker';
+import { PickResumeFile } from '@/features/resumes/domain/usecases/PickResumeFile';
+import { useResumeLibraryPreferences } from '@/features/resumes/presentation/stores/useResumeLibraryPreferences';
 import { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
 import { useOnboardingDraftStore } from '@/features/auth/presentation/onboarding/stores/useOnboardingDraftStore';
 
@@ -41,6 +45,9 @@ export function createAppContainer(): Container {
   const sessionCleanupRegistry = new SessionCleanupRegistry();
   sessionCleanupRegistry.register(() =>
     useOnboardingDraftStore.getState().clear(),
+  );
+  sessionCleanupRegistry.register(() =>
+    useResumeLibraryPreferences.getState().clear(),
   );
   container.register(
     dependencyTokens.sessionCleanupRegistry,
@@ -64,8 +71,13 @@ export function createAppContainer(): Container {
   container.register(dependencyTokens.authRepository, authRepository);
   const resumeRepository = new ResumeRepositoryImpl(
     new TrpcResumesDataSource(authenticatedClient),
+    new HttpResumeUploadDataSource(),
   );
   container.register(dependencyTokens.resumeRepository, resumeRepository);
+  container.register(
+    dependencyTokens.pickResumeFile,
+    new PickResumeFile(new ExpoResumeFilePicker()),
+  );
   container.register(
     dependencyTokens.onboardingRepository,
     new OnboardingRepositoryImpl(

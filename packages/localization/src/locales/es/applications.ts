@@ -1,4 +1,6 @@
 const applications = {
+  'nav.collapse': 'Contraer navegación',
+  'nav.expand': 'Expandir navegación',
   title: 'Postulaciones',
   subtitle: 'Organizá y seguí tus oportunidades.',
   add: 'Agregar postulación',
@@ -49,7 +51,7 @@ const applications = {
   'create.resumeHelp': 'El CV principal aparece seleccionado por defecto.',
   'create.uploadResume': 'Subir un CV nuevo',
   'create.uploadError':
-    'No pudimos cargar el CV. Verificá que sea un PDF válido de hasta 10 MiB.',
+    'No pudimos cargar el CV. Verificá que sea un PDF válido, sin contraseña y dentro del límite indicado.',
   'create.compensation': 'Compensación',
   'create.expected': 'Expectativa salarial',
   'create.offered': 'Salario ofrecido',

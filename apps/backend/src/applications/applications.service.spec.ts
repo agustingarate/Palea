@@ -103,6 +103,7 @@ describe('ApplicationsService', () => {
     const createNote = jest.fn().mockResolvedValue({});
     const createCompensations = jest.fn().mockResolvedValue({ count: 1 });
     const transaction = {
+      $queryRaw: jest.fn(),
       $executeRaw: jest.fn(),
       resume: { findFirst: jest.fn().mockResolvedValue({ id: 'resume-id' }) },
       application: {
@@ -214,6 +215,7 @@ describe('ApplicationsService', () => {
     jest.useFakeTimers().setSystemTime(new Date('2026-08-28T00:30:00.000Z'));
     const transaction = jest.fn().mockImplementation(async (run) =>
       run({
+        $queryRaw: jest.fn(),
         $executeRaw: jest.fn(),
         application: {
           aggregate: jest.fn().mockResolvedValue({ _max: { position: -1 } }),
@@ -506,6 +508,7 @@ describe('ApplicationsService', () => {
   it('only associates an owned ready CV', async () => {
     const update = jest.fn();
     const transaction = {
+      $queryRaw: jest.fn(),
       application: {
         findFirst: jest.fn().mockResolvedValue({ id: rows[0]!.id }),
         update,

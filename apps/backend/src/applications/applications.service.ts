@@ -12,6 +12,7 @@ import type { Prisma } from '@prisma/client';
 import sanitizeHtml from 'sanitize-html';
 import { convert } from 'html-to-text';
 import { PrismaService } from '../database/prisma.service';
+import { lockResumeLibrary } from '../account/resume-persistence';
 
 @Injectable()
 export class ApplicationsService {
@@ -23,6 +24,7 @@ export class ApplicationsService {
 
     return this.prisma.$transaction(async (transaction) => {
       await lockApplicationOrder(transaction, subject);
+      await lockResumeLibrary(transaction, subject);
       if (input.resumeId) {
         const resume = await transaction.resume.findFirst({
           where: {
@@ -275,6 +277,7 @@ export class ApplicationsService {
     input: { applicationId: string; resumeId: string | null },
   ) {
     await this.prisma.$transaction(async (transaction) => {
+      await lockResumeLibrary(transaction, subject);
       const application = await transaction.application.findFirst({
         where: { id: input.applicationId, profileId: subject },
         select: { id: true },
@@ -381,11 +384,14 @@ export class ApplicationsService {
   }
 
   async remove(subject: string, applicationId: string) {
-    const result = await this.prisma.application.deleteMany({
-      where: { id: applicationId, profileId: subject },
+    await this.prisma.$transaction(async (tx) => {
+      await lockResumeLibrary(tx, subject);
+      const result = await tx.application.deleteMany({
+        where: { id: applicationId, profileId: subject },
+      });
+      if (result.count !== 1)
+        throw new AppError('applications.not_found', 'NOT_FOUND');
     });
-    if (result.count !== 1)
-      throw new AppError('applications.not_found', 'NOT_FOUND');
     return { success: true as const };
   }
 

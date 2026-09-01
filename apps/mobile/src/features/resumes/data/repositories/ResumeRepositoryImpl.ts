@@ -3,9 +3,13 @@ import type {
   ResumeUploadFile,
 } from '../../domain/repositories/ResumeRepository';
 import type { ResumesDataSource } from '../datasources/ResumesDataSource';
+import type { ResumeUploadDataSource } from '../datasources/ResumeUploadDataSource';
 
 export class ResumeRepositoryImpl implements ResumeRepository {
-  constructor(private readonly dataSource: ResumesDataSource) {}
+  constructor(
+    private readonly dataSource: ResumesDataSource,
+    private readonly uploadDataSource: ResumeUploadDataSource,
+  ) {}
 
   list() {
     return this.dataSource.list();
@@ -23,7 +27,7 @@ export class ResumeRepositoryImpl implements ResumeRepository {
         bytes.byteOffset,
         bytes.byteOffset + bytes.byteLength,
       ) as ArrayBuffer;
-      await putWithProgress(
+      await this.uploadDataSource.put(
         reservation.signedUrl,
         body,
         file.mimeType,
@@ -31,7 +35,7 @@ export class ResumeRepositoryImpl implements ResumeRepository {
       );
       await this.dataSource.confirm({
         resumeId: reservation.resumeId,
-        makePrimary: options.makePrimary,
+        primaryMode: options.primaryMode,
       });
       options.onProgress?.(100);
       return reservation.resumeId;
@@ -45,29 +49,28 @@ export class ResumeRepositoryImpl implements ResumeRepository {
     const result = await this.dataSource.createDownload(resumeId);
     return result.signedUrl;
   }
-}
 
-function putWithProgress(
-  url: string,
-  body: ArrayBuffer,
-  mimeType: string,
-  onProgress?: (progress: number) => void,
-) {
-  return new Promise<void>((resolve, reject) => {
-    const request = new XMLHttpRequest();
-    request.open('PUT', url);
-    request.setRequestHeader('content-type', mimeType);
-    request.timeout = 30_000;
-    request.upload.onprogress = (event) => {
-      if (event.lengthComputable)
-        onProgress?.(Math.round((event.loaded / event.total) * 95));
-    };
-    request.onload = () =>
-      request.status >= 200 && request.status < 300
-        ? resolve()
-        : reject(new Error('resume.uploadFailed'));
-    request.onerror = request.ontimeout = () =>
-      reject(new Error('resume.uploadFailed'));
-    request.send(body);
-  });
+  createPreview(resumeId: string) {
+    return this.dataSource.createPreview(resumeId);
+  }
+
+  policy() {
+    return this.dataSource.policy();
+  }
+
+  rename(resumeId: string, displayName: string) {
+    return this.dataSource.rename(resumeId, displayName);
+  }
+
+  setPrimary(resumeId: string) {
+    return this.dataSource.setPrimary(resumeId);
+  }
+
+  deleteImpact(resumeId: string) {
+    return this.dataSource.deleteImpact(resumeId);
+  }
+
+  delete(input: Parameters<ResumeRepository['delete']>[0]) {
+    return this.dataSource.delete(input);
+  }
 }

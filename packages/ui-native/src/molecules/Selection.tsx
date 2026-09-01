@@ -90,6 +90,7 @@ export interface SegmentedControlProps {
   label: string;
   disabled?: boolean;
   compact?: boolean;
+  hideLabel?: boolean;
 }
 
 export function SegmentedControl({
@@ -99,6 +100,7 @@ export function SegmentedControl({
   label,
   disabled = false,
   compact = false,
+  hideLabel = false,
 }: SegmentedControlProps) {
   const theme = useThemeColors();
   const [containerWidth, setContainerWidth] = useState(0);
@@ -123,7 +125,7 @@ export function SegmentedControl({
 
   return (
     <View className="gap-1">
-      <AppText variant="label">{label}</AppText>
+      {!hideLabel ? <AppText variant="label">{label}</AppText> : null}
       <View
         accessibilityLabel={label}
         accessibilityRole="radiogroup"
@@ -155,6 +157,7 @@ export function SegmentedControl({
             <Pressable
               key={item.value}
               accessibilityRole="radio"
+              accessibilityLabel={item.label}
               accessibilityState={{
                 checked: selected,
                 disabled: disabled || item.disabled,

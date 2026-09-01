@@ -149,6 +149,25 @@ revertible. Include the tests, contracts, and documentation required for the
 behavior in that commit, and order prerequisite changes before the commits that
 consume them. Inspect the staged diff immediately before committing.
 
+Before the first commit, write a commit map whenever a change spans more than
+one concern. A feature commonly produces separate commits for its canonical
+specification, public contract, persistence/backend behavior, and each client
+surface. Do not replace that map with a single `feat` commit merely because the
+work belongs to one ClickUp task. Combine changes only when splitting would
+leave a commit broken, untestable, or semantically incomplete.
+
+For example, a new mobile capability with a tRPC contract normally becomes:
+
+1. `docs(specs): define <capability>`
+2. `feat(contracts): add <capability> API contract`
+3. `feat(api): implement <capability> service`
+4. `feat(mobile): add <capability> experience`
+
+This is a decision aid, not a rigid file-type rule: keep a contract and its
+essential regression test together, and split a shared file by hunk when it
+contains independent changes. Never stage a broad path or `git add -A` without
+first reviewing the staged diff against the commit map.
+
 ## 7. Recovery and cleanup
 
 - Update from the base according to team policy; do not silently change the PR target.

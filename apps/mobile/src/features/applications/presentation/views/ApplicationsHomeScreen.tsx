@@ -29,7 +29,7 @@ import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationActionMenu } from '../components/ApplicationActionMenu';
 import { BoardColumn, ListGroup } from '../components/ApplicationsCollections';
-import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
+import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import { useApplicationsDragAndDrop } from '../hooks/useApplicationsDragAndDrop';
 import {
   applicationStatuses,
@@ -134,7 +134,10 @@ function ApplicationsHomeContent() {
   };
   const notifyPending = (destination: string) => {
     if (destination === 'applications') return;
-    // TODO(CU-86ajvbvec): navigate to the complete CV Library.
+    if (destination === 'resumes') {
+      router.push('/resumes' as never);
+      return;
+    }
     // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
     // TODO(CU-86ajvbvfq): navigate to the candidate profile.
     showSnackbar({ variant: 'info', message: t('nav.pending') });
@@ -145,7 +148,7 @@ function ApplicationsHomeContent() {
     <Screen edges={layout.isExpanded ? ['top', 'bottom'] : ['bottom']}>
       <View className="flex-1 flex-row">
         {layout.isExpanded ? (
-          <ApplicationsDesktopNavigation
+          <ProductDesktopNavigation
             labels={{
               applications: t('nav.applications'),
               metrics: t('nav.metrics'),

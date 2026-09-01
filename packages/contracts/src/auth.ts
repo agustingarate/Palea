@@ -99,11 +99,7 @@ export const completeOnboardingInputSchema = z.object({});
 export const reserveResumeUploadInputSchema = z.object({
   displayName: z.string().trim().min(1).max(160),
   mimeType: z.literal('application/pdf'),
-  sizeBytes: z
-    .number()
-    .int()
-    .positive()
-    .max(10 * 1024 * 1024, 'resume.maxSize'),
+  sizeBytes: z.number().int().positive(),
 });
 
 export const resumeIdInputSchema = z.object({ resumeId: z.uuid() });

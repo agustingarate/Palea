@@ -10,10 +10,32 @@ export const resumeSchema = z.object({
 
 export const resumeListSchema = z.array(resumeSchema);
 
+export const resumeLibraryPolicySchema = z.object({
+  maxSizeBytes: z.number().int().positive(),
+  maxResumes: z.number().int().positive(),
+  usedResumes: z.number().int().min(0),
+});
+
+export const renameResumeInputSchema = z.object({
+  resumeId: z.uuid(),
+  displayName: z.string().trim().min(1).max(160),
+});
+
+export const resumeDeleteImpactSchema = z.object({
+  resumeId: z.uuid(),
+  applicationCount: z.number().int().min(0),
+  isPrimary: z.boolean(),
+});
+
 export const confirmResumeUploadInputSchema = z.object({
   resumeId: z.uuid(),
-  makePrimary: z.boolean(),
+  primaryMode: z.enum(['replace', 'if_missing', 'preserve']),
 });
+export const deleteResumeInputSchema = z.object({
+  resumeId: z.uuid(),
+  expectedImpact: resumeDeleteImpactSchema.omit({ resumeId: true }),
+});
+export type DeleteResumeInput = z.infer<typeof deleteResumeInputSchema>;
 export const resumeDownloadSchema = z.object({
   signedUrl: z.url(),
   expiresAt: z.iso.datetime(),
@@ -23,3 +45,4 @@ export type Resume = z.infer<typeof resumeSchema>;
 export type ConfirmResumeUploadInput = z.infer<
   typeof confirmResumeUploadInputSchema
 >;
+export type ResumeLibraryPolicy = z.infer<typeof resumeLibraryPolicySchema>;

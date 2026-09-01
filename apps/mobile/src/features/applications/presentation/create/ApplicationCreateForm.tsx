@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, View } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
+import { useResumeFilePicker } from '@/features/resumes/presentation/viewmodels/useResumeFilePicker';
 import { useForm } from '@tanstack/react-form';
 import { currencyCatalog } from '@palea/contracts';
 import {
@@ -28,7 +28,7 @@ import {
 import { useNavigation, useRouter } from 'expo-router';
 import { useLocale } from '@/core/localization/LocaleProvider';
 import { useSignOut } from '@/core/session/useSignOut';
-import { ApplicationsDesktopNavigation } from '../components/ApplicationsNavigation';
+import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import { navigateToApplicationsHome } from '../navigation/applicationsHomeNavigation';
 import {
   applicationCreateDefaults,
@@ -73,6 +73,7 @@ function currencyName(currency: string, locale: string) {
 }
 
 export function ApplicationCreateForm() {
+  const picker = useResumeFilePicker();
   const { t, i18n } = useLocale('applications');
   const layout = useResponsiveLayout();
   const navigation = useNavigation();
@@ -204,26 +205,11 @@ export function ApplicationCreateForm() {
   };
 
   const uploadResume = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: 'application/pdf',
-      copyToCacheDirectory: true,
-    });
-    if (result.canceled) return;
-    const asset = result.assets[0];
-    if (!asset) return;
     setUploadError(null);
     try {
-      const bytes = new Uint8Array(
-        await (await fetch(asset.uri)).arrayBuffer(),
-      );
-      const sizeBytes = asset.size ?? bytes.byteLength;
-      if (sizeBytes > 10 * 1024 * 1024) throw new Error('resume.maxSize');
-      const resumeId = await vm.upload.mutateAsync({
-        name: asset.name,
-        mimeType: 'application/pdf',
-        sizeBytes,
-        readBytes: async () => bytes,
-      });
+      const file = await picker.selection.mutateAsync();
+      if (!file) return;
+      const resumeId = await vm.upload.mutateAsync(file);
       setUploadedResume(true);
       form.setFieldValue('resumeId', resumeId);
     } catch {
@@ -578,7 +564,15 @@ export function ApplicationCreateForm() {
         <FileUploadField
           label={t('create.uploadResume')}
           acceptedTypes="PDF"
-          maxSizeLabel="10 MiB"
+          maxSizeLabel={
+            picker.policy.data
+              ? `${picker.policy.data.maxSizeBytes / 1024 / 1024} MiB`
+              : '—'
+          }
+          disabled={
+            !picker.policy.data ||
+            picker.policy.data.usedResumes >= picker.policy.data.maxResumes
+          }
           isLoading={vm.upload.isPending}
           progress={vm.uploadProgress}
           error={uploadError ?? undefined}
@@ -627,7 +621,7 @@ export function ApplicationCreateForm() {
     <Screen edges={['top', 'bottom']}>
       <View className="flex-1 flex-row">
         {layout.isExpanded ? (
-          <ApplicationsDesktopNavigation
+          <ProductDesktopNavigation
             labels={{
               applications: t('nav.applications'),
               metrics: t('nav.metrics'),

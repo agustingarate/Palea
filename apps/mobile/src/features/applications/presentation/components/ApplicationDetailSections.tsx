@@ -270,6 +270,7 @@ export function ApplicationResources({
   resume,
   downloadPending,
   onChooseResume,
+  onPreviewResume,
   onDownload,
   onOpen,
 }: {
@@ -277,6 +278,7 @@ export function ApplicationResources({
   resume: ApplicationDetail['resume'];
   downloadPending: boolean;
   onChooseResume: () => void;
+  onPreviewResume: () => void;
   onDownload: () => void;
   onOpen: (url: string) => void;
 }) {
@@ -292,7 +294,16 @@ export function ApplicationResources({
           downloadLabel={t('detail.download')}
           pending={downloadPending}
           onChoose={onChooseResume}
+          onPreview={onPreviewResume}
           onDownload={onDownload}
+        />
+      ) : null}
+      {!resume && resources.length > 0 ? (
+        <Button
+          label={t('detail.chooseResume')}
+          leadingIcon="fileText"
+          variant="secondary"
+          onPress={onChooseResume}
         />
       ) : null}
       {state.isLoading ? (
@@ -342,6 +353,7 @@ function ResumeRow({
   downloadLabel,
   pending,
   onChoose,
+  onPreview,
   onDownload,
 }: {
   title: string;
@@ -350,19 +362,20 @@ function ResumeRow({
   downloadLabel: string;
   pending: boolean;
   onChoose: () => void;
+  onPreview: () => void;
   onDownload: () => void;
 }) {
-  const { t } = useLocale('applications');
+  const { t: resumeT } = useLocale('resumes');
   return (
     <View className="min-h-control-md flex-row items-center gap-3 rounded-sm bg-surface-subtle/60 px-3 py-3 dark:bg-dark-surface-subtle/60">
       <View className="h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-interaction bg-interaction-subtle dark:border-dark-interaction dark:bg-dark-interaction-subtle">
         <Icon name="fileUser" size="md" tone="interaction" />
       </View>
       <Pressable
-        accessibilityLabel={chooseLabel}
+        accessibilityLabel={resumeT('open', { name: title })}
         accessibilityRole="button"
         className="min-w-0 flex-1 gap-0.5 rounded-sm py-1"
-        onPress={onChoose}
+        onPress={onPreview}
       >
         <AppText
           variant="bodySmall"
@@ -377,10 +390,10 @@ function ResumeRow({
           </AppText>
         ) : null}
       </Pressable>
-      <Badge
-        label={t('detail.resumeResourceType')}
-        tone="interaction"
-        outlined
+      <IconButton
+        icon="edit"
+        accessibilityLabel={chooseLabel}
+        onPress={onChoose}
       />
       <IconButton
         icon="download"

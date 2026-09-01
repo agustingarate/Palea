@@ -1,4 +1,6 @@
 const applications = {
+  'nav.collapse': 'Collapse navigation',
+  'nav.expand': 'Expand navigation',
   title: 'Applications',
   subtitle: 'Organize and track your opportunities.',
   add: 'Add application',
@@ -48,7 +50,7 @@ const applications = {
   'create.resumeHelp': 'Your primary resume is selected by default.',
   'create.uploadResume': 'Upload a new resume',
   'create.uploadError':
-    'We could not upload the resume. Check that it is a valid PDF up to 10 MiB.',
+    'We could not upload the resume. Check that it is a valid PDF without a password and within the displayed limit.',
   'create.compensation': 'Compensation',
   'create.expected': 'Salary expectation',
   'create.offered': 'Offered salary',

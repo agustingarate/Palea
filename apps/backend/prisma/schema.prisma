@@ -244,6 +244,27 @@ model WorkExperience {
   @@map("work_experiences")
 }
 
+model ResumeLibraryPolicy {
+  id           String   @id
+  maxSizeBytes BigInt   @map("max_size_bytes")
+  maxResumes   Int      @map("max_resumes")
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("resume_library_policy")
+}
+
+model ResumeCleanupJob {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storagePath   String   @unique @map("storage_path")
+  availableAt   DateTime @default(now()) @map("available_at") @db.Timestamptz(6)
+  finalizeAfter DateTime @default(now()) @map("finalize_after") @db.Timestamptz(6)
+  attempts      Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([availableAt])
+  @@map("resume_cleanup_jobs")
+}
+
 model Resume {
   id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId           String             @map("profile_id") @db.Uuid

@@ -13,6 +13,11 @@ import {
   resumeListSchema,
   resumeDownloadSchema,
   confirmResumeUploadInputSchema,
+  deleteResumeInputSchema,
+  type DeleteResumeInput,
+  renameResumeInputSchema,
+  resumeDeleteImpactSchema,
+  resumeLibraryPolicySchema,
   saveProfileInputSchema,
   saveSkillsInputSchema,
   saveWorkExperienceInputSchema,
@@ -54,6 +59,7 @@ import {
   type ApplicationResource,
   type Resume,
   type ConfirmResumeUploadInput,
+  type ResumeLibraryPolicy,
 } from '@palea/contracts';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -105,6 +111,10 @@ export interface PaleaApiServices {
     input: ConfirmResumeUploadInput,
   ): Promise<{ success: true }>;
   listResumes(subject: string): Promise<Resume[]>;
+  createResumePreview(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ signedUrl: string; expiresAt: string }>;
   createResumeDownload(
     subject: string,
     resumeId: string,
@@ -112,6 +122,27 @@ export interface PaleaApiServices {
   cancelResumeUpload(
     subject: string,
     resumeId: string,
+  ): Promise<{ success: true }>;
+  getResumePolicy(subject: string): Promise<ResumeLibraryPolicy>;
+  renameResume(
+    subject: string,
+    input: { resumeId: string; displayName: string },
+  ): Promise<{ success: true }>;
+  setPrimaryResume(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ success: true }>;
+  getResumeDeleteImpact(
+    subject: string,
+    resumeId: string,
+  ): Promise<{
+    resumeId: string;
+    applicationCount: number;
+    isPrimary: boolean;
+  }>;
+  deleteResume(
+    subject: string,
+    input: DeleteResumeInput,
   ): Promise<{ success: true }>;
   listApplications(
     subject: string,
@@ -270,6 +301,12 @@ export const onboardingRouter = t.router({
 });
 
 export const resumeRouter = t.router({
+  createPreview: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(resumeDownloadSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.createResumePreview(ctx.identity.subject, input.resumeId),
+    ),
   list: protectedProcedure
     .input(z.object({}).optional())
     .output(resumeListSchema)
@@ -297,6 +334,34 @@ export const resumeRouter = t.router({
     .output(resumeDownloadSchema)
     .mutation(({ ctx, input }) =>
       ctx.services.createResumeDownload(ctx.identity.subject, input.resumeId),
+    ),
+  policy: protectedProcedure
+    .input(z.object({}).optional())
+    .output(resumeLibraryPolicySchema)
+    .query(({ ctx }) => ctx.services.getResumePolicy(ctx.identity.subject)),
+  rename: protectedProcedure
+    .input(renameResumeInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.renameResume(ctx.identity.subject, input),
+    ),
+  setPrimary: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.setPrimaryResume(ctx.identity.subject, input.resumeId),
+    ),
+  deleteImpact: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(resumeDeleteImpactSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.getResumeDeleteImpact(ctx.identity.subject, input.resumeId),
+    ),
+  delete: protectedProcedure
+    .input(deleteResumeInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.deleteResume(ctx.identity.subject, input),
     ),
 });
 

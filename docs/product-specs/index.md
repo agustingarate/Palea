@@ -3,6 +3,7 @@
 - [Web subscriptions](web-subscriptions.md) — approved Free/Pro, Paddle and RevenueCat contract.
 
 - [MVP data model](mvp-data-model.md) — draft model derived from ClickUp and Stitch.
+- [Resume library](resume-library.md) — gestión y visualización privada de CVs.
 
 - [Applications home](applications-home.md) — approved candidate application list and board behavior.
 - [Application creation](application-create.md) — approved responsive draft creation flow.

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -314,15 +314,33 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const press = usePressFeedback('icon');
+  const [focused, setFocused] = useState(false);
+  const [hovered, setHovered] = useState(false);
   return (
     <AnimatedView style={press.animatedStyle}>
       <Pressable
         accessibilityLabel={accessibilityLabel}
         accessibilityRole="button"
         accessibilityState={{ disabled: Boolean(disabled) }}
-        className={`h-touch-target w-touch-target items-center justify-center rounded-full ${tone === 'interaction' ? 'bg-interaction-subtle dark:bg-dark-interaction-subtle' : tone === 'danger' ? 'bg-danger-subtle dark:bg-dark-danger-subtle' : 'bg-transparent'} ${disabled ? 'opacity-disabled' : ''}`}
+        className={`h-touch-target w-touch-target items-center justify-center rounded-full border ${focused ? 'border-focus-ring dark:border-dark-focus-ring' : 'border-transparent'} ${disabled ? 'opacity-disabled' : ''}`}
         disabled={disabled}
         {...props}
+        onHoverIn={(event) => {
+          setHovered(true);
+          props.onHoverIn?.(event);
+        }}
+        onHoverOut={(event) => {
+          setHovered(false);
+          props.onHoverOut?.(event);
+        }}
+        onFocus={(event) => {
+          setFocused(true);
+          props.onFocus?.(event);
+        }}
+        onBlur={(event) => {
+          setFocused(false);
+          props.onBlur?.(event);
+        }}
         onPressIn={(event) => {
           press.onPressIn();
           props.onPressIn?.(event);
@@ -332,11 +350,15 @@ export function IconButton({
           props.onPressOut?.(event);
         }}
       >
-        <Icon
-          name={icon}
-          size={iconSize}
-          tone={tone === 'default' ? 'default' : tone}
-        />
+        <View
+          className={`h-8 w-8 items-center justify-center rounded-full ${tone === 'interaction' ? 'bg-interaction-subtle dark:bg-dark-interaction-subtle' : tone === 'danger' ? 'bg-danger-subtle dark:bg-dark-danger-subtle' : hovered ? 'bg-surface-subtle/50 dark:bg-dark-surface-subtle/50' : ''}`}
+        >
+          <Icon
+            name={icon}
+            size={iconSize}
+            tone={tone === 'default' ? 'default' : tone}
+          />
+        </View>
       </Pressable>
     </AnimatedView>
   );

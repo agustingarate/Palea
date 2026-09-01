@@ -31,9 +31,11 @@ export function AppProviders({ children }: PropsWithChildren) {
       }),
   );
   const { setColorScheme } = useColorScheme();
+  // const themePreference = useThemeStore((state) => state.preference);
 
-  // Product decision for the current release: the application is light-only.
+  // Follow the platform preference, including the library's approved dark theme.
   useEffect(() => setColorScheme('light'), [setColorScheme]);
+
   useEffect(() => {
     const onChange = (status: AppStateStatus) => {
       if (Platform.OS !== 'web') focusManager.setFocused(status === 'active');

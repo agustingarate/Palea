@@ -8,6 +8,8 @@ import esAuth from './locales/es/auth';
 import enAuth from './locales/en/auth';
 import esApplications from './locales/es/applications';
 import enApplications from './locales/en/applications';
+import esResumes from './locales/es/resumes';
+import enResumes from './locales/en/resumes';
 
 export const supportedLocales = ['es', 'en'] as const;
 export type Locale = (typeof supportedLocales)[number];
@@ -20,6 +22,7 @@ export const resources = {
     web: esWeb,
     auth: esAuth,
     applications: esApplications,
+    resumes: esResumes,
   },
   en: {
     common: enCommon,
@@ -27,6 +30,7 @@ export const resources = {
     web: enWeb,
     auth: enAuth,
     applications: enApplications,
+    resumes: enResumes,
   },
 } as const;
 

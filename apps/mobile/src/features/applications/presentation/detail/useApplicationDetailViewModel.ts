@@ -59,8 +59,10 @@ export function useApplicationDetailViewModel(applicationId: string) {
           sizeBytes: file.sizeBytes,
         },
         file,
-        { makePrimary: false },
+        { primaryMode: 'preserve' },
       );
+      // Keep the successfully uploaded CV discoverable even if association fails.
+      await queryClient.invalidateQueries({ queryKey: ['resumes'] });
       await updateResume.execute(applicationId, resumeId);
     },
     onSuccess: () => {
