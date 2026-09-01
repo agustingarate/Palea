@@ -1,14 +1,23 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { createApp } from '../src/create-app';
+import { ResumeCleanupService } from '../src/account/resume-cleanup.service';
 
 describe('Palea backend', () => {
   let app: INestApplication;
   beforeAll(async () => {
+    // HTTP smoke tests do not own a database. Worker persistence is verified
+    // separately against local Supabase by verify-resume-library.mjs.
+    jest
+      .spyOn(ResumeCleanupService.prototype, 'onModuleInit')
+      .mockImplementation(() => undefined);
     app = await createApp();
     await app.init();
   });
-  afterAll(async () => app.close());
+  afterAll(async () => {
+    await app.close();
+    jest.restoreAllMocks();
+  });
 
   it('serves REST health', async () => {
     await request(app.getHttpServer())

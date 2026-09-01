@@ -8,3 +8,4 @@ pnpm-lock.yaml
 *.snap
 expo-env.d.ts
 next-env.d.ts
+apps/mobile/public/pdfjs/
