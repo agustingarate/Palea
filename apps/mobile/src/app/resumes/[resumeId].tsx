@@ -1,1 +1,1 @@
-export { ResumeLibraryScreen as default } from '@/features/resumes/presentation/views/ResumeLibraryScreen';
+export { ResumeReaderScreen as default } from '@/features/resumes/presentation/views/ResumeReaderScreen';

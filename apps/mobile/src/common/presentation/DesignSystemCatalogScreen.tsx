@@ -45,6 +45,8 @@ import {
   useResponsiveLayout,
 } from '@palea/ui-native';
 import { useThemeStore, type ThemePreference } from '@/core/state/themeStore';
+import { useLocale } from '@/core/localization/LocaleProvider';
+import { useRouter } from 'expo-router';
 
 const nextTheme: Record<ThemePreference, ThemePreference> = {
   system: 'light',
@@ -55,6 +57,8 @@ const nextTheme: Record<ThemePreference, ThemePreference> = {
 const noOp = () => undefined;
 
 export function DesignSystemCatalogScreen() {
+  const router = useRouter();
+  const { i18n } = useLocale();
   const layout = useResponsiveLayout();
   const [segment, setSegment] = useState('remote');
   const [tab, setTab] = useState('overview');
@@ -120,6 +124,21 @@ export function DesignSystemCatalogScreen() {
             label="Form template"
             variant="ghost"
             onPress={() => setShowFormTemplate(true)}
+          />
+          <Button
+            label={`Language: ${i18n.language}`}
+            variant="secondary"
+            onPress={() =>
+              void i18n.changeLanguage(
+                i18n.language.startsWith('es') ? 'en' : 'es',
+              )
+            }
+          />
+          <Button
+            label="Resume library"
+            variant="secondary"
+            leadingIcon="fileText"
+            onPress={() => router.push('/resumes')}
           />
         </View>
       </View>

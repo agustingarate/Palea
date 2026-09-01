@@ -14,6 +14,7 @@ import {
   useSnackbar,
 } from '@palea/ui-native';
 import { DesignSystemCatalogScreen } from './DesignSystemCatalogScreen';
+import { LocaleProvider } from '@/core/localization/LocaleProvider';
 
 function renderWithSafeArea(node: ReactNode) {
   return render(
@@ -23,7 +24,7 @@ function renderWithSafeArea(node: ReactNode) {
         insets: { top: 44, left: 0, right: 0, bottom: 34 },
       }}
     >
-      {node}
+      <LocaleProvider locale="en">{node}</LocaleProvider>
     </SafeAreaProvider>,
   );
 }
