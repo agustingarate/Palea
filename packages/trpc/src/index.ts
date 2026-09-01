@@ -13,6 +13,8 @@ import {
   resumeListSchema,
   resumeDownloadSchema,
   confirmResumeUploadInputSchema,
+  deleteResumeInputSchema,
+  type DeleteResumeInput,
   renameResumeInputSchema,
   resumeDeleteImpactSchema,
   resumeLibraryPolicySchema,
@@ -109,6 +111,10 @@ export interface PaleaApiServices {
     input: ConfirmResumeUploadInput,
   ): Promise<{ success: true }>;
   listResumes(subject: string): Promise<Resume[]>;
+  createResumePreview(
+    subject: string,
+    resumeId: string,
+  ): Promise<{ signedUrl: string; expiresAt: string }>;
   createResumeDownload(
     subject: string,
     resumeId: string,
@@ -134,7 +140,10 @@ export interface PaleaApiServices {
     applicationCount: number;
     isPrimary: boolean;
   }>;
-  deleteResume(subject: string, resumeId: string): Promise<{ success: true }>;
+  deleteResume(
+    subject: string,
+    input: DeleteResumeInput,
+  ): Promise<{ success: true }>;
   listApplications(
     subject: string,
     input: ApplicationListInput,
@@ -292,6 +301,12 @@ export const onboardingRouter = t.router({
 });
 
 export const resumeRouter = t.router({
+  createPreview: protectedProcedure
+    .input(resumeIdInputSchema)
+    .output(resumeDownloadSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.createResumePreview(ctx.identity.subject, input.resumeId),
+    ),
   list: protectedProcedure
     .input(z.object({}).optional())
     .output(resumeListSchema)
@@ -343,10 +358,10 @@ export const resumeRouter = t.router({
       ctx.services.getResumeDeleteImpact(ctx.identity.subject, input.resumeId),
     ),
   delete: protectedProcedure
-    .input(resumeIdInputSchema)
+    .input(deleteResumeInputSchema)
     .output(operationResultSchema)
     .mutation(({ ctx, input }) =>
-      ctx.services.deleteResume(ctx.identity.subject, input.resumeId),
+      ctx.services.deleteResume(ctx.identity.subject, input),
     ),
 });
 

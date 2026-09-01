@@ -29,8 +29,13 @@ export const resumeDeleteImpactSchema = z.object({
 
 export const confirmResumeUploadInputSchema = z.object({
   resumeId: z.uuid(),
-  makePrimary: z.boolean(),
+  primaryMode: z.enum(['replace', 'if_missing', 'preserve']),
 });
+export const deleteResumeInputSchema = z.object({
+  resumeId: z.uuid(),
+  expectedImpact: resumeDeleteImpactSchema.omit({ resumeId: true }),
+});
+export type DeleteResumeInput = z.infer<typeof deleteResumeInputSchema>;
 export const resumeDownloadSchema = z.object({
   signedUrl: z.url(),
   expiresAt: z.iso.datetime(),

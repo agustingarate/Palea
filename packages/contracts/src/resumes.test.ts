@@ -7,9 +7,9 @@ describe('resume contracts', () => {
     expect(
       confirmResumeUploadInputSchema.parse({
         resumeId: id,
-        makePrimary: false,
+        primaryMode: 'preserve',
       }),
-    ).toEqual({ resumeId: id, makePrimary: false });
+    ).toEqual({ resumeId: id, primaryMode: 'preserve' });
     expect(
       confirmResumeUploadInputSchema.safeParse({ resumeId: id }).success,
     ).toBe(false);
