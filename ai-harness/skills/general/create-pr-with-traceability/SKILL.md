@@ -16,6 +16,9 @@ explicit evidence from the task or user.
 ## Safety and authority
 
 - Inspect before mutating: Git status, current branch, task, spec, and scope.
+- Before preparing any PR, update every affected application changelog under an
+  `Unreleased` heading. Do not invent, select, or state a release version unless
+  the user explicitly requests one.
 - Preserve unrelated user changes. Never reset, checkout away, force-push, or
   delete work without explicit authorization.
 - Resolve the base branch and PR target explicitly. If either is missing or
@@ -37,6 +40,7 @@ Confirm or locate:
 6. Git hosting provider adapter and authentication, if execution is requested.
 7. ClickUp connector, if the reverse link/comment is part of the requested
    delivery.
+8. Affected changelogs, each with an accurate `Unreleased` entry.
 
 If the task, spec, branch, or scope cannot be reconciled, report the conflict
 instead of guessing.
@@ -89,6 +93,10 @@ After confirmation only:
    and deferred work to the PR body.
 6. Add the PR URL and branch to the ClickUp task through the connector.
 7. Re-read the resulting links when possible and report evidence.
+
+When the user explicitly authorizes a merge, merge only after the PR's required
+validations and repository policy checks are green. Report an unavailable or
+failing check instead of merging around it.
 
 If an action fails, stop at the failure boundary, preserve the local state, and
 report what completed and what remains. Do not retry destructive or external
