@@ -60,6 +60,27 @@ import {
   type Resume,
   type ConfirmResumeUploadInput,
   type ResumeLibraryPolicy,
+  profileCatalogInputSchema,
+  profileCatalogPageSchema,
+  profileDetailSchema,
+  profileExperiencesInputSchema,
+  profileExperiencesPageSchema,
+  profileExperienceIdInputSchema,
+  createProfileExperienceInputSchema,
+  updateProfileExperienceInputSchema,
+  updateProfileRoleInputSchema,
+  replaceProfileSkillsInputSchema,
+  profileLocaleInputSchema,
+  profileExperienceSchema,
+  type CreateProfileExperienceInput,
+  type ProfileCatalogInput,
+  type ProfileCatalogPage,
+  type ProfileDetail,
+  type ProfileExperiencesInput,
+  type ProfileExperiencesPage,
+  type ReplaceProfileSkillsInput,
+  type UpdateProfileExperienceInput,
+  type UpdateProfileRoleInput,
 } from '@palea/contracts';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -79,6 +100,37 @@ export interface PaleaApiServices {
     signal?: AbortSignal;
   }): Promise<ProjectDto[]>;
   getAccount(identity: RequestIdentity): Promise<AccountProfile>;
+  getProfile(identity: RequestIdentity, locale: Locale): Promise<ProfileDetail>;
+  updateProfileRole(
+    subject: string,
+    input: UpdateProfileRoleInput,
+  ): Promise<{ success: true }>;
+  listProfileExperiences(
+    subject: string,
+    input: ProfileExperiencesInput,
+  ): Promise<ProfileExperiencesPage>;
+  getProfileExperience(
+    subject: string,
+    experienceId: string,
+  ): Promise<z.infer<typeof profileExperienceSchema>>;
+  createProfileExperience(
+    subject: string,
+    input: CreateProfileExperienceInput,
+  ): Promise<z.infer<typeof profileExperienceSchema>>;
+  updateProfileExperience(
+    subject: string,
+    input: UpdateProfileExperienceInput,
+  ): Promise<z.infer<typeof profileExperienceSchema>>;
+  deleteProfileExperience(
+    subject: string,
+    experienceId: string,
+  ): Promise<{ success: true }>;
+  listProfileInterests(input: ProfileCatalogInput): Promise<ProfileCatalogPage>;
+  listProfileSkills(input: ProfileCatalogInput): Promise<ProfileCatalogPage>;
+  replaceProfileSkills(
+    subject: string,
+    input: ReplaceProfileSkillsInput,
+  ): Promise<{ success: true }>;
   completeRegistration(
     subject: string,
     input: CompleteRegistrationInput,
@@ -300,6 +352,75 @@ export const onboardingRouter = t.router({
     ),
 });
 
+export const profileRouter = t.router({
+  detail: protectedProcedure
+    .input(profileLocaleInputSchema)
+    .output(profileDetailSchema)
+    .query(({ ctx, input }) =>
+      ctx.services.getProfile(ctx.identity, input.locale),
+    ),
+  updateRole: protectedProcedure
+    .input(updateProfileRoleInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.updateProfileRole(ctx.identity.subject, input),
+    ),
+  experiences: t.router({
+    list: protectedProcedure
+      .input(profileExperiencesInputSchema)
+      .output(profileExperiencesPageSchema)
+      .query(({ ctx, input }) =>
+        ctx.services.listProfileExperiences(ctx.identity.subject, input),
+      ),
+    get: protectedProcedure
+      .input(profileExperienceIdInputSchema)
+      .output(profileExperienceSchema)
+      .query(({ ctx, input }) =>
+        ctx.services.getProfileExperience(
+          ctx.identity.subject,
+          input.experienceId,
+        ),
+      ),
+    create: protectedProcedure
+      .input(createProfileExperienceInputSchema)
+      .output(profileExperienceSchema)
+      .mutation(({ ctx, input }) =>
+        ctx.services.createProfileExperience(ctx.identity.subject, input),
+      ),
+    update: protectedProcedure
+      .input(updateProfileExperienceInputSchema)
+      .output(profileExperienceSchema)
+      .mutation(({ ctx, input }) =>
+        ctx.services.updateProfileExperience(ctx.identity.subject, input),
+      ),
+    delete: protectedProcedure
+      .input(profileExperienceIdInputSchema)
+      .output(operationResultSchema)
+      .mutation(({ ctx, input }) =>
+        ctx.services.deleteProfileExperience(
+          ctx.identity.subject,
+          input.experienceId,
+        ),
+      ),
+  }),
+  catalogs: t.router({
+    interests: protectedProcedure
+      .input(profileCatalogInputSchema)
+      .output(profileCatalogPageSchema)
+      .query(({ ctx, input }) => ctx.services.listProfileInterests(input)),
+    skills: protectedProcedure
+      .input(profileCatalogInputSchema)
+      .output(profileCatalogPageSchema)
+      .query(({ ctx, input }) => ctx.services.listProfileSkills(input)),
+  }),
+  replaceSkills: protectedProcedure
+    .input(replaceProfileSkillsInputSchema)
+    .output(operationResultSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.replaceProfileSkills(ctx.identity.subject, input),
+    ),
+});
+
 export const resumeRouter = t.router({
   createPreview: protectedProcedure
     .input(resumeIdInputSchema)
@@ -469,6 +590,7 @@ export const appRouter = t.router({
   account: accountRouter,
   catalogs: catalogsRouter,
   onboarding: onboardingRouter,
+  profile: profileRouter,
   resume: resumeRouter,
   applications: applicationsRouter,
 });

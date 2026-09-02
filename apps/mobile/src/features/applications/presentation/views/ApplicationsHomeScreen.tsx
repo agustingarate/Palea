@@ -30,6 +30,7 @@ import { PostAuthRouteGuard } from '@/features/auth/presentation/components/Post
 import { ApplicationActionMenu } from '../components/ApplicationActionMenu';
 import { BoardColumn, ListGroup } from '../components/ApplicationsCollections';
 import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
+import { ProfileCompletionBanner } from '@/features/profile/presentation/components/ProfileCompletionBanner';
 import { useApplicationsDragAndDrop } from '../hooks/useApplicationsDragAndDrop';
 import {
   applicationStatuses,
@@ -138,8 +139,11 @@ function ApplicationsHomeContent() {
       router.push('/resumes' as never);
       return;
     }
+    if (destination === 'profile') {
+      router.push('/profile' as never);
+      return;
+    }
     // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
-    // TODO(CU-86ajvbvfq): navigate to the candidate profile.
     showSnackbar({ variant: 'info', message: t('nav.pending') });
   };
   const addApplication = () => router.push('/applications/new');
@@ -206,6 +210,7 @@ function ApplicationsHomeContent() {
             addLabel={t('add')}
             onAdd={addApplication}
           />
+          <ProfileCompletionBanner />
           <View className="flex-1">
             {isBoard ? (
               <ScrollView

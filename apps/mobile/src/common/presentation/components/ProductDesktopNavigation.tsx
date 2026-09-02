@@ -49,7 +49,7 @@ export function ProductDesktopNavigation({
   onPending: (destination: 'resumes' | 'metrics' | 'profile') => void;
   onSignOut: () => void;
   signingOut: boolean;
-  active?: 'applications' | 'resumes';
+  active?: 'applications' | 'resumes' | 'profile';
   /** Collapses the shared sidebar when a focused detail view needs more space. */
   collapseWhen?: boolean;
 }) {
@@ -128,8 +128,9 @@ export function ProductDesktopNavigation({
           <DesktopNavItem
             label={labels.profile}
             icon="user"
+            selected={active === 'profile'}
             collapsed={collapsed}
-            onPress={() => onPending('profile')}
+            onPress={() => router.push('/profile' as never)}
           />
         </View>
         {collapsed ? (

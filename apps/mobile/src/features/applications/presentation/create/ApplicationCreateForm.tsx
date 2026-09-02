@@ -245,12 +245,19 @@ export function ApplicationCreateForm() {
     requestDiscard(() => void signOut());
   };
   const notifyPending = (destination: 'resumes' | 'metrics' | 'profile') => {
+    if (destination === 'profile') {
+      const openProfile = () => {
+        allowLeaveRef.current = true;
+        router.push('/profile' as never);
+      };
+      if (dirtyRef.current) requestDiscard(openProfile);
+      else openProfile();
+      return;
+    }
     if (destination === 'resumes') {
       // TODO(CU-86ajvbvec): navigate to the complete CV Library.
-    } else if (destination === 'metrics') {
-      // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
     } else {
-      // TODO(CU-86ajvbvfq): navigate to the candidate profile.
+      // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
     }
     showSnackbar({ variant: 'info', message: t('nav.pending') });
   };

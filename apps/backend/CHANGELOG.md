@@ -9,6 +9,13 @@ and this application uses [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
+- Perfil profesional protegido: detalle localizado con completitud, historial de
+  experiencias paginado por cursor, edición owner-scoped y selección atómica de
+  habilidades. Los catálogos de intereses y habilidades ahora admiten búsqueda
+  localizada y paginación estable.
+- Catálogos iniciales bilingües e idempotentes con 45 intereses y 150
+  habilidades que cubren sectores profesionales, oficios y capacidades
+  transversales.
 - Biblioteca de CVs con política centralizada de tamaño y cupo, accesos firmados
   separados para lectura y descarga, validación estructural de PDF y
   autorización por propietario.

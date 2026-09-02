@@ -187,10 +187,13 @@ function ApplicationDetailLoadedContent({
       showSnackbar({ variant: 'error', message: t('nav.logoutError') });
     }
   };
-  const notifyPending = (_destination: 'resumes' | 'metrics' | 'profile') => {
+  const notifyPending = (destination: 'resumes' | 'metrics' | 'profile') => {
+    if (destination === 'profile') {
+      router.push('/profile' as never);
+      return;
+    }
     // TODO(CU-86ajvbvec): navigate to the complete CV Library.
     // TODO(CU-86ajvbvfm): navigate to the applications metrics dashboard.
-    // TODO(CU-86ajvbvfq): navigate to the candidate profile.
     showSnackbar({ variant: 'info', message: t('nav.pending') });
   };
 

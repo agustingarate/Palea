@@ -11,6 +11,7 @@ import {
 } from 'react-native-reanimated';
 import { primitives } from '@palea/design-tokens';
 import { AppText } from '../atoms/AppText';
+import { Button } from '../atoms/Button';
 import { Icon } from '../atoms/Icon';
 import { Surface } from '../atoms/Surface';
 import { Badge, Skeleton, type StatusTone } from '../atoms/VisualPrimitives';
@@ -332,14 +333,44 @@ export function CollectionFeedback(state: CollectionState) {
         ))}
       </View>
     );
+  if (state.status === 'empty')
+    return (
+      <Surface
+        accessibilityRole="summary"
+        className="items-center gap-4 border-dashed px-6 py-9"
+      >
+        <View
+          accessibilityElementsHidden
+          className="bg-surface-subtle dark:bg-dark-surface-subtle h-12 w-12 items-center justify-center rounded-full"
+        >
+          <Icon name="folder" size="lg" tone="interaction" />
+        </View>
+        <View className="max-w-md items-center gap-1">
+          <AppText variant="sectionTitle" className="text-center">
+            {state.title}
+          </AppText>
+          <AppText className="text-center" tone="muted">
+            {state.message}
+          </AppText>
+        </View>
+        {state.actionLabel && state.onAction ? (
+          <Button
+            label={state.actionLabel}
+            size="sm"
+            variant="secondary"
+            onPress={state.onAction}
+          />
+        ) : null}
+      </Surface>
+    );
   return (
     <FeedbackMessage
       title={state.title}
       message={state.message}
-      tone={state.status === 'error' ? 'danger' : 'info'}
+      tone="danger"
       actionLabel={state.actionLabel}
       onAction={state.onAction}
-      icon={state.status === 'empty' ? 'folder' : 'error'}
+      icon="error"
     />
   );
 }

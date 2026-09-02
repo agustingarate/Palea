@@ -20,6 +20,20 @@ import type {
 } from '@/features/applications/domain/usecases/ApplicationDetailUseCases';
 import type { ResumeRepository } from '@/features/resumes/domain/repositories/ResumeRepository';
 import type { PickResumeFile } from '@/features/resumes/domain/usecases/PickResumeFile';
+import type { GetProfileDetail } from '@/features/profile/domain/usecases/GetProfileDetail';
+import type { ListProfileInterests } from '@/features/profile/domain/usecases/ListProfileInterests';
+import type { UpdateProfileRole } from '@/features/profile/domain/usecases/UpdateProfileRole';
+import type {
+  CreateProfileExperience,
+  DeleteProfileExperience,
+  GetProfileExperience,
+  ListProfileExperiences,
+  UpdateProfileExperience,
+} from '@/features/profile/domain/usecases/ProfileExperienceUseCases';
+import type {
+  ListProfileSkills,
+  ReplaceProfileSkills,
+} from '@/features/profile/domain/usecases/ProfileSkillUseCases';
 import { createToken } from './container';
 import type { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
 
@@ -30,6 +44,16 @@ export interface AppDependencies {
   onboardingRepository: OnboardingRepository;
   resumeRepository: ResumeRepository;
   pickResumeFile: PickResumeFile;
+  getProfileDetail: GetProfileDetail;
+  listProfileInterests: ListProfileInterests;
+  updateProfileRole: UpdateProfileRole;
+  listProfileExperiences: ListProfileExperiences;
+  createProfileExperience: CreateProfileExperience;
+  getProfileExperience: GetProfileExperience;
+  updateProfileExperience: UpdateProfileExperience;
+  deleteProfileExperience: DeleteProfileExperience;
+  listProfileSkills: ListProfileSkills;
+  replaceProfileSkills: ReplaceProfileSkills;
   applicationRepository: ApplicationRepository;
   createApplication: CreateApplication;
   listApplications: ListApplications;
@@ -56,6 +80,30 @@ export const dependencyTokens = {
   ),
   resumeRepository: createToken<ResumeRepository>('ResumeRepository'),
   pickResumeFile: createToken<PickResumeFile>('PickResumeFile'),
+  getProfileDetail: createToken<GetProfileDetail>('GetProfileDetail'),
+  listProfileInterests: createToken<ListProfileInterests>(
+    'ListProfileInterests',
+  ),
+  updateProfileRole: createToken<UpdateProfileRole>('UpdateProfileRole'),
+  listProfileExperiences: createToken<ListProfileExperiences>(
+    'ListProfileExperiences',
+  ),
+  createProfileExperience: createToken<CreateProfileExperience>(
+    'CreateProfileExperience',
+  ),
+  getProfileExperience: createToken<GetProfileExperience>(
+    'GetProfileExperience',
+  ),
+  updateProfileExperience: createToken<UpdateProfileExperience>(
+    'UpdateProfileExperience',
+  ),
+  deleteProfileExperience: createToken<DeleteProfileExperience>(
+    'DeleteProfileExperience',
+  ),
+  listProfileSkills: createToken<ListProfileSkills>('ListProfileSkills'),
+  replaceProfileSkills: createToken<ReplaceProfileSkills>(
+    'ReplaceProfileSkills',
+  ),
   applicationRepository: createToken<ApplicationRepository>(
     'ApplicationRepository',
   ),

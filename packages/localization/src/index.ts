@@ -10,6 +10,8 @@ import esApplications from './locales/es/applications';
 import enApplications from './locales/en/applications';
 import esResumes from './locales/es/resumes';
 import enResumes from './locales/en/resumes';
+import esProfile from './locales/es/profile';
+import enProfile from './locales/en/profile';
 
 export const supportedLocales = ['es', 'en'] as const;
 export type Locale = (typeof supportedLocales)[number];
@@ -23,6 +25,7 @@ export const resources = {
     auth: esAuth,
     applications: esApplications,
     resumes: esResumes,
+    profile: esProfile,
   },
   en: {
     common: enCommon,
@@ -31,6 +34,7 @@ export const resources = {
     auth: enAuth,
     applications: enApplications,
     resumes: enResumes,
+    profile: enProfile,
   },
 } as const;
 

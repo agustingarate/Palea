@@ -101,6 +101,8 @@ export interface ChipProps extends Omit<PressableProps, 'children'> {
   selected?: boolean;
   disabled?: boolean;
   onRemove?: () => void;
+  /** Localized accessible name for the independent remove control. */
+  removeAccessibilityLabel?: string;
 }
 
 export function Chip({
@@ -109,6 +111,7 @@ export function Chip({
   selected = false,
   disabled = false,
   onRemove,
+  removeAccessibilityLabel,
   onPress,
   ...props
 }: ChipProps) {
@@ -206,8 +209,10 @@ export function Chip({
       )}
       {onRemove ? (
         <Pressable
-          accessibilityLabel={`Remove ${label}`}
+          accessibilityLabel={removeAccessibilityLabel ?? `Remove ${label}`}
           accessibilityRole="button"
+          accessibilityState={{ disabled }}
+          disabled={disabled}
           hitSlop={8}
           onPress={onRemove}
         >

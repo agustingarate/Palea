@@ -227,8 +227,13 @@ export function ApplicationStageForm({
     </FormSection>
   );
 
-  const notifyPending = () =>
+  const notifyPending = (destination: 'resumes' | 'metrics' | 'profile') => {
+    if (destination === 'profile') {
+      router.push('/profile' as never);
+      return;
+    }
     showSnackbar({ variant: 'info', message: t('nav.pending') });
+  };
   return (
     <Screen edges={['top', 'bottom']}>
       <View className="flex-1 flex-row">
