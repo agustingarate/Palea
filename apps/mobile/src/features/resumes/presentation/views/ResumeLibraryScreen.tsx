@@ -242,6 +242,16 @@ function ResumeLibraryContent() {
                   label: appT('nav.resumes'),
                   icon: 'fileText',
                 },
+                {
+                  value: 'metrics',
+                  label: appT('nav.metrics'),
+                  icon: 'barChart',
+                },
+                {
+                  value: 'profile',
+                  label: appT('nav.profile'),
+                  icon: 'user',
+                },
               ]}
             />
           ) : null}

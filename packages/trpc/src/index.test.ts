@@ -156,4 +156,59 @@ describe('appRouter', () => {
       }),
     ).rejects.toBeDefined();
   });
+
+  it('protects and delegates profile mutations with the authenticated subject', async () => {
+    const updateProfileRole = jest.fn().mockResolvedValue({ success: true });
+    const authenticated = {
+      ...context,
+      identity: { subject: 'user-1', email: null, roles: [] },
+      services: { ...context.services, updateProfileRole },
+    };
+
+    await expect(
+      appRouter.createCaller(context).profile.updateRole({
+        roleDescription: 'Product designer',
+        experienceBand: 'two_to_four',
+        interestIds: ['00000000-0000-4000-8000-000000000001'],
+      }),
+    ).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+
+    await appRouter.createCaller(authenticated).profile.updateRole({
+      roleDescription: 'Product designer',
+      experienceBand: 'two_to_four',
+      interestIds: ['00000000-0000-4000-8000-000000000001'],
+    });
+
+    expect(updateProfileRole).toHaveBeenCalledWith('user-1', {
+      roleDescription: 'Product designer',
+      experienceBand: 'two_to_four',
+      interestIds: ['00000000-0000-4000-8000-000000000001'],
+    });
+  });
+
+  it('protects and scopes a profile experience lookup to its owner', async () => {
+    const experienceId = '00000000-0000-4000-8000-000000000001';
+    const getProfileExperience = jest.fn().mockResolvedValue({
+      id: experienceId,
+      companyName: 'Palea',
+      role: 'Product designer',
+      startedOn: '2024-01-01',
+      endedOn: null,
+      isCurrent: true,
+    });
+    const authenticated = {
+      ...context,
+      identity: { subject: 'user-1', email: null, roles: [] },
+      services: { ...context.services, getProfileExperience },
+    };
+
+    await expect(
+      appRouter.createCaller(context).profile.experiences.get({ experienceId }),
+    ).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+    await appRouter
+      .createCaller(authenticated)
+      .profile.experiences.get({ experienceId });
+
+    expect(getProfileExperience).toHaveBeenCalledWith('user-1', experienceId);
+  });
 });

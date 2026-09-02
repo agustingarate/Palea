@@ -36,6 +36,22 @@ import { TrpcResumesDataSource } from '@/features/resumes/data/datasources/TrpcR
 import { HttpResumeUploadDataSource } from '@/features/resumes/data/datasources/HttpResumeUploadDataSource';
 import { ExpoResumeFilePicker } from '@/features/resumes/data/datasources/ExpoResumeFilePicker';
 import { PickResumeFile } from '@/features/resumes/domain/usecases/PickResumeFile';
+import { TrpcProfileDataSource } from '@/features/profile/data/datasources/TrpcProfileDataSource';
+import { ProfileRepositoryImpl } from '@/features/profile/data/repositories/ProfileRepositoryImpl';
+import { GetProfileDetail } from '@/features/profile/domain/usecases/GetProfileDetail';
+import { ListProfileInterests } from '@/features/profile/domain/usecases/ListProfileInterests';
+import { UpdateProfileRole } from '@/features/profile/domain/usecases/UpdateProfileRole';
+import {
+  CreateProfileExperience,
+  DeleteProfileExperience,
+  GetProfileExperience,
+  ListProfileExperiences,
+  UpdateProfileExperience,
+} from '@/features/profile/domain/usecases/ProfileExperienceUseCases';
+import {
+  ListProfileSkills,
+  ReplaceProfileSkills,
+} from '@/features/profile/domain/usecases/ProfileSkillUseCases';
 import { useResumeLibraryPreferences } from '@/features/resumes/presentation/stores/useResumeLibraryPreferences';
 import { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
 import { useOnboardingDraftStore } from '@/features/auth/presentation/onboarding/stores/useOnboardingDraftStore';
@@ -84,6 +100,49 @@ export function createAppContainer(): Container {
       new TrpcOnboardingDataSource(authenticatedClient),
       resumeRepository,
     ),
+  );
+  const profileRepository = new ProfileRepositoryImpl(
+    new TrpcProfileDataSource(authenticatedClient),
+  );
+  container.register(
+    dependencyTokens.getProfileDetail,
+    new GetProfileDetail(profileRepository),
+  );
+  container.register(
+    dependencyTokens.listProfileInterests,
+    new ListProfileInterests(profileRepository),
+  );
+  container.register(
+    dependencyTokens.updateProfileRole,
+    new UpdateProfileRole(profileRepository),
+  );
+  container.register(
+    dependencyTokens.listProfileExperiences,
+    new ListProfileExperiences(profileRepository),
+  );
+  container.register(
+    dependencyTokens.createProfileExperience,
+    new CreateProfileExperience(profileRepository),
+  );
+  container.register(
+    dependencyTokens.getProfileExperience,
+    new GetProfileExperience(profileRepository),
+  );
+  container.register(
+    dependencyTokens.updateProfileExperience,
+    new UpdateProfileExperience(profileRepository),
+  );
+  container.register(
+    dependencyTokens.deleteProfileExperience,
+    new DeleteProfileExperience(profileRepository),
+  );
+  container.register(
+    dependencyTokens.listProfileSkills,
+    new ListProfileSkills(profileRepository),
+  );
+  container.register(
+    dependencyTokens.replaceProfileSkills,
+    new ReplaceProfileSkills(profileRepository),
   );
   const applicationRepository = new ApplicationRepositoryImpl(
     new TrpcApplicationsDataSource(authenticatedClient),

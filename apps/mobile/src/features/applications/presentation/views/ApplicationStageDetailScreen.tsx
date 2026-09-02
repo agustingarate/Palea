@@ -126,9 +126,13 @@ function ApplicationStageDetailContent() {
               logout: t('nav.logout'),
             }}
             onAdd={() => router.push('/applications/new')}
-            onPending={() =>
-              showSnackbar({ variant: 'info', message: t('nav.pending') })
-            }
+            onPending={(destination) => {
+              if (destination === 'profile') {
+                router.push('/profile' as never);
+                return;
+              }
+              showSnackbar({ variant: 'info', message: t('nav.pending') });
+            }}
             onSignOut={() => void signOut.mutateAsync()}
             signingOut={signOut.isPending}
           />

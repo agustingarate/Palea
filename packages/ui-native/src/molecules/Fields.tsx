@@ -269,6 +269,11 @@ export interface SearchableSelectProps<Value extends string = string> {
   compact?: boolean;
   leadingIcon?: IconName;
   renderLeading?: (option: SelectOption<Value>) => ReactNode;
+  /**
+   * Receives search text as it changes. Consumers can use it to refresh a
+   * remote catalogue while the picker keeps its native local filtering.
+   */
+  onQueryChange?: (query: string) => void;
   onValueChange(value: Value): void;
 }
 
@@ -298,6 +303,7 @@ export function SearchableSelect<Value extends string = string>({
   compact = false,
   leadingIcon,
   renderLeading,
+  onQueryChange,
   onValueChange,
 }: SearchableSelectProps<Value>) {
   const [open, setOpen] = useState(false);
@@ -320,9 +326,13 @@ export function SearchableSelect<Value extends string = string>({
         ),
     );
   }, [options, query]);
+  const updateQuery = (nextQuery: string) => {
+    setQuery(nextQuery);
+    onQueryChange?.(nextQuery);
+  };
   const close = () => {
     setOpen(false);
-    setQuery('');
+    updateQuery('');
     trigger.current?.focus?.();
   };
   const choose = (option: SelectOption<Value>) => {
@@ -401,7 +411,7 @@ export function SearchableSelect<Value extends string = string>({
                 label={searchPlaceholder}
                 placeholder={searchPlaceholder}
                 value={query}
-                onChangeText={setQuery}
+                onChangeText={updateQuery}
                 autoFocus
               />
             ) : null}

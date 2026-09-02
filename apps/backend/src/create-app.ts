@@ -72,6 +72,28 @@ async function createContext(
       listProjects: (input) => projects.list(input),
       getAccount: (requestIdentity) =>
         account.getMe(requestIdentity.subject, requestIdentity.email),
+      getProfile: (requestIdentity, locale) =>
+        account.getProfile(
+          requestIdentity.subject,
+          requestIdentity.email,
+          locale,
+        ),
+      updateProfileRole: (subject, input) =>
+        account.updateProfileRole(subject, input),
+      listProfileExperiences: (subject, input) =>
+        account.listProfileExperiences(subject, input),
+      getProfileExperience: (subject, experienceId) =>
+        account.getProfileExperience(subject, experienceId),
+      createProfileExperience: (subject, input) =>
+        account.createProfileExperience(subject, input),
+      updateProfileExperience: (subject, input) =>
+        account.updateProfileExperience(subject, input),
+      deleteProfileExperience: (subject, experienceId) =>
+        account.deleteProfileExperience(subject, experienceId),
+      listProfileInterests: (input) => account.listProfileInterests(input),
+      listProfileSkills: (input) => account.listProfileSkills(input),
+      replaceProfileSkills: (subject, input) =>
+        account.replaceProfileSkills(subject, input),
       completeRegistration: (subject, input) =>
         account.completeRegistration(subject, input),
       getOnboardingCatalog: (locale) => account.catalogs(locale),

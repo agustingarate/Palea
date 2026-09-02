@@ -141,6 +141,7 @@ export function useResumeLibraryInteractions(expanded: boolean) {
     addApplication: () => router.push('/applications/new'),
     navigate: (destination: string) => {
       if (destination === 'applications') router.push('/');
+      else if (destination === 'profile') router.push('/profile' as never);
       else if (destination !== 'resumes')
         showSnackbar({ variant: 'info', message: appT('nav.pending') });
     },

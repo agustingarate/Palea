@@ -9,6 +9,10 @@ and this application uses [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
+- Perfil de usuario protegido y localizado: identidad de sólo lectura, rol
+  profesional, alerta única de completitud, historial de experiencias CRUD
+  paginado y selector de hasta diez habilidades. La navegación de producto y
+  los avisos de Home ahora abren el perfil correspondiente.
 - Biblioteca de CVs privada: carga y selección de PDF, visor integrado,
   descargas, renombre, principal, borrado con impacto y reutilización en
   onboarding y postulaciones.
