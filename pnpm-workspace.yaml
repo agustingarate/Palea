@@ -9,6 +9,9 @@ allowBuilds:
   esbuild: true
   prisma: true
   sharp: true
+  # OCR runtime ships prebuilt browser artifacts; its postinstall only invokes
+  # opencollective-postinstall and is intentionally never executed.
+  tesseract.js: false
 
 packageExtensions:
   'react-native-css-interop@*':

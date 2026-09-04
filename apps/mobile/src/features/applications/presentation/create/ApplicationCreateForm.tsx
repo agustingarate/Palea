@@ -37,6 +37,8 @@ import {
   todayLocal,
 } from './applicationCreateModel';
 import { useApplicationCreateViewModel } from './useApplicationCreateViewModel';
+import { useJobDescriptionImport } from './useJobDescriptionImport';
+import { JobDescriptionImageImportCard } from './JobDescriptionImageImportCard';
 
 const NONE_RESUME = 'none';
 const currencyCountries: Record<string, string> = {
@@ -81,6 +83,7 @@ export function ApplicationCreateForm() {
   const { showSnackbar } = useSnackbar();
   const signOutMutation = useSignOut();
   const vm = useApplicationCreateViewModel();
+  const jobDescriptionImport = useJobDescriptionImport();
   const [step, setStep] = useState<1 | 2>(1);
   const [descriptionSource, setDescriptionSource] = useState<
     'manual' | 'url' | 'image'
@@ -107,6 +110,16 @@ export function ApplicationCreateForm() {
       }
     },
   });
+  const importPastedImage = useCallback(
+    (image: Blob) => {
+      setDescriptionSource('image');
+      const uri = URL.createObjectURL(image);
+      void jobDescriptionImport.importImageUri(uri, () =>
+        URL.revokeObjectURL(uri),
+      );
+    },
+    [jobDescriptionImport],
+  );
   const requestDiscard = useCallback((action: () => void) => {
     setDiscardAction(() => action);
   }, []);
@@ -443,38 +456,68 @@ export function ApplicationCreateForm() {
           }
           items={[
             { value: 'manual', label: t('create.manual') },
-            { value: 'url', label: t('create.url') },
+            ...(layout.isWeb
+              ? []
+              : [{ value: 'url' as const, label: t('create.url') }]),
             { value: 'image', label: t('create.image') },
           ]}
         />
-        {descriptionSource === 'manual' ? (
-          <form.Field name="jobDescriptionHtml">
-            {(field) => (
-              <RichTextEditor
-                label={t('create.writeDescription')}
-                value={field.state.value}
-                placeholder={t('create.descriptionHelp')}
-                linkLabel={t('create.link')}
-                linkPlaceholder={t('create.linkPlaceholder')}
-                cancelLabel={t('create.cancel')}
-                confirmLabel={t('create.confirm')}
-                undoLabel={t('create.undo')}
-                redoLabel={t('create.redo')}
-                onChange={field.handleChange}
-                error={fieldError(field.state.meta.errors, t)}
+        {descriptionSource === 'image' ? (
+          <View className="gap-3">
+            <JobDescriptionImageImportCard
+              title={
+                jobDescriptionImport.status === 'loading'
+                  ? t('create.importLoading')
+                  : t('create.importImage')
+              }
+              description={t('create.importImageHint')}
+              disabled={jobDescriptionImport.status === 'loading'}
+              onSelectImage={(uri?: string, release?: () => void) =>
+                uri
+                  ? void jobDescriptionImport.importImageUri(uri, release)
+                  : void jobDescriptionImport.importImage()
+              }
+            />
+            {jobDescriptionImport.status === 'loading' ? (
+              <Button
+                label={t('create.cancel')}
+                variant="secondary"
+                onPress={jobDescriptionImport.cancel}
               />
-            )}
-          </form.Field>
-        ) : (
-          <FeedbackMessage
-            title={t('create.comingSoonTitle')}
-            message={t(
-              descriptionSource === 'url'
-                ? 'create.urlComingSoon'
-                : 'create.imageComingSoon',
-            )}
-          />
-        )}
+            ) : null}
+            {jobDescriptionImport.status === 'empty' ? (
+              <FeedbackMessage
+                title={t('create.importEmptyTitle')}
+                message={t('create.importEmptyMessage')}
+              />
+            ) : null}
+            {jobDescriptionImport.status === 'error' ? (
+              <FeedbackMessage
+                title={t('create.importErrorTitle')}
+                message={t('create.importErrorMessage')}
+                tone="danger"
+              />
+            ) : null}
+          </View>
+        ) : null}
+        <form.Field name="jobDescriptionHtml">
+          {(field) => (
+            <RichTextEditor
+              label={t('create.writeDescription')}
+              value={field.state.value}
+              placeholder={t('create.descriptionHelp')}
+              linkLabel={t('create.link')}
+              linkPlaceholder={t('create.linkPlaceholder')}
+              cancelLabel={t('create.cancel')}
+              confirmLabel={t('create.confirm')}
+              undoLabel={t('create.undo')}
+              redoLabel={t('create.redo')}
+              onChange={field.handleChange}
+              onPasteImage={importPastedImage}
+              error={fieldError(field.state.meta.errors, t)}
+            />
+          )}
+        </form.Field>
         <View className="gap-2">
           <AppText variant="label">{t('create.skills')}</AppText>
           <Notice
@@ -701,6 +744,47 @@ export function ApplicationCreateForm() {
           <Modal
             transparent
             animationType="fade"
+            visible={jobDescriptionImport.previewHtml !== null}
+            onRequestClose={jobDescriptionImport.dismiss}
+          >
+            <Pressable
+              className="flex-1 items-center justify-center bg-black/40 p-6"
+              onPress={jobDescriptionImport.dismiss}
+            >
+              <Pressable
+                accessibilityRole="alert"
+                className="w-full max-w-md gap-5 rounded-2xl bg-surface p-6 shadow-lg"
+                onPress={() => undefined}
+              >
+                <AppText variant="sectionTitle">
+                  {t('create.importConfirmTitle')}
+                </AppText>
+                <AppText tone="muted">
+                  {t('create.importConfirmMessage')}
+                </AppText>
+                <View className="flex-row justify-end gap-3">
+                  <Button
+                    label={t('create.cancel')}
+                    variant="secondary"
+                    onPress={jobDescriptionImport.dismiss}
+                  />
+                  <Button
+                    label={t('create.confirm')}
+                    onPress={() => {
+                      form.setFieldValue(
+                        'jobDescriptionHtml',
+                        jobDescriptionImport.previewHtml ?? '',
+                      );
+                      jobDescriptionImport.dismiss();
+                    }}
+                  />
+                </View>
+              </Pressable>
+            </Pressable>
+          </Modal>
+          <Modal
+            transparent
+            animationType="fade"
             visible={discardAction !== null}
             onRequestClose={() => setDiscardAction(null)}
           >
@@ -748,7 +832,11 @@ export function ApplicationCreateForm() {
             <Button
               label={t('create.cancel')}
               variant="ghost"
-              disabled={vm.create.isPending || vm.upload.isPending}
+              disabled={
+                vm.create.isPending ||
+                vm.upload.isPending ||
+                jobDescriptionImport.status === 'loading'
+              }
               onPress={cancel}
             />
             {!layout.isWeb && step === 2 ? (
@@ -783,7 +871,11 @@ export function ApplicationCreateForm() {
                       label={t('create.save')}
                       leadingIcon="stickyNoteCheck"
                       loading={vm.create.isPending}
-                      disabled={!canSubmit || vm.upload.isPending}
+                      disabled={
+                        !canSubmit ||
+                        vm.upload.isPending ||
+                        jobDescriptionImport.status === 'loading'
+                      }
                       onPress={() => form.handleSubmit()}
                     />
                   );

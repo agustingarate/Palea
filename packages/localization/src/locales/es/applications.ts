@@ -31,6 +31,22 @@ const applications = {
     'La captura segura desde URL estará disponible en una próxima iteración. Por ahora podés pegar la descripción manualmente.',
   'create.imageComingSoon':
     'La captura desde imagen estará disponible en una próxima iteración. Por ahora podés pegar la descripción manualmente.',
+  'create.urlUnavailableTitle':
+    'La importación por URL no está disponible en web',
+  'create.urlUnavailableWeb':
+    'Por seguridad, Expo Web no importa URLs arbitrarias. Podés pegar la descripción manualmente o importar una imagen local.',
+  'create.importImage': 'Elegir imagen e importar texto',
+  'create.importImageHint': 'Arrastrá o subí una imagen',
+  'create.importLoading': 'Extrayendo texto localmente…',
+  'create.importEmptyTitle': 'No encontramos texto',
+  'create.importEmptyMessage':
+    'La imagen no contiene texto utilizable. Tu borrador no cambió.',
+  'create.importErrorTitle': 'No pudimos extraer el texto',
+  'create.importErrorMessage':
+    'Probá con otra imagen o ingresá la descripción manualmente. Tu borrador no cambió.',
+  'create.importConfirmTitle': '¿Usar el texto importado?',
+  'create.importConfirmMessage':
+    'Al confirmar, el texto importado reemplazará la descripción actual.',
   'create.details': 'Condiciones de la oportunidad',
   'create.workMode': 'Modalidad',
   'create.commitment': 'Dedicación',

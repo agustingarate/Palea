@@ -32,9 +32,9 @@ acceden exclusivamente mediante procedimientos tRPC protegidos de Nest.
   ser futura.
 - La descripción manual admite H1/H2/H3, negrita, cursiva, listas y HTML de
   enlaces ya existente. La toolbar web conserva H1 y no ofrece creación de
-  enlaces en esta entrega. URL e imagen se muestran como estados informativos
-  no disponibles; mientras no exista el pipeline de captura, no alteran el HTML
-  manual que se envía.
+  enlaces en esta entrega. URL e imagen siguen el contrato de importación local
+  de `SPEC-APPLICATIONS-005`; sólo pueden prellenar localmente el HTML y nunca
+  cambian el contrato manual que se envía.
 - Modalidad, dedicación, contratación y duración comienzan en `unspecified`.
 - Se selecciona el CV principal por defecto, o ninguno si no existe. Un CV nuevo
   queda seleccionado y disponible en Biblioteca sin cambiar el principal.
@@ -73,8 +73,9 @@ acceden exclusivamente mediante procedimientos tRPC protegidos de Nest.
   localizada; los errores conservan el formulario y muestran feedback accesible.
 - **AC-03:** Mobile conserva datos entre los dos pasos y no persiste al avanzar;
   web muestra el formulario completo sin estirar la composición mobile.
-- **AC-04:** URL, imagen y skills automáticas tienen estados read-only claros y
-  no invocan endpoints ficticios.
+- **AC-04:** URL, imagen y skills automáticas tienen estados claros y no invocan
+  endpoints ficticios. La importación local aprobada se rige por
+  `SPEC-APPLICATIONS-005`.
 - **AC-05:** El CV principal se preselecciona; se puede elegir otro, ninguno o
   subir un PDF. El nuevo CV no reemplaza al principal.
 - **AC-06:** Todo CTA de agregar postulación de Home abre el alta. Tras guardar,
@@ -149,8 +150,10 @@ URL e imagen se anuncian como no disponibles.
 
 ## Non-goals
 
-Detalle y edición de postulación, Biblioteca completa, scraping, OCR/visión,
-llamadas a Vercel AI, extracción efectiva de skills y edición manual de skills.
+Detalle y edición de postulación, Biblioteca completa, scraping backend,
+OCR/visión remotos, llamadas a Vercel AI, extracción efectiva de skills y
+edición manual de skills. La importación local de `SPEC-APPLICATIONS-005` no es
+un non-goal.
 
 ## Test mapping
 
@@ -168,6 +171,7 @@ llamadas a Vercel AI, extracción efectiva de skills y edición manual de skills
 ## Related decisions
 
 - [Home de postulaciones](applications-home.md)
+- [Importación local de descripción](job-description-local-import.md)
 - [Modelo de datos funcional del MVP](mvp-data-model.md)
 - [Mobile design system](mobile-design-system.md)
 - [ADR-002](../design-docs/ADR-002-mobile-architecture.md)

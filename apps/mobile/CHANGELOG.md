@@ -9,6 +9,9 @@ and this application uses [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
+- Importación local de descripción de puesto desde imagen: OCR en dispositivo
+  para iOS/Android y Web, selección/arrastre/pegado accesible, formato seguro
+  basado en layout y confirmación antes de reemplazar el borrador.
 - Perfil de usuario protegido y localizado: identidad de sólo lectura, rol
   profesional, alerta única de completitud, historial de experiencias CRUD
   paginado y selector de hasta diez habilidades. La navegación de producto y

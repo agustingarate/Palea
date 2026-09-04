@@ -52,6 +52,14 @@ export function createAppConfig(input: {
       'expo-router',
       'expo-font',
       'expo-document-picker',
+      [
+        'expo-image-picker',
+        {
+          photosPermission:
+            'Palea accede a una imagen elegida para extraer localmente el texto de una descripción.',
+          microphonePermission: false,
+        },
+      ],
       '@react-native-community/datetimepicker',
       ['expo-dev-client', { addGeneratedScheme: appVariant === 'development' }],
     ],

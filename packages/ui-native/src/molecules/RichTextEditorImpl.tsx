@@ -34,6 +34,8 @@ export interface RichTextEditorProps {
   undoLabel: string;
   redoLabel: string;
   onChange(value: string): void;
+  /** Web-only: images pasted in the editor are routed to the host importer. */
+  onPasteImage?(image: Blob): void;
 }
 
 export function RichTextEditor({

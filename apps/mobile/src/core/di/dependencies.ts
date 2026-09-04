@@ -36,6 +36,10 @@ import type {
 } from '@/features/profile/domain/usecases/ProfileSkillUseCases';
 import { createToken } from './container';
 import type { SessionCleanupRegistry } from '../session/SessionCleanupRegistry';
+import type {
+  JobDescriptionImagePicker,
+  JobDescriptionImportPort,
+} from '@/features/applications/domain/jobDescriptionImport';
 
 export interface AppDependencies {
   getProjects: GetProjects;
@@ -56,6 +60,8 @@ export interface AppDependencies {
   replaceProfileSkills: ReplaceProfileSkills;
   applicationRepository: ApplicationRepository;
   createApplication: CreateApplication;
+  jobDescriptionImport: JobDescriptionImportPort;
+  jobDescriptionImagePicker: JobDescriptionImagePicker;
   listApplications: ListApplications;
   updateApplicationStatus: UpdateApplicationStatus;
   deleteApplication: DeleteApplication;
@@ -108,6 +114,12 @@ export const dependencyTokens = {
     'ApplicationRepository',
   ),
   createApplication: createToken<CreateApplication>('CreateApplication'),
+  jobDescriptionImport: createToken<JobDescriptionImportPort>(
+    'JobDescriptionImport',
+  ),
+  jobDescriptionImagePicker: createToken<JobDescriptionImagePicker>(
+    'JobDescriptionImagePicker',
+  ),
   listApplications: createToken<ListApplications>('ListApplications'),
   updateApplicationStatus: createToken<UpdateApplicationStatus>(
     'UpdateApplicationStatus',

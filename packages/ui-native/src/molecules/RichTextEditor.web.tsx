@@ -74,6 +74,7 @@ export function RichTextEditor({
   undoLabel,
   redoLabel,
   onChange,
+  onPasteImage,
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLElement | null>(null);
   const lastEmittedValueRef = useRef(value);
@@ -176,6 +177,14 @@ export function RichTextEditor({
             const html = event.currentTarget.innerHTML;
             lastEmittedValueRef.current = html;
             onChange(html);
+          },
+          onPaste: (event: ClipboardEvent) => {
+            const image = Array.from(event.clipboardData?.items ?? [])
+              .find((item) => item.type.startsWith('image/'))
+              ?.getAsFile();
+            if (!image) return;
+            event.preventDefault();
+            onPasteImage?.(image);
           },
           role: 'textbox',
           suppressContentEditableWarning: true,

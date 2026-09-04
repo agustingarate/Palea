@@ -19,3 +19,4 @@ apps/backend/supabase/.branches/
 apps/backend/supabase/.temp/
 apps/backend/supabase/catalog/staging.sql
 apps/mobile/public/pdfjs/
+apps/mobile/public/tesseract/
