@@ -34,6 +34,7 @@ import {
   applicationListInputSchema,
   applicationPageSchema,
   updateApplicationStatusInputSchema,
+  updateApplicationInputSchema,
   createApplicationInputSchema,
   applicationSchema,
   applicationIdSchema,
@@ -49,6 +50,7 @@ import {
   type ApplicationListInput,
   type ApplicationPage,
   type UpdateApplicationStatusInput,
+  type UpdateApplicationInput,
   type CreateApplicationInput,
   type Application,
   type ApplicationDetail,
@@ -207,6 +209,10 @@ export interface PaleaApiServices {
   getApplication(
     subject: string,
     applicationId: string,
+  ): Promise<ApplicationDetail>;
+  updateApplication(
+    subject: string,
+    input: UpdateApplicationInput,
   ): Promise<ApplicationDetail>;
   listApplicationStages(
     subject: string,
@@ -504,6 +510,12 @@ export const applicationsRouter = t.router({
     .output(applicationDetailSchema)
     .query(({ ctx, input }) =>
       ctx.services.getApplication(ctx.identity.subject, input.applicationId),
+    ),
+  update: protectedProcedure
+    .input(updateApplicationInputSchema)
+    .output(applicationDetailSchema)
+    .mutation(({ ctx, input }) =>
+      ctx.services.updateApplication(ctx.identity.subject, input),
     ),
   listStages: protectedProcedure
     .input(applicationIdSchema)

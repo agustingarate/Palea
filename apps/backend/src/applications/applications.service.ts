@@ -6,6 +6,7 @@ import type {
   CompensationRange,
   CreateApplicationStageInput,
   CreateApplicationInput,
+  UpdateApplicationInput,
   UpdateApplicationStageInput,
 } from '@palea/contracts';
 import type { Prisma } from '@prisma/client';
@@ -53,6 +54,9 @@ export class ApplicationsService {
           commitment: input.commitment,
           contractType: input.contractType,
           durationType: input.durationType,
+          url: input.url,
+          location: input.location,
+          schedule: input.schedule,
           resumeId: input.resumeId,
           description: description?.text,
           descriptionHtml: description?.html,
@@ -172,6 +176,69 @@ export class ApplicationsService {
         maximumMinor: compensation.maximumMinor?.toString() ?? null,
       })),
     };
+  }
+
+  async update(subject: string, input: UpdateApplicationInput) {
+    assertNotFuture(input.appliedOn, input.timeZone);
+    const description = normalizeDescription(input.jobDescription?.html);
+    await this.prisma.$transaction(async (transaction) => {
+      await lockResumeLibrary(transaction, subject);
+      const application = await transaction.application.findFirst({
+        where: { id: input.applicationId, profileId: subject },
+        select: { id: true, status: true },
+      });
+      if (!application)
+        throw new AppError('applications.not_found', 'NOT_FOUND');
+      if (application.status !== 'draft' && !input.appliedOn) {
+        throw new AppError('applications.date_required', 'BAD_REQUEST');
+      }
+      if (input.resumeId) {
+        const resume = await transaction.resume.findFirst({
+          where: {
+            id: input.resumeId,
+            profileId: subject,
+            uploadStatus: 'ready',
+          },
+          select: { id: true },
+        });
+        if (!resume)
+          throw new AppError('applications.invalid_resume', 'BAD_REQUEST');
+      }
+      await transaction.application.update({
+        where: { id: application.id },
+        data: {
+          companyName: input.companyName,
+          role: input.role,
+          appliedOn: input.appliedOn ? toDatabaseDate(input.appliedOn) : null,
+          url: input.url,
+          location: input.location,
+          schedule: input.schedule,
+          workMode: input.workMode,
+          commitment: input.commitment,
+          contractType: input.contractType,
+          durationType: input.durationType,
+          resumeId: input.resumeId,
+          description: description?.text,
+          descriptionHtml: description?.html,
+          descriptionSource: description ? 'manual' : null,
+          descriptionCaptureStatus: description ? 'completed' : 'not_requested',
+        },
+      });
+      await transaction.applicationCompensation.deleteMany({
+        where: { applicationId: application.id },
+      });
+      const compensations = compensationRows(
+        application.id,
+        input.expectedCompensation,
+        input.offeredCompensation,
+      );
+      if (compensations.length) {
+        await transaction.applicationCompensation.createMany({
+          data: compensations,
+        });
+      }
+    });
+    return this.get(subject, input.applicationId);
   }
 
   async listStages(subject: string, applicationId: string) {

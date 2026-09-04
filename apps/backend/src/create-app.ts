@@ -126,6 +126,8 @@ async function createContext(
         applications.create(subject, input),
       getApplication: (subject, applicationId) =>
         applications.get(subject, applicationId),
+      updateApplication: (subject, input) =>
+        applications.update(subject, input),
       listApplicationStages: (subject, applicationId) =>
         applications.listStages(subject, applicationId),
       createApplicationStage: (subject, input) =>
