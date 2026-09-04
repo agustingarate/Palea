@@ -171,9 +171,9 @@ export function createAppContainer(): Container {
     new ExpoJobDescriptionImagePicker(),
   );
   container.register(
-     dependencyTokens.updateApplication,
-     new UpdateApplication(applicationRepository),
-   );
+    dependencyTokens.updateApplication,
+    new UpdateApplication(applicationRepository),
+  );
   container.register(
     dependencyTokens.updateApplicationStatus,
     new UpdateApplicationStatus(applicationRepository),
