@@ -1,6 +1,7 @@
 import {
   applicationCreateFormSchema,
   majorToMinor,
+  toUpdateApplicationInput,
   toCreateApplicationInput,
 } from './applicationCreateModel';
 
@@ -23,6 +24,9 @@ describe('application create form mapping', () => {
         companyName: 'Palea',
         role: 'Engineer',
         appliedOn: null,
+        url: '',
+        location: '',
+        schedule: '',
         jobDescriptionHtml: '',
         workMode: 'unspecified',
         commitment: 'unspecified',
@@ -41,6 +45,9 @@ describe('application create form mapping', () => {
       }),
     ).toMatchObject({
       appliedOn: null,
+      url: null,
+      location: null,
+      schedule: null,
       expectedCompensation: null,
       offeredCompensation: null,
     });
@@ -51,6 +58,9 @@ describe('application create form mapping', () => {
       companyName: 'Palea',
       role: 'Engineer',
       appliedOn: null,
+      url: '',
+      location: '',
+      schedule: '',
       jobDescriptionHtml: '',
       workMode: 'unspecified',
       commitment: 'unspecified',
@@ -86,5 +96,37 @@ describe('application create form mapping', () => {
         ]),
       );
     }
+  });
+
+  it('maps normalized editable fields to the update contract', () => {
+    expect(
+      toUpdateApplicationInput('00000000-0000-4000-8000-000000000001', {
+        companyName: 'Palea',
+        role: 'Engineer',
+        appliedOn: null,
+        url: 'https://example.com/job',
+        location: 'Córdoba',
+        schedule: '9 to 18',
+        jobDescriptionHtml: '',
+        workMode: 'remote',
+        commitment: 'full_time',
+        contractType: 'employment',
+        durationType: 'indefinite',
+        resumeId: null,
+        expectedMinimum: '',
+        expectedMaximum: '',
+        expectedCurrency: 'USD',
+        expectedPeriod: 'month',
+        offeredMinimum: '',
+        offeredMaximum: '',
+        offeredCurrency: 'USD',
+        offeredPeriod: 'month',
+      }),
+    ).toMatchObject({
+      url: 'https://example.com/job',
+      location: 'Córdoba',
+      schedule: '9 to 18',
+      expectedCompensation: null,
+    });
   });
 });

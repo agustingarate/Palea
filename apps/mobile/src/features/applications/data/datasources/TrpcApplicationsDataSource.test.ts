@@ -6,6 +6,7 @@ const client = {
   applications: {
     list: { query: jest.fn() },
     create: { mutate: jest.fn() },
+    update: { mutate: jest.fn() },
     updateStatus: { mutate: jest.fn() },
     delete: { mutate: jest.fn() },
     createStage: { mutate: jest.fn() },
@@ -84,6 +85,9 @@ describe('TrpcApplicationsDataSource', () => {
         companyName: 'Palea',
         role: 'Engineer',
         appliedOn: null,
+        url: null,
+        location: null,
+        schedule: null,
         workMode: 'unspecified',
         commitment: 'unspecified',
         contractType: 'unspecified',
@@ -96,6 +100,54 @@ describe('TrpcApplicationsDataSource', () => {
         timeZone: 'UTC',
       }),
     ).resolves.toMatchObject({ status: 'draft', appliedOn: null });
+  });
+
+  it('validates update input and detail output at the transport boundary', async () => {
+    const detail = {
+      id: applicationId,
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      status: 'draft',
+      workMode: 'unspecified',
+      position: 0,
+      commitment: 'unspecified',
+      contractType: 'unspecified',
+      durationType: 'unspecified',
+      url: null,
+      location: null,
+      schedule: null,
+      descriptionHtml: null,
+      description: null,
+      skillAnalysisStatus: 'not_requested',
+      requiredSkills: [],
+      resume: null,
+      compensations: [],
+    };
+    client.applications.update.mutate.mockResolvedValue(detail);
+    await expect(
+      dataSource.update({
+        applicationId,
+        companyName: 'Palea',
+        role: 'Engineer',
+        appliedOn: null,
+        url: null,
+        location: null,
+        schedule: null,
+        workMode: 'unspecified',
+        commitment: 'unspecified',
+        contractType: 'unspecified',
+        durationType: 'unspecified',
+        resumeId: null,
+        jobDescription: null,
+        expectedCompensation: null,
+        offeredCompensation: null,
+        timeZone: 'UTC',
+      }),
+    ).resolves.toMatchObject(detail);
+    expect(client.applications.update.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({ applicationId, url: null, location: null }),
+    );
   });
 
   it('parses and delegates the complete stage CRUD at the transport boundary', async () => {

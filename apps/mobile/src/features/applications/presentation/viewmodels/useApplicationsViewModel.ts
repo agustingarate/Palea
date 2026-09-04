@@ -359,5 +359,6 @@ export function useApplicationsViewModel() {
     loadMoreBoardColumns,
     move,
     remove,
+    removePending: deleteMutation.isPending,
   };
 }

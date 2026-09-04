@@ -1,5 +1,4 @@
 import {
-  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -28,6 +27,7 @@ import { useLocale } from '@/core/localization/LocaleProvider';
 import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationActionMenu } from '../components/ApplicationActionMenu';
+import { ApplicationDeleteDialog } from '../components/ApplicationDeleteDialog';
 import { BoardColumn, ListGroup } from '../components/ApplicationsCollections';
 import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import { ProfileCompletionBanner } from '@/features/profile/presentation/components/ProfileCompletionBanner';
@@ -72,6 +72,7 @@ function ApplicationsHomeContent() {
     targetIndex?: number;
   } | null>(null);
   const [moveDate, setMoveDate] = useState<string | null>(todayLocal());
+  const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const expandStatus = (status: ApplicationStatus) =>
     setExpanded((current) =>
       current[status] ? current : { ...current, [status]: true },
@@ -105,26 +106,16 @@ function ApplicationsHomeContent() {
     onExpand: expandStatus,
   });
   const isBoard = layout.isExpanded && view === 'board';
-  const remove = (application: Application) =>
-    Alert.alert(t('delete.title'), t('delete.message'), [
-      { text: t('delete.cancel'), style: 'cancel' },
-      {
-        text: t('delete.confirm'),
-        style: 'destructive',
-        onPress: () =>
-          void vm
-            .remove(application)
-            .then(() =>
-              showSnackbar({
-                variant: 'success',
-                message: t('feedback.deleted'),
-              }),
-            )
-            .catch(() =>
-              showSnackbar({ variant: 'error', message: t('error.delete') }),
-            ),
-      },
-    ]);
+  const remove = async () => {
+    if (!deleteTarget) return;
+    try {
+      await vm.remove(deleteTarget);
+      setDeleteTarget(null);
+      showSnackbar({ variant: 'success', message: t('feedback.deleted') });
+    } catch {
+      showSnackbar({ variant: 'error', message: t('error.delete') });
+    }
+  };
   const signOut = async () => {
     try {
       await signOutMutation.mutateAsync();
@@ -392,12 +383,31 @@ function ApplicationsHomeContent() {
                 cancel: t('actions.cancel'),
               }}
               onDismiss={() => setActionFor(null)}
+              onEdit={() => {
+                const application = actionFor.application;
+                setActionFor(null);
+                router.push(`/applications/${application.id}/edit`);
+              }}
               onDelete={() => {
                 setActionFor(null);
-                remove(actionFor.application);
+                setDeleteTarget(actionFor.application);
               }}
             />
           ) : null}
+          <ApplicationDeleteDialog
+            visible={Boolean(deleteTarget)}
+            application={deleteTarget}
+            pending={vm.removePending}
+            labels={{
+              title: t('delete.title'),
+              message: t('delete.message'),
+              cancel: t('delete.cancel'),
+              confirm: t('delete.confirm'),
+              pending: t('delete.pending'),
+            }}
+            onDismiss={() => setDeleteTarget(null)}
+            onConfirm={() => void remove()}
+          />
           <Modal
             transparent
             animationType="fade"

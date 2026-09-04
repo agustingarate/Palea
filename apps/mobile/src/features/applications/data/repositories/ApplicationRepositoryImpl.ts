@@ -4,6 +4,7 @@ import type {
   ApplicationPage,
   ApplicationStatus,
   CreateApplicationInput,
+  UpdateApplicationInput,
   ApplicationDetail,
   ApplicationStage,
   ApplicationNote,
@@ -23,6 +24,9 @@ export class ApplicationRepositoryImpl implements ApplicationRepository {
   }
   async create(input: CreateApplicationInput): Promise<Application> {
     return this.dataSource.create(input);
+  }
+  update(input: UpdateApplicationInput): Promise<ApplicationDetail> {
+    return this.dataSource.update(input);
   }
   get(applicationId: string): Promise<ApplicationDetail> {
     return this.dataSource.get(applicationId);

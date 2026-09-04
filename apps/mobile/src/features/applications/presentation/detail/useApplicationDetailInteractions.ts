@@ -1,4 +1,4 @@
-import { Alert, Linking } from 'react-native';
+import { Linking } from 'react-native';
 import { useState } from 'react';
 import { useResumeFilePicker } from '@/features/resumes/presentation/viewmodels/useResumeFilePicker';
 import type { ApplicationStatus } from '@palea/contracts';
@@ -47,6 +47,7 @@ export function useApplicationDetailInteractions({
     null,
   );
   const [moveDate, setMoveDate] = useState<string | null>(todayLocal());
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const commitStatus = async (
     status: ApplicationStatus,
@@ -124,28 +125,15 @@ export function useApplicationDetailInteractions({
     );
   };
 
-  const removeApplication = () => {
-    Alert.alert(t('delete.title'), t('delete.message'), [
-      { text: t('delete.cancel'), style: 'cancel' },
-      {
-        text: t('delete.confirm'),
-        style: 'destructive',
-        onPress: () => {
-          void mutations
-            .removeApplication()
-            .then(() => {
-              showSnackbar({
-                variant: 'success',
-                message: t('feedback.deleted'),
-              });
-              navigateToApplicationsHome(router);
-            })
-            .catch(() =>
-              showSnackbar({ variant: 'error', message: t('error.delete') }),
-            );
-        },
-      },
-    ]);
+  const removeApplication = async () => {
+    try {
+      await mutations.removeApplication();
+      setDeleteOpen(false);
+      showSnackbar({ variant: 'success', message: t('feedback.deleted') });
+      navigateToApplicationsHome(router);
+    } catch {
+      showSnackbar({ variant: 'error', message: t('error.delete') });
+    }
   };
 
   return {
@@ -157,6 +145,8 @@ export function useApplicationDetailInteractions({
     setPendingStatus,
     moveDate,
     setMoveDate,
+    deleteOpen,
+    setDeleteOpen,
     selectStatus,
     confirmStatusDate,
     downloadResume,

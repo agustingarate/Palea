@@ -33,6 +33,7 @@ import { navigateToApplicationsHome } from '../navigation/applicationsHomeNaviga
 import {
   applicationCreateDefaults,
   applicationCreateFormSchema,
+  type ApplicationCreateFormValues,
   toCreateApplicationInput,
   todayLocal,
 } from './applicationCreateModel';
@@ -74,7 +75,20 @@ function currencyName(currency: string, locale: string) {
   );
 }
 
-export function ApplicationCreateForm() {
+export function ApplicationCreateForm({
+  mode = 'create',
+  initialValues = applicationCreateDefaults,
+  onSave,
+  onComplete,
+  onCancel,
+}: {
+  mode?: 'create' | 'edit';
+  initialValues?: ApplicationCreateFormValues;
+  onSave?: (values: ApplicationCreateFormValues) => Promise<void>;
+  onComplete?: () => void;
+  onCancel?: () => void;
+}) {
+  const isEdit = mode === 'edit';
   const picker = useResumeFilePicker();
   const { t, i18n } = useLocale('applications');
   const layout = useResponsiveLayout();
@@ -96,17 +110,22 @@ export function ApplicationCreateForm() {
   const allowLeaveRef = useRef(false);
   const defaultResumeApplied = useRef(false);
   const form = useForm({
-    defaultValues: applicationCreateDefaults,
+    defaultValues: initialValues,
     validators: { onSubmit: applicationCreateFormSchema },
     onSubmit: async ({ value }) => {
       setSubmissionError(null);
       try {
-        await vm.create.mutateAsync(toCreateApplicationInput(value));
+        if (onSave) await onSave(value);
+        else await vm.create.mutateAsync(toCreateApplicationInput(value));
         allowLeaveRef.current = true;
-        showSnackbar({ variant: 'success', message: t('create.success') });
-        navigateToApplicationsHome(router);
+        showSnackbar({
+          variant: 'success',
+          message: t(isEdit ? 'edit.success' : 'create.success'),
+        });
+        onComplete?.();
+        if (!onComplete) navigateToApplicationsHome(router);
       } catch {
-        setSubmissionError(t('create.error'));
+        setSubmissionError(t(isEdit ? 'edit.error' : 'create.error'));
       }
     },
   });
@@ -125,12 +144,12 @@ export function ApplicationCreateForm() {
   }, []);
 
   useEffect(() => {
-    if (defaultResumeApplied.current || !vm.resumes.data) return;
+    if (isEdit || defaultResumeApplied.current || !vm.resumes.data) return;
     defaultResumeApplied.current = true;
     const primary = vm.resumes.data.find((resume) => resume.isPrimary);
     if (primary)
       form.setFieldValue('resumeId', primary.id, { dontUpdateMeta: true });
-  }, [form, vm.resumes.data]);
+  }, [form, isEdit, vm.resumes.data]);
 
   useEffect(
     () =>
@@ -232,11 +251,19 @@ export function ApplicationCreateForm() {
   const cancel = () => {
     if (!dirtyRef.current) {
       allowLeaveRef.current = true;
+      if (onCancel) {
+        onCancel();
+        return;
+      }
       navigateToApplicationsHome(router);
       return;
     }
     requestDiscard(() => {
       allowLeaveRef.current = true;
+      if (onCancel) {
+        onCancel();
+        return;
+      }
       navigateToApplicationsHome(router);
     });
   };
@@ -441,6 +468,46 @@ export function ApplicationCreateForm() {
             />
           )}
         </form.Field>
+        <ResponsiveGrid columns={{ compact: 1, medium: 2, expanded: 2 }}>
+          <form.Field name="url">
+            {(field) => (
+              <TextField
+                label={t('create.jobUrl')}
+                placeholder="https://…"
+                keyboardType="url"
+                maxLength={2048}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChangeText={field.handleChange}
+                error={fieldError(field.state.meta.errors, t)}
+              />
+            )}
+          </form.Field>
+          <form.Field name="location">
+            {(field) => (
+              <TextField
+                label={t('create.location')}
+                maxLength={200}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChangeText={field.handleChange}
+                error={fieldError(field.state.meta.errors, t)}
+              />
+            )}
+          </form.Field>
+          <form.Field name="schedule">
+            {(field) => (
+              <TextField
+                label={t('create.schedule')}
+                maxLength={200}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChangeText={field.handleChange}
+                error={fieldError(field.state.meta.errors, t)}
+              />
+            )}
+          </form.Field>
+        </ResponsiveGrid>
       </FormSection>
       <FormSection
         contained={layout.isWeb}
@@ -637,25 +704,27 @@ export function ApplicationCreateForm() {
         {compensationFields('expected', t('create.expected'))}
         {compensationFields('offered', t('create.offered'))}
       </FormSection>
-      <FormSection
-        contained={layout.isWeb}
-        leadingIcon="penLine"
-        title={t('create.additionalInformation')}
-      >
-        <form.Field name="privateNotes">
-          {(field) => (
-            <TextAreaField
-              label={t('create.additionalInformationLabel')}
-              placeholder={t('create.notesPlaceholder')}
-              maxLength={10_000}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChangeText={field.handleChange}
-              error={fieldError(field.state.meta.errors, t)}
-            />
-          )}
-        </form.Field>
-      </FormSection>
+      {!isEdit ? (
+        <FormSection
+          contained={layout.isWeb}
+          leadingIcon="penLine"
+          title={t('create.additionalInformation')}
+        >
+          <form.Field name="privateNotes">
+            {(field) => (
+              <TextAreaField
+                label={t('create.additionalInformationLabel')}
+                placeholder={t('create.notesPlaceholder')}
+                maxLength={10_000}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChangeText={field.handleChange}
+                error={fieldError(field.state.meta.errors, t)}
+              />
+            )}
+          </form.Field>
+        </FormSection>
+      ) : null}
     </>
   );
 
@@ -689,8 +758,8 @@ export function ApplicationCreateForm() {
         ) : null}
         <View className="flex-1">
           <TopAppBar
-            title={t('create.title')}
-            subtitle={layout.isWeb ? t('create.subtitle') : undefined}
+            title={t(isEdit ? 'edit.title' : 'create.title')}
+            subtitle={layout.isWeb ? t(isEdit ? 'edit.subtitle' : 'create.subtitle') : undefined}
             leading={
               <Button
                 label="‹"
@@ -722,19 +791,19 @@ export function ApplicationCreateForm() {
                     label: t('nav.applications'),
                     onPress: () => router.replace('/'),
                   },
-                  { label: t('create.title') },
+                  { label: t(isEdit ? 'edit.title' : 'create.title') },
                 ]}
               />
             ) : null}
-            {!layout.isWeb ? (
+            {!layout.isWeb && !isEdit ? (
               <ProgressIndicator
                 current={step}
                 total={2}
                 label={t('create.step', { current: step })}
               />
             ) : null}
-            {layout.isWeb || step === 1 ? firstStep : null}
-            {layout.isWeb || step === 2 ? secondStep : null}
+            {layout.isWeb || isEdit || step === 1 ? firstStep : null}
+            {layout.isWeb || isEdit || step === 2 ? secondStep : null}
             {submissionError ? (
               <AppText accessibilityLiveRegion="polite" tone="danger">
                 {submissionError}
@@ -839,7 +908,7 @@ export function ApplicationCreateForm() {
               }
               onPress={cancel}
             />
-            {!layout.isWeb && step === 2 ? (
+            {!layout.isWeb && !isEdit && step === 2 ? (
               <Button
                 label={t('create.back')}
                 variant="secondary"
@@ -847,7 +916,7 @@ export function ApplicationCreateForm() {
                 onPress={() => setStep(1)}
               />
             ) : null}
-            {!layout.isWeb && step === 1 ? (
+            {!layout.isWeb && !isEdit && step === 1 ? (
               <form.Subscribe selector={(state) => state.values}>
                 {(values) => (
                   <Button
@@ -868,7 +937,7 @@ export function ApplicationCreateForm() {
                   dirtyRef.current = isDirty;
                   return (
                     <Button
-                      label={t('create.save')}
+                      label={t(isEdit ? 'edit.save' : 'create.save')}
                       leadingIcon="stickyNoteCheck"
                       loading={vm.create.isPending}
                       disabled={
@@ -883,7 +952,7 @@ export function ApplicationCreateForm() {
               </form.Subscribe>
             )}
           </StickyActionBar>
-          {!layout.isWeb && step === 1 ? (
+          {!layout.isWeb && !isEdit && step === 1 ? (
             <form.Subscribe selector={(state) => state.isDirty}>
               {(isDirty) => {
                 dirtyRef.current = isDirty;

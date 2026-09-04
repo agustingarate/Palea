@@ -12,6 +12,7 @@ import {
 const repository = {
   list: jest.fn().mockResolvedValue({ items: [], nextCursor: null, total: 0 }),
   create: jest.fn().mockResolvedValue({}),
+  update: jest.fn().mockResolvedValue({}),
   updateStatus: jest.fn().mockResolvedValue(undefined),
   remove: jest.fn().mockResolvedValue(undefined),
   get: jest.fn().mockResolvedValue({}),
@@ -40,6 +41,9 @@ describe('application use cases', () => {
       companyName: 'Palea',
       role: 'Engineer',
       appliedOn: null,
+      url: null,
+      location: null,
+      schedule: null,
       workMode: 'unspecified' as const,
       commitment: 'unspecified' as const,
       contractType: 'unspecified' as const,

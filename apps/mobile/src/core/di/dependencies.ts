@@ -7,6 +7,7 @@ import type { ListApplications } from '@/features/applications/domain/usecases/L
 import type { UpdateApplicationStatus } from '@/features/applications/domain/usecases/UpdateApplicationStatus';
 import type { DeleteApplication } from '@/features/applications/domain/usecases/DeleteApplication';
 import type { CreateApplication } from '@/features/applications/domain/usecases/CreateApplication';
+import type { UpdateApplication } from '@/features/applications/domain/usecases/UpdateApplication';
 import type {
   GetApplicationDetail,
   GetApplicationNote,
@@ -62,6 +63,7 @@ export interface AppDependencies {
   createApplication: CreateApplication;
   jobDescriptionImport: JobDescriptionImportPort;
   jobDescriptionImagePicker: JobDescriptionImagePicker;
+  updateApplication: UpdateApplication;
   listApplications: ListApplications;
   updateApplicationStatus: UpdateApplicationStatus;
   deleteApplication: DeleteApplication;
@@ -120,6 +122,7 @@ export const dependencyTokens = {
   jobDescriptionImagePicker: createToken<JobDescriptionImagePicker>(
     'JobDescriptionImagePicker',
   ),
+  updateApplication: createToken<UpdateApplication>('UpdateApplication'),
   listApplications: createToken<ListApplications>('ListApplications'),
   updateApplicationStatus: createToken<UpdateApplicationStatus>(
     'UpdateApplicationStatus',

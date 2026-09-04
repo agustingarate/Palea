@@ -4,6 +4,7 @@ const applicationId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 const dataSource = {
   list: jest.fn(),
   create: jest.fn(),
+  update: jest.fn(),
   updateStatus: jest.fn(),
   remove: jest.fn(),
   get: jest.fn(),
@@ -72,6 +73,9 @@ describe('ApplicationRepositoryImpl', () => {
       companyName: 'Palea',
       role: 'Engineer',
       appliedOn: null,
+      url: null,
+      location: null,
+      schedule: null,
       workMode: 'unspecified' as const,
       commitment: 'unspecified' as const,
       contractType: 'unspecified' as const,
@@ -85,6 +89,30 @@ describe('ApplicationRepositoryImpl', () => {
     };
     await repository.create(input);
     expect(dataSource.create).toHaveBeenCalledWith(input);
+  });
+
+  it('delegates complete editing through the datasource port', async () => {
+    const input = {
+      applicationId,
+      companyName: 'Palea',
+      role: 'Engineer',
+      appliedOn: null,
+      url: null,
+      location: null,
+      schedule: null,
+      workMode: 'unspecified' as const,
+      commitment: 'unspecified' as const,
+      contractType: 'unspecified' as const,
+      durationType: 'unspecified' as const,
+      resumeId: null,
+      jobDescription: null,
+      expectedCompensation: null,
+      offeredCompensation: null,
+      timeZone: 'UTC',
+    };
+    dataSource.update.mockResolvedValue({ id: applicationId });
+    await repository.update(input);
+    expect(dataSource.update).toHaveBeenCalledWith(input);
   });
 
   it('delegates stage CRUD through the datasource port', async () => {
