@@ -60,6 +60,7 @@ function ApplicationEditContent() {
           toUpdateApplicationInput(applicationId, values),
         );
       }}
+      pending={vm.update.isPending}
       onComplete={() => router.replace(`/applications/${applicationId}`)}
       onCancel={() => router.replace(`/applications/${applicationId}`)}
     />

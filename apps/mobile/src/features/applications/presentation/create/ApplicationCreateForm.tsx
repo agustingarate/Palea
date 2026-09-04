@@ -81,12 +81,15 @@ export function ApplicationCreateForm({
   onSave,
   onComplete,
   onCancel,
+  pending = false,
 }: {
   mode?: 'create' | 'edit';
   initialValues?: ApplicationCreateFormValues;
   onSave?: (values: ApplicationCreateFormValues) => Promise<void>;
   onComplete?: () => void;
   onCancel?: () => void;
+  /** Allows the edit host to keep the shared action bar pending during its mutation. */
+  pending?: boolean;
 }) {
   const isEdit = mode === 'edit';
   const picker = useResumeFilePicker();
@@ -98,6 +101,7 @@ export function ApplicationCreateForm({
   const signOutMutation = useSignOut();
   const vm = useApplicationCreateViewModel();
   const jobDescriptionImport = useJobDescriptionImport();
+  const isSubmitting = vm.create.isPending || pending;
   const [step, setStep] = useState<1 | 2>(1);
   const [descriptionSource, setDescriptionSource] = useState<
     'manual' | 'url' | 'image'
@@ -902,7 +906,7 @@ export function ApplicationCreateForm({
               label={t('create.cancel')}
               variant="ghost"
               disabled={
-                vm.create.isPending ||
+                isSubmitting ||
                 vm.upload.isPending ||
                 jobDescriptionImport.status === 'loading'
               }
@@ -912,7 +916,7 @@ export function ApplicationCreateForm({
               <Button
                 label={t('create.back')}
                 variant="secondary"
-                disabled={vm.create.isPending || vm.upload.isPending}
+                disabled={isSubmitting || vm.upload.isPending}
                 onPress={() => setStep(1)}
               />
             ) : null}
@@ -939,9 +943,10 @@ export function ApplicationCreateForm({
                     <Button
                       label={t(isEdit ? 'edit.save' : 'create.save')}
                       leadingIcon="stickyNoteCheck"
-                      loading={vm.create.isPending}
+                      loading={isSubmitting}
                       disabled={
                         !canSubmit ||
+                        isSubmitting ||
                         vm.upload.isPending ||
                         jobDescriptionImport.status === 'loading'
                       }
