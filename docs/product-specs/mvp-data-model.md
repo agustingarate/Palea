@@ -175,3 +175,7 @@ análisis futuro de skills. La automatización permanece fuera de alcance.
 La versión 1.4 incorpora `SPEC-APPLICATIONS-004`: reemplaza `details` por
 `comments` y define resultado, dificultad, preguntas, restricciones y orden
 determinista para el CRUD completo de etapas.
+
+La edición y eliminación de postulaciones se rige por
+`SPEC-APPLICATIONS-005`; usa columnas y cascadas existentes, por lo que no
+introduce una migración de esquema.

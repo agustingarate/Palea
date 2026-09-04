@@ -29,7 +29,9 @@ acceden exclusivamente mediante procedimientos tRPC protegidos de Nest.
 - En mobile el alta es un wizard de dos pasos; en web las mismas secciones se
   muestran en un formulario responsive único.
 - Empresa y rol son obligatorios. La fecha de postulación es opcional y no puede
-  ser futura.
+  ser futura. URL de oferta HTTP(S), ubicación y horario son opcionales; URL
+  admite hasta 2048 caracteres y ubicación/horario se normalizan a `null` y
+  admiten hasta 200.
 - La descripción manual admite H1/H2/H3, negrita, cursiva, listas y HTML de
   enlaces ya existente. La toolbar web conserva H1 y no ofrece creación de
   enlaces en esta entrega. URL e imagen siguen el contrato de importación local
@@ -64,6 +66,9 @@ acceden exclusivamente mediante procedimientos tRPC protegidos de Nest.
   orden dentro de `draft` se serializa por candidato y estado.
 - **BR-08:** Skills requeridas y skills de CV se modelan por entidad y permanecen
   sin análisis hasta que exista una implementación backend aprobada.
+- **BR-09:** `url`, `location` y `schedule` se persisten al crear y se muestran
+  en Detalle; captura por URL/imagen sigue siendo informativa y no consume esos
+  campos.
 
 ## Acceptance criteria
 
@@ -150,10 +155,10 @@ URL e imagen se anuncian como no disponibles.
 
 ## Non-goals
 
-Detalle y edición de postulación, Biblioteca completa, scraping backend,
-OCR/visión remotos, llamadas a Vercel AI, extracción efectiva de skills y
-edición manual de skills. La importación local de `SPEC-APPLICATIONS-005` no es
-un non-goal.
+Biblioteca completa, scraping backend, OCR/visión remotos, llamadas a Vercel AI,
+extracción efectiva de skills y edición manual de skills. La importación local
+de `SPEC-APPLICATIONS-005` no es un non-goal; la edición y eliminación se
+definen en [SPEC-APPLICATIONS-005](application-edit-delete.md).
 
 ## Test mapping
 
@@ -171,6 +176,7 @@ un non-goal.
 ## Related decisions
 
 - [Home de postulaciones](applications-home.md)
+- [Edición y eliminación de postulaciones](application-edit-delete.md)
 - [Importación local de descripción](job-description-local-import.md)
 - [Modelo de datos funcional del MVP](mvp-data-model.md)
 - [Mobile design system](mobile-design-system.md)
