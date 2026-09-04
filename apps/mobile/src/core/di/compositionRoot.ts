@@ -20,6 +20,8 @@ import { ListApplications } from '@/features/applications/domain/usecases/ListAp
 import { UpdateApplicationStatus } from '@/features/applications/domain/usecases/UpdateApplicationStatus';
 import { DeleteApplication } from '@/features/applications/domain/usecases/DeleteApplication';
 import { CreateApplication } from '@/features/applications/domain/usecases/CreateApplication';
+import { JobDescriptionImportDataSource } from '@/features/applications/data/datasources/JobDescriptionImportDataSource';
+import { ExpoJobDescriptionImagePicker } from '@/features/applications/data/datasources/ExpoJobDescriptionImagePicker';
 import {
   GetApplicationDetail,
   GetApplicationNote,
@@ -158,6 +160,14 @@ export function createAppContainer(): Container {
   container.register(
     dependencyTokens.createApplication,
     new CreateApplication(applicationRepository),
+  );
+  container.register(
+    dependencyTokens.jobDescriptionImport,
+    new JobDescriptionImportDataSource(),
+  );
+  container.register(
+    dependencyTokens.jobDescriptionImagePicker,
+    new ExpoJobDescriptionImagePicker(),
   );
   container.register(
     dependencyTokens.updateApplicationStatus,

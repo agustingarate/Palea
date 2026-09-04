@@ -8,6 +8,7 @@
 
 - [Applications home](applications-home.md) — approved candidate application list and board behavior.
 - [Application creation](application-create.md) — approved responsive draft creation flow.
+- [Local job-description import](job-description-local-import.md) — draft local-only URL and OCR prefill contract.
 - [Application detail](application-detail.md) — approved owner-scoped application detail.
 - [Application stages](application-stages.md) — approved owner-scoped process stage CRUD and timeline.
 

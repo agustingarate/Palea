@@ -2,12 +2,14 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { preparePdfAssets } from './scripts/prepare-pdf-assets.mjs';
+import { prepareTesseractAssets } from './scripts/prepare-tesseract-assets.mjs';
 
 const loadCommonJs = createRequire(import.meta.url);
 const { getDefaultConfig } = loadCommonJs('expo/metro-config');
 const { withNativeWind } = loadCommonJs('nativewind/metro');
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 preparePdfAssets(projectRoot);
+prepareTesseractAssets(projectRoot);
 const workspaceRoot = path.resolve(projectRoot, '../..');
 const queryCoreEntry = loadCommonJs.resolve('@tanstack/query-core');
 const developmentSourceEntries = {
