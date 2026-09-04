@@ -123,10 +123,12 @@ const applications = {
   'detail.changeStatus': 'Cambiar estado',
   'detail.edit': 'Editar postulación',
   'edit.title': 'Editar postulación',
-  'edit.subtitle': 'Actualizá los datos de la oportunidad sin perder tu progreso.',
+  'edit.subtitle':
+    'Actualizá los datos de la oportunidad sin perder tu progreso.',
   'edit.save': 'Guardar cambios',
   'edit.success': 'Postulación actualizada.',
-  'edit.error': 'No pudimos actualizar la postulación. Tus cambios siguen aquí.',
+  'edit.error':
+    'No pudimos actualizar la postulación. Tus cambios siguen aquí.',
   'detail.download': 'Descargar CV',
   'detail.downloadError': 'No pudimos descargar el CV.',
   'detail.chooseResume': 'Elegir CV asociado',

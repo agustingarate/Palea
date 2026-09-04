@@ -67,12 +67,14 @@ function ApplicationEditContent() {
   );
 }
 
-function toFormValues(application: ApplicationDetail): ApplicationCreateFormValues {
+function toFormValues(
+  application: ApplicationDetail,
+): ApplicationCreateFormValues {
   const compensation = (kind: 'expected' | 'offered') => {
     const value = application.compensations.find((item) => item.kind === kind);
-    const exponent = currencyCatalog.find(
-      (currency) => currency.code === value?.currency,
-    )?.exponent ?? 2;
+    const exponent =
+      currencyCatalog.find((currency) => currency.code === value?.currency)
+        ?.exponent ?? 2;
     return {
       minimum: minorToMajor(value?.minimumMinor ?? null, exponent),
       maximum: minorToMajor(value?.maximumMinor ?? null, exponent),

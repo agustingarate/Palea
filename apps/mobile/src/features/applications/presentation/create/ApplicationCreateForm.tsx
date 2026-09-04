@@ -763,7 +763,11 @@ export function ApplicationCreateForm({
         <View className="flex-1">
           <TopAppBar
             title={t(isEdit ? 'edit.title' : 'create.title')}
-            subtitle={layout.isWeb ? t(isEdit ? 'edit.subtitle' : 'create.subtitle') : undefined}
+            subtitle={
+              layout.isWeb
+                ? t(isEdit ? 'edit.subtitle' : 'create.subtitle')
+                : undefined
+            }
             leading={
               <Button
                 label="‹"

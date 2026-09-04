@@ -79,11 +79,11 @@ no se agrega scraping, OCR, análisis de skills ni automatización.
 
 Stitch es input obligatorio, proyecto `16272299109015713935`:
 
-| Superficie | Referencias | Construcción requerida |
-| --- | --- | --- |
-| Móvil | `Edit Application Form` (`307069fe46fc4d65ade7098b7d38ac04`), `Improved Form` (`f250ab54dd2f49738cf393fa13dca127`), `Comprehensive` (`38f91f4fcc22451288d6b840cdafe3b1`) | Cabecera con retorno, secciones claras, campos de ancho completo y flujo vertical; edición no muestra pasos ni nota. |
-| Web | `Add/Edit Application - Web (Unified)` (`5098dd9742514380a29c14237f54f40c`) | Contenedor centrado amplio, secciones agrupadas, grid cuando hay espacio y acciones persistentes; no tarjetas simétricas genéricas. |
-| Detalle/eliminación | `Application Detail - Web (Unified)` (`8ef72d8f0acb467b84f1e9b2597aa2b2`) | Cabecera de identidad con acciones separadas y diálogo destructivo claro. |
+| Superficie          | Referencias                                                                                                                                                              | Construcción requerida                                                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Móvil               | `Edit Application Form` (`307069fe46fc4d65ade7098b7d38ac04`), `Improved Form` (`f250ab54dd2f49738cf393fa13dca127`), `Comprehensive` (`38f91f4fcc22451288d6b840cdafe3b1`) | Cabecera con retorno, secciones claras, campos de ancho completo y flujo vertical; edición no muestra pasos ni nota.                |
+| Web                 | `Add/Edit Application - Web (Unified)` (`5098dd9742514380a29c14237f54f40c`)                                                                                              | Contenedor centrado amplio, secciones agrupadas, grid cuando hay espacio y acciones persistentes; no tarjetas simétricas genéricas. |
+| Detalle/eliminación | `Application Detail - Web (Unified)` (`8ef72d8f0acb467b84f1e9b2597aa2b2`)                                                                                                | Cabecera de identidad con acciones separadas y diálogo destructivo claro.                                                           |
 
 Se reutilizan tokens y organismos `@palea/ui-native`. En 390 px hay una
 columna; en 768 px se preservan targets de 48 dp; en 1280 px hay agrupación y
@@ -98,13 +98,13 @@ edición, por ser no objetivos aprobados.
 
 ## Pruebas
 
-| Requisito | Evidencia |
-| --- | --- |
-| BR-01/02 | Contratos y servicio: owner, fecha e invariantes de estado. |
-| BR-03/04/05 | Servicio: CV, sanitización y compensaciones atómicas. |
-| BR-06 | Cascadas de etapas, nota, recursos, compensaciones y skills; CV sobrevive. |
-| Cliente | Mapping, caché, rutas, dirty guard, upload, errores, CTAs y regresión de alta. |
-| Visual | QA en 390/768/1280 contra Stitch, temas, teclado/foco y overflow. |
+| Requisito   | Evidencia                                                                      |
+| ----------- | ------------------------------------------------------------------------------ |
+| BR-01/02    | Contratos y servicio: owner, fecha e invariantes de estado.                    |
+| BR-03/04/05 | Servicio: CV, sanitización y compensaciones atómicas.                          |
+| BR-06       | Cascadas de etapas, nota, recursos, compensaciones y skills; CV sobrevive.     |
+| Cliente     | Mapping, caché, rutas, dirty guard, upload, errores, CTAs y regresión de alta. |
+| Visual      | QA en 390/768/1280 contra Stitch, temas, teclado/foco y overflow.              |
 
 ## Referencias
 

@@ -96,9 +96,11 @@ export const applicationEditableFormSchema = z
     }
   });
 
-export const applicationCreateFormSchema = applicationEditableFormSchema.extend({
-  privateNotes: z.string().max(10_000, 'validation.notes.max'),
-});
+export const applicationCreateFormSchema = applicationEditableFormSchema.extend(
+  {
+    privateNotes: z.string().max(10_000, 'validation.notes.max'),
+  },
+);
 
 export type ApplicationCreateFormValues = z.infer<
   typeof applicationCreateFormSchema

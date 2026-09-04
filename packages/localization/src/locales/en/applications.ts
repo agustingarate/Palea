@@ -121,10 +121,12 @@ const applications = {
   'detail.changeStatus': 'Change status',
   'detail.edit': 'Edit application',
   'edit.title': 'Edit application',
-  'edit.subtitle': 'Update the opportunity details and keep your progress intact.',
+  'edit.subtitle':
+    'Update the opportunity details and keep your progress intact.',
   'edit.save': 'Save changes',
   'edit.success': 'Application updated.',
-  'edit.error': 'We could not update the application. Your changes are still here.',
+  'edit.error':
+    'We could not update the application. Your changes are still here.',
   'detail.download': 'Download resume',
   'detail.downloadError': 'We could not download the resume.',
   'detail.chooseResume': 'Choose associated resume',
@@ -255,7 +257,8 @@ const applications = {
     'We could not move the application. Its previous status was restored.',
   'error.delete': 'We could not delete the application.',
   'delete.title': 'Delete application?',
-  'delete.message': 'This removes its stages, private note, resources, compensation and required skills. Your resume stays in the Library.',
+  'delete.message':
+    'This removes its stages, private note, resources, compensation and required skills. Your resume stays in the Library.',
   'delete.pending': 'Deleting application…',
   'delete.cancel': 'Cancel',
   'delete.confirm': 'Delete',

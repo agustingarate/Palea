@@ -288,12 +288,14 @@ export const applicationEditableFieldsSchema = z.object({
   offeredCompensation: compensationRangeSchema.nullable().default(null),
   timeZone: applicationTimeZoneSchema,
 });
-export const createApplicationInputSchema = applicationEditableFieldsSchema.extend({
-  privateNotes: z.string().max(10_000).default(''),
-});
-export const updateApplicationInputSchema = applicationEditableFieldsSchema.extend({
-  applicationId: z.uuid(),
-});
+export const createApplicationInputSchema =
+  applicationEditableFieldsSchema.extend({
+    privateNotes: z.string().max(10_000).default(''),
+  });
+export const updateApplicationInputSchema =
+  applicationEditableFieldsSchema.extend({
+    applicationId: z.uuid(),
+  });
 export type Application = z.infer<typeof applicationSchema>;
 export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
 export type ApplicationPage = z.infer<typeof applicationPageSchema>;

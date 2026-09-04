@@ -275,7 +275,7 @@ function ApplicationDetailLoadedContent({
           </ScrollView>
         </View>
       </View>
-          <ApplicationDetailModals
+      <ApplicationDetailModals
         status={{
           visible: interactions.statusOpen,
           current: application.status,
@@ -318,21 +318,21 @@ function ApplicationDetailLoadedContent({
           onChange: interactions.setMoveDate,
           onConfirm: interactions.confirmStatusDate,
         }}
-          />
-          <ApplicationDeleteDialog
-            visible={interactions.deleteOpen}
-            application={application}
-            pending={deleting}
-            labels={{
-              title: t('delete.title'),
-              message: t('delete.message'),
-              cancel: t('delete.cancel'),
-              confirm: t('delete.confirm'),
-              pending: t('delete.pending'),
-            }}
-            onDismiss={() => interactions.setDeleteOpen(false)}
-            onConfirm={() => void interactions.removeApplication()}
-          />
+      />
+      <ApplicationDeleteDialog
+        visible={interactions.deleteOpen}
+        application={application}
+        pending={deleting}
+        labels={{
+          title: t('delete.title'),
+          message: t('delete.message'),
+          cancel: t('delete.cancel'),
+          confirm: t('delete.confirm'),
+          pending: t('delete.pending'),
+        }}
+        onDismiss={() => interactions.setDeleteOpen(false)}
+        onConfirm={() => void interactions.removeApplication()}
+      />
     </Screen>
   );
 }
