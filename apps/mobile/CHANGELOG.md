@@ -9,6 +9,11 @@ and this application uses [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
+- Edición integral de postulaciones con formulario reutilizable, campos de
+  oferta y compensaciones, protección ante descarte y actualización coherente
+  de detalle, Home y tablero.
+- Eliminación confirmada de postulaciones desde Home y Detalle, con rollback
+  optimista, mensajes accesibles y preservación explícita del CV.
 - Importación local de descripción de puesto desde imagen: OCR en dispositivo
   para iOS/Android y Web, selección/arrastre/pegado accesible, formato seguro
   basado en layout y confirmación antes de reemplazar el borrador.
