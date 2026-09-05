@@ -1,6 +1,9 @@
 module.exports = {
   preset: 'jest-expo',
   clearMocks: true,
+  // Expo's native test preset retains a process handle after all assertions
+  // complete. CI must report the completed suite rather than wait indefinitely.
+  forceExit: true,
   setupFiles: ['<rootDir>/test/environment.setup.cjs'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

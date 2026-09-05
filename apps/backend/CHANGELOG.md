@@ -9,6 +9,9 @@ and this application uses [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ### Added
 
+- Actualización transaccional y owner-scoped de postulaciones, con validación
+  de CV listo, sanitización de descripción, invariantes de fecha y reemplazo
+  exacto de compensaciones.
 - Perfil profesional protegido: detalle localizado con completitud, historial de
   experiencias paginado por cursor, edición owner-scoped y selección atómica de
   habilidades. Los catálogos de intereses y habilidades ahora admiten búsqueda

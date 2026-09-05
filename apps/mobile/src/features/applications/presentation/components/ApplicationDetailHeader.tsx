@@ -18,9 +18,11 @@ export function ApplicationDetailHeader({
   backLabel,
   statusLabel,
   changeStatusLabel,
+  editLabel,
   deleteLabel,
   onBack,
   onStatus,
+  onEdit,
   onDelete,
   deleting,
 }: {
@@ -29,9 +31,11 @@ export function ApplicationDetailHeader({
   backLabel: string;
   statusLabel: string;
   changeStatusLabel: string;
+  editLabel: string;
   deleteLabel: string;
   onBack: () => void;
   onStatus: () => void;
+  onEdit: () => void;
   onDelete: () => void;
   deleting: boolean;
 }) {
@@ -58,6 +62,12 @@ export function ApplicationDetailHeader({
               variant="ghost"
               size="sm"
               onPress={onStatus}
+            />
+            <IconButton
+              icon="edit"
+              accessibilityLabel={editLabel}
+              disabled={deleting}
+              onPress={onEdit}
             />
             <IconButton
               icon="trash"
@@ -112,6 +122,13 @@ export function ApplicationDetailHeader({
           </View>
         </View>
         <View className="flex-row items-center gap-2">
+          <Button
+            label={editLabel}
+            leadingIcon="edit"
+            variant="secondary"
+            disabled={deleting}
+            onPress={onEdit}
+          />
           <Button
             label={deleteLabel}
             leadingIcon="trash"

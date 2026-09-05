@@ -7,6 +7,7 @@ import {
   applicationStageSchema,
   createApplicationStageInputSchema,
   createApplicationInputSchema,
+  updateApplicationInputSchema,
   currencyCodes,
   updateApplicationStatusInputSchema,
   updateApplicationStageInputSchema,
@@ -162,6 +163,38 @@ describe('application contracts', () => {
         role: 'Engineer',
         timeZone: 'UTC',
         jobDescription: { source: 'url', url: 'https://example.com/job' },
+      }).success,
+    ).toBe(false);
+  });
+
+  it('shares normalized editable fields across create and update inputs', () => {
+    const input = updateApplicationInputSchema.parse({
+      applicationId: id,
+      companyName: ' Palea ',
+      role: ' Engineer ',
+      url: 'https://example.com/jobs/1',
+      location: ' Córdoba ',
+      schedule: ' 9 to 18 ',
+      timeZone: 'UTC',
+    });
+    expect(input).toMatchObject({
+      companyName: 'Palea',
+      role: 'Engineer',
+      url: 'https://example.com/jobs/1',
+      location: 'Córdoba',
+      schedule: '9 to 18',
+      appliedOn: null,
+    });
+    expect(
+      updateApplicationInputSchema.safeParse({
+        ...input,
+        url: 'ftp://example.com/jobs/1',
+      }).success,
+    ).toBe(false);
+    expect(
+      updateApplicationInputSchema.safeParse({
+        ...input,
+        location: 'x'.repeat(201),
       }).success,
     ).toBe(false);
   });

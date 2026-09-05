@@ -5,11 +5,13 @@ export function ApplicationActionMenu({
   anchor,
   labels,
   onDismiss,
+  onEdit,
   onDelete,
 }: {
   anchor: { x: number; y: number };
   labels: { edit: string; remove: string; cancel: string };
   onDismiss: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }) {
   return (
@@ -40,8 +42,7 @@ export function ApplicationActionMenu({
             <Pressable
               accessibilityRole="menuitem"
               className="min-h-control-sm flex-row items-center gap-2 px-3"
-              // TODO(CU-86ajvbve7): navigate to application editing.
-              onPress={onDismiss}
+              onPress={onEdit}
             >
               <Icon name="edit" size="sm" tone="muted" />
               <AppText variant="label" className="flex-1">

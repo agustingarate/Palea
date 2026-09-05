@@ -17,7 +17,8 @@ compensaciones, descripción, habilidades, etapas, nota, recursos y CV; cambiar
 el estado y asociar, reemplazar, quitar, cargar o descargar un CV. Aplica a
 Expo nativo y Expo Web; `apps/web` queda fuera de alcance.
 
-La edición general pertenece a CU-86ajvbve7. El CRUD de etapas está definido en
+La edición y eliminación general pertenecen a
+[SPEC-APPLICATIONS-005](application-edit-delete.md), CU-86ajvbve7. El CRUD de etapas está definido en
 [SPEC-APPLICATIONS-004](application-stages.md); notas y recursos pertenecen a
 sus tareas respectivas. La
 eliminación de una postulación se expone desde la cabecera Web de este detalle
@@ -123,6 +124,8 @@ Procedimientos tRPC protegidos, con entradas y salidas Zod en
 - `applications.listResources({ applicationId })`
 - `applications.updateResume({ applicationId, resumeId })`
 - `resume.createDownload({ resumeId })`
+- `applications.update(input) -> ApplicationDetail` se define en
+  [SPEC-APPLICATIONS-005](application-edit-delete.md).
 
 ## Arquitectura cliente
 

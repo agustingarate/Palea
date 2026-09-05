@@ -122,6 +122,9 @@ describe('ApplicationsService', () => {
       companyName: 'Palea',
       role: 'Engineer',
       appliedOn: null,
+      url: 'https://example.com/job',
+      location: 'Córdoba',
+      schedule: '9 to 18',
       workMode: 'remote',
       commitment: 'full_time',
       contractType: 'employment',
@@ -196,6 +199,9 @@ describe('ApplicationsService', () => {
         companyName: 'Palea',
         role: 'Engineer',
         appliedOn: '2999-01-01',
+        url: null,
+        location: null,
+        schedule: null,
         workMode: 'unspecified',
         commitment: 'unspecified',
         contractType: 'unspecified',
@@ -233,6 +239,9 @@ describe('ApplicationsService', () => {
       companyName: 'Palea',
       role: 'Engineer',
       appliedOn: '2026-08-28',
+      url: null,
+      location: null,
+      schedule: null,
       workMode: 'unspecified' as const,
       commitment: 'unspecified' as const,
       contractType: 'unspecified' as const,
@@ -526,5 +535,81 @@ describe('ApplicationsService', () => {
       }),
     ).rejects.toMatchObject({ appCode: 'applications.invalid_resume' });
     expect(update).not.toHaveBeenCalled();
+  });
+
+  it('updates only editable fields atomically and replaces compensation rows', async () => {
+    const update = jest.fn();
+    const deleteMany = jest.fn();
+    const createMany = jest.fn();
+    const detail = {
+      ...rows[0],
+      commitment: 'unspecified',
+      contractType: 'unspecified',
+      durationType: 'unspecified',
+      url: 'https://example.com/job',
+      location: 'Córdoba',
+      schedule: '9 to 18',
+      descriptionHtml: '<p>Safe</p>',
+      description: 'Safe',
+      skillAnalysisStatus: 'not_requested',
+      resume: null,
+      compensations: [],
+      requiredSkills: [],
+    };
+    const transaction = {
+      $queryRaw: jest.fn(),
+      application: {
+        findFirst: jest
+          .fn()
+          .mockResolvedValue({ id: rows[0]!.id, status: 'draft' }),
+        update,
+      },
+      resume: { findFirst: jest.fn().mockResolvedValue({ id: 'resume-1' }) },
+      applicationCompensation: { deleteMany, createMany },
+    };
+    const applicationFindFirst = jest.fn().mockResolvedValue(detail);
+    const service = new ApplicationsService({
+      application: { findFirst: applicationFindFirst },
+      $transaction: (run: (tx: typeof transaction) => Promise<unknown>) =>
+        run(transaction),
+    } as never);
+
+    await expect(
+      service.update(subject, {
+        applicationId: rows[0]!.id,
+        companyName: 'Palea updated',
+        role: 'Engineer',
+        appliedOn: null,
+        url: 'https://example.com/job',
+        location: 'Córdoba',
+        schedule: '9 to 18',
+        workMode: 'remote',
+        commitment: 'unspecified',
+        contractType: 'unspecified',
+        durationType: 'unspecified',
+        resumeId: null,
+        jobDescription: { source: 'manual', html: '<p>Safe</p>' },
+        expectedCompensation: {
+          minimumMinor: '1000',
+          maximumMinor: null,
+          currency: 'USD',
+          period: 'month',
+        },
+        offeredCompensation: null,
+        timeZone: 'UTC',
+      }),
+    ).resolves.toMatchObject({ companyName: 'Palea' });
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          companyName: 'Palea updated',
+          location: 'Córdoba',
+        }),
+      }),
+    );
+    expect(deleteMany).toHaveBeenCalledWith({
+      where: { applicationId: rows[0]!.id },
+    });
+    expect(createMany).toHaveBeenCalledTimes(1);
   });
 });

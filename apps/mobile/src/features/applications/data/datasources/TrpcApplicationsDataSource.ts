@@ -13,7 +13,9 @@ import {
   applicationResourcesSchema,
   applicationResumeInputSchema,
   createApplicationInputSchema,
+  updateApplicationInputSchema,
   type CreateApplicationInput,
+  type UpdateApplicationInput,
   type ApplicationStatus,
   type CreateApplicationStageInput,
   type UpdateApplicationStageInput,
@@ -40,6 +42,14 @@ export class TrpcApplicationsDataSource implements ApplicationsDataSource {
     return applicationSchema.parse(
       await this.client.applications.create.mutate(
         createApplicationInputSchema.parse(input),
+      ),
+    );
+  }
+
+  async update(input: UpdateApplicationInput) {
+    return applicationDetailSchema.parse(
+      await this.client.applications.update.mutate(
+        updateApplicationInputSchema.parse(input),
       ),
     );
   }

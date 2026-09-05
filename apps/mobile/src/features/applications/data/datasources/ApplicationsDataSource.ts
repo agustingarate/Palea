@@ -3,6 +3,7 @@ import type {
   ApplicationPage,
   ApplicationStatus,
   CreateApplicationInput,
+  UpdateApplicationInput,
   ApplicationDetail,
   ApplicationStage,
   ApplicationNote,
@@ -17,6 +18,7 @@ export interface ApplicationsDataSource {
     options?: { search?: string; cursor?: string },
   ): Promise<ApplicationPage>;
   create(input: CreateApplicationInput): Promise<Application>;
+  update(input: UpdateApplicationInput): Promise<ApplicationDetail>;
   get(applicationId: string): Promise<ApplicationDetail>;
   listStages(applicationId: string): Promise<ApplicationStage[]>;
   createStage(input: CreateApplicationStageInput): Promise<ApplicationStage>;

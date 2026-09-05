@@ -13,6 +13,7 @@ import { useSignOut } from '@/core/session/useSignOut';
 import { PostAuthRouteGuard } from '@/features/auth/presentation/components/PostAuthRouteGuard';
 import { ApplicationDetailHeader } from '../components/ApplicationDetailHeader';
 import { ApplicationDetailModals } from '../components/ApplicationDetailModals';
+import { ApplicationDeleteDialog } from '../components/ApplicationDeleteDialog';
 import { ProductDesktopNavigation } from '@/common/presentation/components/ProductDesktopNavigation';
 import {
   ApplicationDetailSummary,
@@ -224,11 +225,13 @@ function ApplicationDetailLoadedContent({
             backLabel={t('detail.back')}
             statusLabel={t(`status.${application.status}`)}
             changeStatusLabel={t('detail.changeStatus')}
+            editLabel={t('detail.edit')}
             deleteLabel={t('actions.delete')}
             deleting={deleting}
             onBack={() => navigateToApplicationsHome(router)}
             onStatus={() => interactions.setStatusOpen(true)}
-            onDelete={interactions.removeApplication}
+            onEdit={() => router.push(`/applications/${applicationId}/edit`)}
+            onDelete={() => interactions.setDeleteOpen(true)}
           />
           {!layout.isExpanded ? (
             <Tabs
@@ -315,6 +318,20 @@ function ApplicationDetailLoadedContent({
           onChange: interactions.setMoveDate,
           onConfirm: interactions.confirmStatusDate,
         }}
+      />
+      <ApplicationDeleteDialog
+        visible={interactions.deleteOpen}
+        application={application}
+        pending={deleting}
+        labels={{
+          title: t('delete.title'),
+          message: t('delete.message'),
+          cancel: t('delete.cancel'),
+          confirm: t('delete.confirm'),
+          pending: t('delete.pending'),
+        }}
+        onDismiss={() => interactions.setDeleteOpen(false)}
+        onConfirm={() => void interactions.removeApplication()}
       />
     </Screen>
   );

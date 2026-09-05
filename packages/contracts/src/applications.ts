@@ -120,6 +120,23 @@ export const manualJobDescriptionSchema = z.object({
   source: z.literal('manual'),
   html: z.string().max(100_000),
 });
+const nullableTrimmedText = (maximum: number) =>
+  z
+    .union([z.string().max(maximum), z.null()])
+    .default(null)
+    .transform((value) => value?.trim() || null);
+const applicationUrlSchema = z
+  .union([z.string().trim().max(2048), z.null()])
+  .default(null)
+  .transform((value, context) => {
+    const normalized = value || null;
+    if (normalized && !/^https?:\/\//i.test(normalized)) {
+      context.addIssue({ code: 'custom', message: 'application.url' });
+      return z.NEVER;
+    }
+    return normalized;
+  })
+  .pipe(z.url().nullable());
 export const applicationIdSchema = z.object({ applicationId: z.uuid() });
 export const applicationResumeInputSchema = applicationIdSchema.extend({
   resumeId: z.uuid().nullable(),
@@ -254,21 +271,31 @@ export const updateApplicationStatusInputSchema = applicationIdSchema.extend({
   appliedOn: z.iso.date().optional(),
   timeZone: applicationTimeZoneSchema,
 });
-export const createApplicationInputSchema = z.object({
+export const applicationEditableFieldsSchema = z.object({
   companyName: z.string().trim().min(1).max(120),
   role: z.string().trim().min(1).max(120),
   appliedOn: z.iso.date().nullable().default(null),
+  url: applicationUrlSchema,
+  location: nullableTrimmedText(200),
+  schedule: nullableTrimmedText(200),
   workMode: workModeSchema.default('unspecified'),
   commitment: commitmentSchema.default('unspecified'),
   contractType: contractTypeSchema.default('unspecified'),
   durationType: durationTypeSchema.default('unspecified'),
   resumeId: z.uuid().nullable().default(null),
   jobDescription: manualJobDescriptionSchema.nullable().default(null),
-  privateNotes: z.string().max(10_000).default(''),
   expectedCompensation: compensationRangeSchema.nullable().default(null),
   offeredCompensation: compensationRangeSchema.nullable().default(null),
   timeZone: applicationTimeZoneSchema,
 });
+export const createApplicationInputSchema =
+  applicationEditableFieldsSchema.extend({
+    privateNotes: z.string().max(10_000).default(''),
+  });
+export const updateApplicationInputSchema =
+  applicationEditableFieldsSchema.extend({
+    applicationId: z.uuid(),
+  });
 export type Application = z.infer<typeof applicationSchema>;
 export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
 export type ApplicationPage = z.infer<typeof applicationPageSchema>;
@@ -294,6 +321,9 @@ export type ApplicationResumeInput = z.infer<
 export type ApplicationListInput = z.infer<typeof applicationListInputSchema>;
 export type CreateApplicationInput = z.infer<
   typeof createApplicationInputSchema
+>;
+export type UpdateApplicationInput = z.infer<
+  typeof updateApplicationInputSchema
 >;
 export type CompensationRange = z.infer<typeof compensationRangeSchema>;
 export type CompensationPeriod = z.infer<typeof compensationPeriodSchema>;

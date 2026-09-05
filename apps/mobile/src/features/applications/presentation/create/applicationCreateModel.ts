@@ -3,6 +3,8 @@ import {
   currencyCatalog,
   type CompensationRange,
   type CreateApplicationInput,
+  type UpdateApplicationInput,
+  updateApplicationInputSchema,
 } from '@palea/contracts';
 import { z } from 'zod';
 
@@ -12,7 +14,7 @@ const optionalAmount = z
   .regex(/^\d+(?:[.,]\d+)?$/, 'validation.salary.format')
   .or(z.literal(''));
 
-export const applicationCreateFormSchema = z
+export const applicationEditableFormSchema = z
   .object({
     companyName: z
       .string()
@@ -25,6 +27,16 @@ export const applicationCreateFormSchema = z
       .min(1, 'validation.role.required')
       .max(120, 'validation.role.max'),
     appliedOn: z.iso.date('validation.date.invalid').nullable(),
+    url: z
+      .string()
+      .trim()
+      .max(2048, 'validation.url.max')
+      .refine(
+        (value) => !value || /^https?:\/\//i.test(value),
+        'validation.url.invalid',
+      ),
+    location: z.string().trim().max(200, 'validation.location.max'),
+    schedule: z.string().trim().max(200, 'validation.schedule.max'),
     jobDescriptionHtml: z.string().max(100_000, 'validation.description.max'),
     workMode: z.enum(['remote', 'hybrid', 'onsite', 'unspecified']),
     commitment: z.enum(['full_time', 'part_time', 'unspecified']),
@@ -46,7 +58,6 @@ export const applicationCreateFormSchema = z
     offeredMaximum: optionalAmount,
     offeredCurrency: z.string().length(3),
     offeredPeriod: z.enum(['hour', 'day', 'week', 'month', 'year']),
-    privateNotes: z.string().max(10_000, 'validation.notes.max'),
   })
   .superRefine((values, context) => {
     const record = values as Record<string, string>;
@@ -85,14 +96,26 @@ export const applicationCreateFormSchema = z
     }
   });
 
+export const applicationCreateFormSchema = applicationEditableFormSchema.extend(
+  {
+    privateNotes: z.string().max(10_000, 'validation.notes.max'),
+  },
+);
+
 export type ApplicationCreateFormValues = z.infer<
   typeof applicationCreateFormSchema
+>;
+export type ApplicationEditableFormValues = z.infer<
+  typeof applicationEditableFormSchema
 >;
 
 export const applicationCreateDefaults: ApplicationCreateFormValues = {
   companyName: '',
   role: '',
   appliedOn: null,
+  url: '',
+  location: '',
+  schedule: '',
   jobDescriptionHtml: '',
   workMode: 'unspecified',
   commitment: 'unspecified',
@@ -121,6 +144,9 @@ export function toCreateApplicationInput(
     companyName: values.companyName,
     role: values.role,
     appliedOn: values.appliedOn,
+    url: values.url || null,
+    location: values.location || null,
+    schedule: values.schedule || null,
     workMode: values.workMode,
     commitment: values.commitment,
     contractType: values.contractType,
@@ -130,6 +156,42 @@ export function toCreateApplicationInput(
       ? { source: 'manual', html: values.jobDescriptionHtml }
       : null,
     privateNotes: values.privateNotes,
+    expectedCompensation: toCompensation(
+      values.expectedMinimum,
+      values.expectedMaximum,
+      values.expectedCurrency,
+      values.expectedPeriod,
+    ),
+    offeredCompensation: toCompensation(
+      values.offeredMinimum,
+      values.offeredMaximum,
+      values.offeredCurrency,
+      values.offeredPeriod,
+    ),
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  });
+}
+
+export function toUpdateApplicationInput(
+  applicationId: string,
+  values: ApplicationEditableFormValues,
+): UpdateApplicationInput {
+  return updateApplicationInputSchema.parse({
+    applicationId,
+    companyName: values.companyName,
+    role: values.role,
+    appliedOn: values.appliedOn,
+    url: values.url || null,
+    location: values.location || null,
+    schedule: values.schedule || null,
+    workMode: values.workMode,
+    commitment: values.commitment,
+    contractType: values.contractType,
+    durationType: values.durationType,
+    resumeId: values.resumeId,
+    jobDescription: values.jobDescriptionHtml.trim()
+      ? { source: 'manual', html: values.jobDescriptionHtml }
+      : null,
     expectedCompensation: toCompensation(
       values.expectedMinimum,
       values.expectedMaximum,
@@ -178,6 +240,15 @@ export function majorToMinor(value: string, exponent: number) {
   if (BigInt(minor) > 9223372036854775807n)
     throw new Error('validation.salary.range');
   return minor;
+}
+
+export function minorToMajor(value: string | null, exponent: number) {
+  if (!value) return '';
+  const digits = value.padStart(exponent + 1, '0');
+  if (!exponent) return digits;
+  const whole = digits.slice(0, -exponent);
+  const fraction = digits.slice(-exponent).replace(/0+$/, '');
+  return fraction ? `${whole}.${fraction}` : whole;
 }
 
 export function todayLocal(now = new Date()) {

@@ -17,6 +17,9 @@ const applications = {
   'create.datePlaceholder': 'Sin fecha',
   'create.dateHelp':
     'Es opcional mientras la postulación permanezca en Borrador.',
+  'create.jobUrl': 'URL de la oferta',
+  'create.location': 'Ubicación',
+  'create.schedule': 'Horario',
   'create.clearDate': 'Quitar fecha',
   'create.today': 'Hoy',
   'create.description': 'Descripción del puesto',
@@ -118,6 +121,14 @@ const applications = {
   'detail.resources': 'Recursos',
   'detail.unspecified': 'Sin especificar',
   'detail.changeStatus': 'Cambiar estado',
+  'detail.edit': 'Editar postulación',
+  'edit.title': 'Editar postulación',
+  'edit.subtitle':
+    'Actualizá los datos de la oportunidad sin perder tu progreso.',
+  'edit.save': 'Guardar cambios',
+  'edit.success': 'Postulación actualizada.',
+  'edit.error':
+    'No pudimos actualizar la postulación. Tus cambios siguen aquí.',
   'detail.download': 'Descargar CV',
   'detail.downloadError': 'No pudimos descargar el CV.',
   'detail.chooseResume': 'Elegir CV asociado',
@@ -213,6 +224,10 @@ const applications = {
   'validation.role.required': 'Ingresá el rol.',
   'validation.role.max': 'El rol no puede superar 120 caracteres.',
   'validation.date.invalid': 'Ingresá una fecha válida.',
+  'validation.url.max': 'La URL no puede superar 2.048 caracteres.',
+  'validation.url.invalid': 'Ingresá una URL HTTP(S) válida.',
+  'validation.location.max': 'La ubicación no puede superar 200 caracteres.',
+  'validation.schedule.max': 'El horario no puede superar 200 caracteres.',
   'validation.description.max':
     'La descripción no puede superar 100.000 caracteres.',
   'validation.notes.max':
@@ -249,7 +264,8 @@ const applications = {
   'error.delete': 'No pudimos eliminar la postulación.',
   'delete.title': '¿Eliminar postulación?',
   'delete.message':
-    'Esta acción eliminará la postulación y sus datos asociados.',
+    'Esta acción eliminará etapas, nota privada, recursos, compensaciones y skills requeridas. Tu CV seguirá en Biblioteca.',
+  'delete.pending': 'Eliminando postulación…',
   'delete.cancel': 'Cancelar',
   'delete.confirm': 'Eliminar',
   'feedback.moved': 'Postulación actualizada.',
